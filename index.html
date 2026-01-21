@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1 HUNDRED | The Fashion Marketplace</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#111111',
+                        'brand-grey': '#f8f8f8',
+                        'brand-mid-grey': '#999999',
+                        'electric-blue': '#111111', // Changed to black
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    spacing: {
+                        '128': '32rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Utilities */
+        body {
+            background-color: #ffffff;
+            color: #111111;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hide Scrollbar for cleaner aesthetic */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #111111;
+        }
+
+        /* Typography Utilities */
+        .clip-text-parent { overflow: hidden; }
+        .clip-text-child { transform: translateY(100%); }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #111111;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        #loader img {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Image Aspects */
+        .aspect-portrait { aspect-ratio: 1/1; }
+
+        /* Grid Layouts */
+        .marketplace-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .marketplace-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+
+        /* Animations */
+        .hover-lift { transition: transform 0.3s ease; }
+        .hover-lift:hover { transform: translateY(-4px); }
+
+        .magnetic-btn { display: inline-block; }
+
+        /* SVG Line Drawing */
+        .draw-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- LOADER -->
+    <div id="loader">
+        <img src="logo.svg" alt="1 HUNDRED" class="h-40 w-auto">
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-brand-black text-white px-6 py-3 rounded-full shadow-xl z-[60] flex items-center gap-3 translate-y-24 transition-transform duration-300 pointer-events-none">
+        <i data-lucide="check-circle" class="w-4 h-4 text-electric-blue"></i>
+        <span id="toast-msg" class="text-sm font-medium">Added to bag</span>
+    </div>
+
+    <!-- GLOBAL HEADER -->
+    <header class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 transition-all duration-300" id="main-header">
+        <div class="max-w-[1920px] mx-auto px-4 h-16 flex items-center justify-between">
+            <!-- Left: Logo & Nav -->
+            <div class="flex items-center gap-8">
+                <a href="#" class="flex items-center" onclick="lenis.scrollTo(0)">
+                    <img src="logo.svg" alt="1 HUNDRED" class="h-8 w-auto">
+                </a>
+                <nav class="hidden md:flex gap-6 text-sm font-medium uppercase tracking-wide">
+                    <div class="group relative cursor-pointer py-5">
+                        <span class="hover:text-electric-blue transition-colors">Women</span>
+                        <!-- Mega Menu Demo -->
+                        <div class="absolute top-full left-0 w-[800px] bg-white border border-gray-100 shadow-xl p-8 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 grid grid-cols-4 gap-6 z-50">
+                            <div>
+                                <h4 class="font-bold mb-4 border-b border-black pb-1">New In</h4>
+                                <ul class="space-y-2 text-gray-500">
+                                    <li class="hover:text-electric-blue cursor-pointer">View All</li>
+                                    <li class="hover:text-electric-blue cursor-pointer">Clothing</li>
+                                    <li class="hover:text-electric-blue cursor-pointer">Shoes</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold mb-4 border-b border-black pb-1">Clothing</h4>
+                                <ul class="space-y-2 text-gray-500">
+                                    <li class="hover:text-electric-blue cursor-pointer">Dresses</li>
+                                    <li class="hover:text-electric-blue cursor-pointer">Tops</li>
+                                    <li class="hover:text-electric-blue cursor-pointer">Denim</li>
+                                </ul>
+                            </div>
+                            <div class="col-span-2 bg-gray-100 p-4 flex items-end relative overflow-hidden group/card">
+                                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover/card:scale-105 transition-transform duration-700">
+                                <span class="relative z-10 font-bold text-xl text-white">New Season Drop</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="hover:text-electric-blue transition-colors py-5">Men</a>
+                    <a href="#" class="hover:text-electric-blue transition-colors py-5 text-electric-blue">New In</a>
+                    <a href="#" class="hover:text-electric-blue transition-colors py-5 text-red-500">Sale</a>
+                </nav>
+            </div>
+
+            <!-- Center: Search (Typeahead) -->
+            <div class="hidden lg:block relative flex-1 max-w-md mx-8">
+                <div class="relative group">
+                    <input type="text" placeholder="Search for items, brands..." class="w-full bg-brand-grey border-none rounded-full py-2 px-10 text-sm focus:ring-2 focus:ring-electric-blue transition-shadow placeholder-gray-400">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    <!-- Typeahead Dropdown -->
+                    <div class="absolute top-full left-0 w-full bg-white shadow-lg rounded-b-lg mt-1 p-4 hidden group-focus-within:block border border-gray-100">
+                        <div class="text-xs text-gray-400 font-bold uppercase mb-2">Trending</div>
+                        <ul class="text-sm space-y-2">
+                            <li class="flex justify-between hover:bg-gray-50 p-1 cursor-pointer"><span>Oversized Blazer</span> <span class="text-gray-300">Category</span></li>
+                            <li class="flex justify-between hover:bg-gray-50 p-1 cursor-pointer"><span>Cargo Pants</span> <span class="text-gray-300">Category</span></li>
+                            <li class="flex justify-between hover:bg-gray-50 p-1 cursor-pointer"><span>Nike Dunk</span> <span class="text-gray-300">Brand</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-6">
+                <button class="relative hover:text-electric-blue transition-colors" aria-label="Account"><i data-lucide="user" class="w-5 h-5"></i></button>
+                <button class="relative hover:text-electric-blue transition-colors" aria-label="Wishlist">
+                    <i data-lucide="heart" class="w-5 h-5"></i>
+                    <span id="wishlist-count" class="absolute -top-1 -right-2 bg-brand-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+                <button id="cart-trigger" class="relative hover:text-electric-blue transition-colors" aria-label="Cart">
+                    <i data-lucide="shopping-bag" class="w-5 h-5" id="cart-icon"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-2 bg-electric-blue text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center opacity-0 transform scale-0 transition-all duration-300">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- STORE HUD (Persistent) -->
+    <aside class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 hidden md:flex flex-col items-end gap-1 pointer-events-none mix-blend-difference text-white">
+        <div class="text-[10px] font-bold tracking-widest uppercase mb-2 opacity-50">Chapter <span id="hud-number">01</span>/12</div>
+        <div class="h-32 w-[1px] bg-white/20 relative">
+            <div id="hud-progress" class="absolute top-0 left-0 w-full bg-white h-0 transition-all duration-100 ease-out"></div>
+        </div>
+        <div id="hud-title" class="text-xs font-bold uppercase tracking-widest mt-2 origin-right rotate-90 translate-y-8 translate-x-2">Campaign</div>
+        <div id="hud-icon" class="mt-8 transition-all duration-500">
+            <i data-lucide="tag" class="w-4 h-4"></i>
+        </div>
+    </aside>
+
+    <main id="scroll-container">
+
+        <!-- CHAPTER 01: CAMPAIGN OPEN -->
+        <section id="ch1" class="relative overflow-hidden" data-hud="Campaign" data-icon="flag">
+            <!-- Video Container - Will be pinned by GSAP -->
+            <div id="hero-video-container" class="w-full h-screen overflow-hidden flex items-center justify-center bg-black">
+                <video id="hero-video" class="min-w-full min-h-full w-auto h-auto object-cover" muted playsinline>
+                    <source src="hero-video.mp4" type="video/mp4">
+                </video>
+                <div class="absolute inset-0 bg-black/20"></div>
+
+                <!-- Text Content - Appears after video scroll -->
+                <div id="hero-content" class="absolute inset-0 flex items-center justify-center z-10 opacity-0 pointer-events-none transition-opacity duration-700">
+                    <div class="text-center text-white px-4">
+                        <div class="overflow-hidden mb-4">
+                            <h2 class="text-sm font-bold tracking-[0.2em] uppercase">Spring / Summer 2026</h2>
+                        </div>
+                        <div class="mb-8 flex justify-center">
+                            <img src="logo.svg" alt="1 HUNDRED" class="h-32 md:h-48 w-auto" style="filter: brightness(0) invert(1);">
+                        </div>
+                        <div class="flex gap-4 justify-center">
+                            <button onclick="scrollToShop()" class="bg-white text-black px-8 py-3 font-bold uppercase text-sm tracking-wider hover:bg-electric-blue hover:text-white transition-colors">Shop New In</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="scroll-indicator" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-2">
+                    <p class="text-white text-xs uppercase tracking-widest font-bold">Scroll Down</p>
+                    <div class="w-px h-8 bg-white"></div>
+                    <i data-lucide="arrow-down" class="w-6 h-6 text-white animate-bounce"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 02: TREND RAIL (Horizontal) -->
+        <section id="ch2" class="h-screen bg-brand-black text-white overflow-hidden flex flex-col justify-center relative z-50" data-hud="Trends" data-icon="zap">
+            <div class="px-8 mb-8">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-electric-blue mb-2">02 — Trending Now</h3>
+                <h2 class="text-4xl font-display font-bold">Our Collection</h2>
+            </div>
+
+            <div class="trend-wrapper w-full overflow-hidden">
+                <div class="trend-rail flex gap-0.5 pl-8">
+                    <!-- Trend Cards Generated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 03: CATEGORY GRID -->
+        <section id="ch3" class="n-h-screen bg-white py-24 px-4 relative z-50" data-hud="Categories" data-icon="grid">
+            <div class="max-w-[1920px] mx-auto">
+                <div class="flex items-end justify-between mb-12 border-b border-gray-200 pb-4">
+                    <h2 class="text-4xl font-display font-bold uppercase text-brand-black">Shop By Category</h2>
+                    <a href="#" class="text-sm font-bold uppercase hover:text-electric-blue">View All Categories</a>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="category-grid">
+                    <!-- Categories injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 04: PINNED FILTER ENGINE -->
+        <section id="ch4" class="h-screen bg-brand-grey flex items-center justify-center relative overflow-hidden z-50" data-hud="Filter Engine" data-icon="sliders">
+            <div class="absolute inset-0 pointer-events-none">
+                <svg id="filter-path-svg" class="w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="none">
+                    <path id="filter-path" d="M -50 300 Q 250 100 500 300 T 1050 300" fill="none" stroke="#e5e7eb" stroke-width="2"/>
+                    <circle id="filter-dot" cx="0" cy="0" r="6" fill="#111111" />
+                </svg>
+            </div>
+
+            <div class="text-center z-10 max-w-2xl px-4">
+                <h2 class="text-5xl font-display font-bold uppercase mb-6 filter-title opacity-0 translate-y-10">Refine Your Style</h2>
+                <div class="bg-white p-8 shadow-2xl rounded-xl filter-card opacity-0 scale-90">
+                    <div class="flex flex-wrap justify-center gap-3 mb-8" id="demo-filters">
+                        <button class="px-4 py-2 rounded-full border border-gray-200 text-sm font-bold hover:border-electric-blue hover:text-electric-blue transition-colors">Size: M</button>
+                        <button class="px-4 py-2 rounded-full border border-gray-200 text-sm font-bold hover:border-electric-blue hover:text-electric-blue transition-colors">Color: Black</button>
+                        <button class="px-4 py-2 rounded-full border border-gray-200 text-sm font-bold hover:border-electric-blue hover:text-electric-blue transition-colors">Price: £50-£100</button>
+                        <button class="px-4 py-2 rounded-full border border-gray-200 text-sm font-bold hover:border-electric-blue hover:text-electric-blue transition-colors">Brand: 1 HUNDRED</button>
+                    </div>
+                    <button class="bg-brand-black text-white w-full py-4 font-bold uppercase tracking-widest hover:bg-electric-blue transition-colors">Apply Filters</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 05: PLP MAIN GRID -->
+        <section id="ch5" class="bg-white py-12 px-4 min-h-[150vh] relative z-50" data-hud="Collection" data-icon="shopping-bag">
+            <div class="max-w-[1920px] mx-auto flex gap-12">
+                <!-- Sidebar -->
+                <aside class="w-64 hidden lg:block sticky top-24 h-[calc(100vh-100px)] overflow-y-auto pr-4">
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="font-bold uppercase text-sm mb-4">Sort By</h3>
+                            <select class="w-full border-gray-200 rounded text-sm p-2 bg-gray-50">
+                                <option>Recommended</option>
+                                <option>Price: Low to High</option>
+                                <option>Price: High to Low</option>
+                                <option>Newest In</option>
+                            </select>
+                        </div>
+                        <div>
+                            <h3 class="font-bold uppercase text-sm mb-4">Category</h3>
+                            <ul class="space-y-2 text-sm text-gray-500">
+                                <li class="flex items-center gap-2"><input type="checkbox" checked> <span>All Items</span></li>
+                                <li class="flex items-center gap-2"><input type="checkbox"> <span>Clothing</span></li>
+                                <li class="flex items-center gap-2"><input type="checkbox"> <span>Accessories</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Grid -->
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-gray-400 text-sm font-bold"><span class="text-brand-black">142</span> Styles Found</span>
+                        <button class="lg:hidden text-sm font-bold uppercase underline">Filter & Sort</button>
+                    </div>
+
+                    <div class="marketplace-grid" id="product-grid">
+                        <!-- Products Rendered by JS -->
+                    </div>
+
+                    <div class="mt-16 flex justify-center">
+                        <button class="border-b-2 border-black pb-1 text-xl font-display font-bold uppercase tracking-wide hover:text-electric-blue hover:border-electric-blue transition-colors">Load More</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 06: QUICK VIEW MODAL (Hidden by default, structure for logical flow) -->
+        <!-- Note: This is usually a modal, but for the scroll story, we will simulate a "focused" product section -->
+
+        <!-- CHAPTER 07: PDP FEATURED ITEM -->
+        <section id="ch7" class="h-screen bg-brand-grey flex items-center justify-center py-12 relative z-50" data-hud="Featured" data-icon="star">
+            <div class="max-w-6xl w-full mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row h-[80vh] md:h-[600px]">
+                <div class="md:w-1/2 h-80 md:h-full relative group cursor-crosshair overflow-hidden bg-gray-50">
+                    <img src="product-featured.png" class="w-full h-full object-contain md:object-cover transition-transform duration-700 group-hover:scale-110" alt="Featured Product">
+                    <div class="absolute bottom-4 left-4 bg-white/90 px-3 py-1 text-xs font-bold uppercase tracking-widest">Best Seller</div>
+                </div>
+                <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-electric-blue/5 rounded-bl-full"></div>
+                    <h3 class="text-electric-blue font-bold uppercase text-xs tracking-widest mb-2">Editor's Pick</h3>
+                    <h2 class="text-2xl md:text-4xl font-display font-bold uppercase mb-4 leading-tight">Money Vision Tee</h2>
+                    <p class="text-gray-500 mb-6 leading-relaxed">Bold statement piece featuring striking graphic artwork. Premium heavyweight cotton with intricate face tattoo design and 100 bill blindfold detail.</p>
+                    <div class="text-2xl font-bold mb-6">£45.00</div>
+
+                    <div class="mb-8">
+                        <div class="flex justify-between text-xs font-bold uppercase mb-2">
+                            <span>Select Size</span>
+                            <span class="underline cursor-pointer">Size Guide</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="w-10 h-10 border border-gray-200 hover:border-black flex items-center justify-center text-sm font-bold">S</button>
+                            <button class="w-10 h-10 border-black bg-black text-white flex items-center justify-center text-sm font-bold">M</button>
+                            <button class="w-10 h-10 border border-gray-200 hover:border-black flex items-center justify-center text-sm font-bold">L</button>
+                            <button class="w-10 h-10 border border-gray-200 text-gray-300 line-through cursor-not-allowed flex items-center justify-center text-sm font-bold">XL</button>
+                        </div>
+                    </div>
+
+                    <button class="w-full bg-electric-blue text-white py-4 font-bold uppercase tracking-widest hover:bg-gray-900 transition-colors btn-add-main">Add to Bag</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 09: SOCIAL PROOF -->
+        <section id="ch9" class="bg-white py-24 px-4 overflow-hidden relative z-50" data-hud="Community" data-icon="users">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl font-display font-bold uppercase mb-12 text-center">Check Out Our Socials</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="social-grid">
+                    <!-- Images -->
+                    <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden relative group">
+                        <img src="social-instagram.png" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="instagram" class="text-white"></i>
+                        </div>
+                    </div>
+                    <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden relative group">
+                        <img src="social-tiktok.png" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- Stats -->
+                    <div class="col-span-2 bg-brand-grey rounded-lg p-8 flex flex-col justify-center items-center text-center">
+                        <div class="text-5xl font-display font-bold text-electric-blue mb-2 count-up">4.9/5</div>
+                        <div class="flex gap-1 mb-4 text-electric-blue">
+                            <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                            <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                            <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                            <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                            <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                        </div>
+                        <p class="text-sm font-medium text-gray-500">Based on 12,400+ verified reviews.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 10: TRUST -->
+        <section id="ch10" class="border-t border-gray-100 py-16 bg-white relative z-50" data-hud="Service" data-icon="shield">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+                <div class="flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-full bg-brand-grey flex items-center justify-center mb-4 group-hover:bg-electric-blue group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="truck" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold uppercase mb-2">Next Day Delivery</h3>
+                    <p class="text-sm text-gray-500">Order by 10pm for next day.</p>
+                </div>
+                <div class="flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-full bg-brand-grey flex items-center justify-center mb-4 group-hover:bg-electric-blue group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold uppercase mb-2">Free Returns</h3>
+                    <p class="text-sm text-gray-500">Return within 28 days for free.</p>
+                </div>
+                <div class="flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-full bg-brand-grey flex items-center justify-center mb-4 group-hover:bg-electric-blue group-hover:text-white transition-colors duration-300">
+                        <i data-lucide="credit-card" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold uppercase mb-2">Secure Payment</h3>
+                    <p class="text-sm text-gray-500">Encrypted payment processing.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 11: PINNED CHECKOUT PROMPT -->
+        <section id="ch11" class="h-[80vh] flex items-center justify-center bg-white px-4 relative z-50" data-hud="Checkout" data-icon="credit-card">
+            <div class="bg-white max-w-lg w-full p-8 shadow-xl rounded-xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-electric-blue"></div>
+                <h2 class="text-2xl font-display font-bold uppercase mb-6 flex justify-between items-center">
+                    Your Bag
+                    <span class="text-sm font-sans font-normal text-gray-500">2 Items</span>
+                </h2>
+
+                <div class="space-y-4 mb-8">
+                    <!-- Mock Cart Items -->
+                    <div class="flex gap-4 border-b border-gray-100 pb-4 cart-item-anim opacity-0 translate-x-4">
+                        <div class="w-16 h-20 bg-gray-200 rounded">
+                            <img src="product-tshirt.png" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between font-bold text-sm">
+                                <span>1 HUNDRED Tee</span>
+                                <span>£45.00</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Size: M | Cream</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 border-b border-gray-100 pb-4 cart-item-anim opacity-0 translate-x-4">
+                        <div class="w-16 h-20 bg-gray-200 rounded">
+                             <img src="product-tshirt-2.png" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between font-bold text-sm">
+                                <span>1 HUNDRED Pop Art Tee</span>
+                                <span>£45.00</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Size: L | Cream</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center font-bold text-lg mb-6 subtotal-anim opacity-0">
+                    <span>Subtotal</span>
+                    <span>£90.00</span>
+                </div>
+
+                <button class="w-full bg-brand-black text-white py-4 font-bold uppercase tracking-widest hover:bg-electric-blue transition-colors shadow-lg scale-95 checkout-btn-anim">Secure Checkout</button>
+            </div>
+        </section>
+
+        <!-- CHAPTER 12: FINAL CONVERSION -->
+        <section id="ch12" class="bg-white text-black py-24 relative overflow-hidden z-50" data-hud="1 HUNDRED" data-icon="check-circle">
+            <!-- Footer Content -->
+            <div class="max-w-7xl mx-auto px-4 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-24">
+                    <div>
+                        <h4 class="font-bold uppercase mb-6 tracking-wider">Help & Info</h4>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li><a href="#" class="hover:text-black transition-colors">Help Centre</a></li>
+                            <li><a href="#" class="hover:text-black transition-colors">Delivery & Returns</a></li>
+                            <li><a href="#" class="hover:text-black transition-colors">Track Order</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold uppercase mb-6 tracking-wider">About Us</h4>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li><a href="#" class="hover:text-black transition-colors">Careers</a></li>
+                            <li><a href="#" class="hover:text-black transition-colors">Investors</a></li>
+                            <li><a href="#" class="hover:text-black transition-colors">Sustainability</a></li>
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <h4 class="font-bold uppercase mb-6 tracking-wider">Join The List</h4>
+                        <p class="text-gray-600 text-sm mb-6">Get 15% off your first order and exclusive access to drops.</p>
+                        <div class="flex border-b border-black pb-2">
+                            <input type="email" placeholder="Email Address" class="bg-transparent w-full focus:outline-none text-black placeholder-gray-400">
+                            <button class="font-bold uppercase text-sm hover:text-electric-blue">Join</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-between items-center border-t border-gray-200 pt-8">
+                    <div class="mb-4 md:mb-0">
+                        <img src="logo.svg" alt="1 HUNDRED" class="h-12 w-auto">
+                    </div>
+                    <div class="flex gap-6 text-gray-600 text-sm">
+                        <a href="#" class="hover:text-black transition-colors">Privacy</a>
+                        <a href="#" class="hover:text-black transition-colors">Ts&Cs</a>
+                    </div>
+                    <div class="text-gray-500 text-xs mt-4 md:mt-0">© 2026 1 HUNDRED Ltd</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- UI COMPONENTS: CART DRAWER (Overlay) -->
+    <div id="cart-drawer-overlay" class="fixed inset-0 bg-black/50 z-[60] opacity-0 invisible transition-all duration-300 backdrop-blur-sm"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-500 shadow-2xl flex flex-col">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+            <h2 class="font-display font-bold uppercase text-xl">Bag (2)</h2>
+            <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Static Demo Items for Drawer -->
+           <div class="flex gap-4">
+                <img src="product-tshirt.png" class="w-20 h-24 object-cover rounded bg-gray-100">
+                <div class="flex-1">
+                    <div class="flex justify-between mb-1">
+                        <h3 class="font-bold text-sm">1 HUNDRED Tee</h3>
+                        <span class="font-bold text-sm">£45.00</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">Cream | M</p>
+                    <div class="flex items-center gap-3">
+                         <div class="border border-gray-200 flex rounded">
+                             <button class="px-2 text-xs">-</button>
+                             <span class="px-2 text-xs font-bold py-1">1</span>
+                             <button class="px-2 text-xs">+</button>
+                         </div>
+                         <button class="text-xs text-gray-400 underline hover:text-red-500">Remove</button>
+                    </div>
+                </div>
+            </div>
+           <div class="flex gap-4">
+                <img src="product-tshirt-2.png" class="w-20 h-24 object-cover rounded bg-gray-100">
+                <div class="flex-1">
+                    <div class="flex justify-between mb-1">
+                        <h3 class="font-bold text-sm">1 HUNDRED Pop Art Tee</h3>
+                        <span class="font-bold text-sm">£45.00</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">Cream | L</p>
+                    <div class="flex items-center gap-3">
+                         <div class="border border-gray-200 flex rounded">
+                             <button class="px-2 text-xs">-</button>
+                             <span class="px-2 text-xs font-bold py-1">1</span>
+                             <button class="px-2 text-xs">+</button>
+                         </div>
+                         <button class="text-xs text-gray-400 underline hover:text-red-500">Remove</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 border-t border-gray-100 bg-gray-50">
+            <div class="flex justify-between font-bold text-lg mb-4">
+                <span>Subtotal</span>
+                <span>£90.00</span>
+            </div>
+            <button class="w-full bg-electric-blue text-white py-4 font-bold uppercase tracking-widest hover:bg-gray-900 transition-colors">Checkout</button>
+        </div>
+    </div>
+
+    <!-- QUICK VIEW MODAL (Overlay) -->
+    <div id="qv-overlay" class="fixed inset-0 bg-black/80 z-[80] opacity-0 invisible flex items-center justify-center p-4 transition-all duration-300">
+        <div id="qv-modal" class="bg-white w-full max-w-4xl h-[600px] rounded-lg shadow-2xl flex overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="w-1/2 bg-gray-200 h-full relative">
+                <img id="qv-image" src="" class="w-full h-full object-cover">
+            </div>
+            <div class="w-1/2 p-8 flex flex-col relative overflow-y-auto">
+                <button id="qv-close" class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <div class="text-electric-blue text-xs font-bold uppercase tracking-widest mb-2">New Season</div>
+                <h2 id="qv-title" class="text-2xl font-display font-bold uppercase mb-2">Product Title</h2>
+                <div id="qv-price" class="text-xl font-bold mb-6">£0.00</div>
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">A wardrobe essential designed for the modern individual. Features premium materials and a relaxed fit.</p>
+                <div class="mt-auto">
+                    <button class="w-full bg-black text-white py-3 font-bold uppercase tracking-widest hover:bg-electric-blue transition-colors mb-3 btn-add-qv">Add to Bag</button>
+                    <button class="w-full border border-gray-200 text-black py-3 font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors">View Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & STATE ---
+        const products = [
+            { id: 1, title: "Symbol Vision Tee", price: "£45.00", category: "Tops", image: "product-1.png" },
+            { id: 2, title: "Money Vision Tee", price: "£45.00", category: "Tops", image: "product-2.png" },
+            { id: 3, title: "Pop Art Tee", price: "£45.00", category: "Tops", image: "product-3.png" },
+            { id: 4, title: "Cap Vision Tee", price: "£45.00", category: "Tops", image: "product-4.png" },
+            { id: 5, title: "Certified Boss Tee", price: "£45.00", category: "Tops", image: "product-5.png" },
+            { id: 6, title: "Gang Street Tee", price: "£45.00", category: "Tops", image: "product-6.png" },
+            { id: 7, title: "Classic Logo Tee", price: "£45.00", category: "Tops", image: "product-tshirt.png" },
+            { id: 8, title: "Pop Art Vision Tee", price: "£45.00", category: "Tops", image: "product-tshirt-2.png" },
+        ];
+
+        const trends = [
+            { title: "Cap Vision Hoodie", img: "trend-hoodie-woman.png" },
+            { title: "Symbol Vision", img: "trend-lifestyle.png" },
+            { title: "Street Essentials", img: "trend-hoodie.png" },
+            { title: "Urban Culture", img: "trend-urban-style.png" },
+            { title: "Pop Art Sunset", img: "trend-sunset-style.png" },
+        ];
+
+        const categories = ["Tops", "Hoodies", "Jackets", "Trousers", "Jumpers", "Accessories", "Shoes", "Sale"];
+
+        // --- RENDER FUNCTIONS ---
+        function initRender() {
+            // Render Trends
+            const trendContainer = document.querySelector('.trend-rail');
+            trends.forEach((t, i) => {
+                trendContainer.innerHTML += `
+                    <div class="trend-card w-[80vw] md:w-[30vw] h-[70vh] relative group flex-shrink-0 cursor-pointer overflow-hidden bg-gray-900 border-r border-white/10">
+                        <img src="${t.img}" class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500 scale-100 group-hover:scale-105 transition-transform" />
+                        <div class="absolute bottom-8 left-8">
+                            <h3 class="text-3xl font-display font-bold uppercase text-white mb-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100">${t.title}</h3>
+                            <button class="text-white text-xs font-bold uppercase tracking-widest border-b border-white pb-1 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-200">Shop Trend</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Render Categories
+            const catContainer = document.getElementById('category-grid');
+            categories.forEach(c => {
+                catContainer.innerHTML += `
+                    <div class="relative h-64 bg-gray-50 flex items-center justify-center group overflow-hidden cursor-pointer cat-tile">
+                        <div class="absolute inset-2 border border-black/5 scale-95 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 z-10 cat-border"></div>
+                        <h3 class="text-2xl font-display font-bold uppercase z-20 group-hover:-translate-y-2 transition-transform duration-300">${c}</h3>
+                        <span class="absolute bottom-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold uppercase tracking-widest text-electric-blue">Shop Now</span>
+                    </div>
+                `;
+            });
+
+            // Render Products (PLP)
+            const prodContainer = document.getElementById('product-grid');
+            products.forEach(p => {
+                prodContainer.innerHTML += `
+                    <div class="product-card group relative cursor-pointer" onclick="openQuickView(${p.id})">
+                        <div class="aspect-portrait bg-gray-200 relative overflow-hidden mb-4">
+                            <img src="${p.image}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy">
+                            <div class="absolute bottom-0 left-0 w-full p-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-white/90 backdrop-blur-sm flex justify-center gap-2">
+                                <button class="p-2 hover:text-electric-blue transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                <button class="p-2 hover:text-electric-blue transition-colors btn-add-card"><i data-lucide="shopping-bag" class="w-4 h-4"></i></button>
+                                <button class="p-2 hover:text-electric-blue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-sm uppercase truncate pr-4">${p.title}</h3>
+                                <span class="font-bold text-sm">${p.price}</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">${p.category}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            lucide.createIcons();
+        }
+
+        // --- ANIMATION SETUP (GSAP) ---
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, MotionPathPlugin);
+
+            // 0. Intro Loader
+            const loaderTl = gsap.timeline();
+            loaderTl.to("#loader img", { opacity: 0, duration: 0.5, delay: 0.8 })
+                    .to("#loader", { height: 0, duration: 0.8, ease: "power4.inOut" })
+                    .from("#main-header", { y: -100, duration: 0.5 }, "-=0.3");
+
+            // 0.5. Scroll-Driven Video Hero
+            const heroVideo = document.getElementById('hero-video');
+            const heroVideoContainer = document.getElementById('hero-video-container');
+            const heroContent = document.getElementById('hero-content');
+            const scrollIndicator = document.getElementById('scroll-indicator');
+
+            // Set video to first frame
+            heroVideo.currentTime = 0;
+
+            // Calculate scroll distance based on video duration (5 seconds)
+            // Using 500px per second of video for smooth playback
+            const videoDuration = 5; // 5 second video
+            const scrollPerSecond = 500; // pixels of scroll per second of video
+            const totalScrollDistance = videoDuration * scrollPerSecond; // 2500px total
+
+            ScrollTrigger.create({
+                trigger: "#ch1",
+                start: "top top",
+                end: () => `+=${totalScrollDistance}`,
+                pin: heroVideoContainer,
+                pinSpacing: true,
+                scrub: 0.5,
+                onUpdate: (self) => {
+                    // Update video playback based on scroll position
+                    if (heroVideo.duration) {
+                        heroVideo.currentTime = heroVideo.duration * self.progress;
+                    }
+
+                    // Show content when video is 80% through
+                    if (self.progress > 0.8) {
+                        heroContent.style.opacity = '1';
+                        heroContent.style.pointerEvents = 'auto';
+                    } else {
+                        heroContent.style.opacity = '0';
+                        heroContent.style.pointerEvents = 'none';
+                    }
+                }
+            });
+
+            // 1. HUD Progress & Logic
+            const sections = document.querySelectorAll("section");
+            const hudNumber = document.getElementById("hud-number");
+            const hudTitle = document.getElementById("hud-title");
+            const hudProgress = document.getElementById("hud-progress");
+            const hudIconContainer = document.getElementById("hud-icon");
+            const totalSections = sections.length;
+
+            sections.forEach((section, index) => {
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: "top center",
+                    onEnter: () => updateHud(index, section),
+                    onEnterBack: () => updateHud(index, section)
+                });
+            });
+
+            function updateHud(index, section) {
+                const num = (index + 1).toString().padStart(2, '0');
+                const title = section.dataset.hud;
+                const iconName = section.dataset.icon;
+
+                hudNumber.innerText = num;
+                hudTitle.innerText = title;
+                gsap.to(hudProgress, { height: `${((index + 1) / totalSections) * 100}%` });
+
+                // Icon Swap
+                hudIconContainer.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4"></i>`;
+                lucide.createIcons();
+                gsap.from(hudIconContainer, { rotationY: 360, duration: 0.5 });
+            }
+
+            // 2. Ch 2: Horizontal Scroll Trend Rail
+            const trendRail = document.querySelector(".trend-rail");
+            gsap.to(trendRail, {
+                x: () => -(trendRail.scrollWidth - window.innerWidth) + "px",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#ch2",
+                    pin: true,
+                    scrub: 1,
+                    end: () => "+=" + trendRail.scrollWidth
+                }
+            });
+
+            // 4. Ch 3: Category Stagger
+            ScrollTrigger.batch(".cat-tile", {
+                onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, stagger: 0.1, overwrite: true }),
+                start: "top 80%"
+            });
+
+            // 5. Ch 4: Filter Engine (MotionPath)
+            const tlFilter = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#ch4",
+                    pin: true,
+                    start: "top top",
+                    end: "+=100%",
+                    scrub: 1
+                }
+            });
+
+            tlFilter.to(".filter-title", { opacity: 1, y: 0, duration: 0.5 })
+                    .to("#filter-dot", {
+                        motionPath: {
+                            path: "#filter-path",
+                            align: "#filter-path",
+                            alignOrigin: [0.5, 0.5]
+                        },
+                        duration: 1,
+                        ease: "power1.inOut"
+                    })
+                    .to("#filter-path", { strokeDashoffset: 0, duration: 1 }, "<")
+                    .to(".filter-card", { opacity: 1, scale: 1, duration: 0.5 }, "-=0.5");
+
+            // 6. Ch 5: Product Batch Reveal
+            ScrollTrigger.batch(".product-card", {
+                onEnter: batch => gsap.from(batch, { autoAlpha: 0, y: 30, stagger: 0.1, overwrite: true }),
+                start: "top 85%"
+            });
+
+            // 7. Ch 7: PDP Feature (Pin)
+            ScrollTrigger.create({
+                trigger: "#ch7",
+                pin: true,
+                start: "top top",
+                end: "+=50%"
+            });
+
+            // 8. Ch 11: Cart Preview Animation
+            const tlCart = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#ch11",
+                    start: "center center",
+                    toggleActions: "play none none reverse"
+                }
+            });
+
+            tlCart.to(".cart-item-anim", { opacity: 1, x: 0, stagger: 0.2, duration: 0.5, ease: "back.out(1.7)" })
+                  .to(".subtotal-anim", { opacity: 1, duration: 0.3 })
+                  .to(".checkout-btn-anim", { scale: 1, duration: 0.3 });
+
+        });
+
+        // --- INTERACTION LOGIC ---
+
+        function scrollToShop() {
+            gsap.to(window, { duration: 1, scrollTo: "#ch3", ease: "power2.inOut" });
+        }
+
+        // Quick View Logic
+        const qvOverlay = document.getElementById('qv-overlay');
+        const qvModal = document.getElementById('qv-modal');
+
+        window.openQuickView = (id) => {
+            const product = products.find(p => p.id === id);
+            if(!product) return;
+
+            document.getElementById('qv-image').src = product.image;
+            document.getElementById('qv-title').innerText = product.title;
+            document.getElementById('qv-price').innerText = product.price;
+
+            qvOverlay.classList.remove('invisible', 'opacity-0');
+            qvModal.classList.remove('scale-95');
+            qvModal.classList.add('scale-100');
+        };
+
+        document.getElementById('qv-close').onclick = () => {
+            qvOverlay.classList.add('invisible', 'opacity-0');
+            qvModal.classList.add('scale-95');
+            qvModal.classList.remove('scale-100');
+        };
+
+        // Cart Drawer Logic
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartOverlay = document.getElementById('cart-drawer-overlay');
+        const cartTrigger = document.getElementById('cart-trigger');
+        const closeCart = document.getElementById('close-cart');
+
+        function toggleCart() {
+            const isOpen = !cartDrawer.classList.contains('translate-x-full');
+            if(isOpen) {
+                cartDrawer.classList.add('translate-x-full');
+                cartOverlay.classList.add('opacity-0', 'invisible');
+            } else {
+                cartDrawer.classList.remove('translate-x-full');
+                cartOverlay.classList.remove('opacity-0', 'invisible');
+            }
+        }
+
+        cartTrigger.onclick = toggleCart;
+        closeCart.onclick = toggleCart;
+        cartOverlay.onclick = toggleCart;
+
+        // Add to Bag Micro-interaction
+        const toast = document.getElementById('toast');
+        const cartCount = document.getElementById('cart-count');
+        let count = 0;
+
+        function addToBag() {
+            // Toast
+            toast.classList.remove('translate-y-24');
+            setTimeout(() => toast.classList.add('translate-y-24'), 3000);
+
+            // Cart Count Pulse
+            count++;
+            cartCount.innerText = count;
+            cartCount.classList.remove('hidden', 'opacity-0', 'scale-0');
+
+            // Icon Bounce
+            gsap.to("#cart-icon", { scale: 1.5, duration: 0.1, yoyo: true, repeat: 1 });
+        }
+
+        document.querySelectorAll('.btn-add-main, .btn-add-qv, .btn-add-card').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click
+                addToBag();
+            });
+        });
+
+        // Init
+        initRender();
+
+    </script>
+</body>
+</html>
