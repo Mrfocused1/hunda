@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth overflow-x-hidden">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -141,8 +141,7 @@
         }
 
         .ios-video-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
+            display: none;
         }
 
         .ios-video-overlay svg {
@@ -155,6 +154,16 @@
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* Scroll Lock - prevent scrolling during loader */
+        body.scroll-locked {
+            overflow: hidden !important;
+        }
+
+        /* Main scroll container overflow control */
+        #scroll-container {
+            overflow-x: hidden;
         }
     </style>
 </head>
@@ -750,15 +759,27 @@
             gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, MotionPathPlugin);
 
             // 0. Intro Loader
+            // Prevent scrolling during loader
+            document.body.classList.add('scroll-locked');
+
             const loaderTl = gsap.timeline({
                 onComplete: () => {
-                    // Ensure page is scrollable after loader completes
-                    document.body.style.overflow = 'auto';
+                    // Restore scrolling after loader completes
+                    document.body.classList.remove('scroll-locked');
+                    // Refresh ScrollTrigger after layout settles
+                    setTimeout(() => {
+                        ScrollTrigger.refresh();
+                    }, 100);
                 }
             });
 
-            // Prevent scrolling during loader
-            document.body.style.overflow = 'hidden';
+            // Fallback: ensure scroll is unlocked even if animation fails
+            setTimeout(() => {
+                if (document.body.classList.contains('scroll-locked')) {
+                    document.body.classList.remove('scroll-locked');
+                    ScrollTrigger.refresh();
+                }
+            }, 4000);
 
             loaderTl.to("#loader img", { opacity: 0, duration: 0.5, delay: 1.5 })
                     .to("#loader", { height: 0, duration: 0.8, ease: "power4.inOut" })
@@ -869,11 +890,13 @@
             function initVideoScroll() {
                 if (scrollTriggerInstance) return; // Prevent double initialization
 
-                // Set video to first frame
-                try {
-                    heroVideo.currentTime = 0;
-                } catch (e) {
-                    console.log('Initial seek failed:', e.message);
+                // Set video to first frame when possible
+                if (heroVideo.readyState >= 1) {
+                    try {
+                        heroVideo.currentTime = 0;
+                    } catch (e) {
+                        console.log('Initial seek failed:', e.message);
+                    }
                 }
 
                 scrollTriggerInstance = ScrollTrigger.create({
@@ -885,14 +908,15 @@
                     scrub: isIOS ? 1 : 0.5, // Slower scrub on iOS for smoother playback
                     onUpdate: (self) => {
                         // Update video playback based on scroll position
-                        if (videoReady && heroVideo.duration && !isNaN(heroVideo.duration)) {
+                        // Works even if video isn't fully ready yet
+                        if (heroVideo.readyState >= 2 && heroVideo.duration && !isNaN(heroVideo.duration)) {
                             const targetTime = heroVideo.duration * self.progress;
                             if (!isNaN(targetTime)) {
                                 seekVideoTo(targetTime);
                             }
                         }
 
-                        // Show content when video is 80% through
+                        // Show content when video is 80% through (works regardless of video state)
                         if (self.progress > 0.8) {
                             heroContent.style.opacity = '1';
                             heroContent.style.pointerEvents = 'auto';
@@ -922,7 +946,10 @@
 
             // Main video initialization function
             async function initializeVideo() {
-                // For iOS, try to activate video first
+                // Initialize ScrollTrigger immediately - video will work when ready
+                initVideoScroll();
+
+                // iOS-specific enhancement layer (doesn't block core animation)
                 if (isIOS) {
                     const activated = await activateVideoForIOS();
                     if (!activated) {
@@ -947,9 +974,7 @@
                             const success = await activateVideoForIOS();
                             if (success) {
                                 hideIOSOverlay();
-                                if (!videoReady && heroVideo.readyState >= 2) {
-                                    videoReady = true;
-                                }
+                                videoReady = true;
                             }
                         };
 
@@ -964,11 +989,9 @@
                     } else {
                         // Video activated successfully, hide overlay
                         hideIOSOverlay();
+                        videoReady = true;
                     }
                 }
-
-                // Initialize scroll regardless - it will work once video is ready
-                initVideoScroll();
             }
 
             // Event handlers for video readiness
@@ -1009,30 +1032,18 @@
                 console.error('Video error:', heroVideo.error?.message || 'Unknown error');
             });
 
-            // Check if video is already loaded
+            // Initialize immediately - video will work when ready
             if (heroVideo.readyState >= 2) {
-                console.log('Video already loaded');
                 videoReady = true;
-                initializeVideo();
-            } else if (heroVideo.readyState >= 1) {
-                // Metadata loaded but not enough data
-                console.log('Video metadata ready, waiting for data');
-                initializeVideo();
-            } else {
-                // Wait for metadata
-                heroVideo.addEventListener('loadedmetadata', () => {
-                    initializeVideo();
-                }, { once: true });
             }
+            initializeVideo();
 
-            // Fallback: Initialize after short delay if events don't fire
+            // Fallback: Try to force video load after short delay
             setTimeout(() => {
-                if (!scrollTriggerInstance) {
-                    console.log('Fallback initialization');
-                    heroVideo.load(); // Force reload
-                    initializeVideo();
+                if (!videoReady && heroVideo.readyState < 2) {
+                    heroVideo.load();
                 }
-            }, 2000);
+            }, 1000);
 
             // Additional iOS fallback - initialize on first scroll if not ready
             if (isIOS) {
@@ -1234,6 +1245,12 @@
 
         // Init
         initRender();
+
+        // Refresh ScrollTrigger after content renders
+        requestAnimationFrame(() => {
+            ScrollTrigger.refresh();
+            console.log('ScrollTrigger refreshed after content render');
+        });
 
     </script>
 </body>
