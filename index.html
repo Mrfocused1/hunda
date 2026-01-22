@@ -219,7 +219,7 @@
         <section id="ch1" class="relative overflow-hidden" data-hud="Campaign" data-icon="flag">
             <!-- Video Container - Will be pinned by GSAP -->
             <div id="hero-video-container" class="w-full h-screen overflow-hidden flex items-center justify-center bg-black">
-                <video id="hero-video" class="min-w-full min-h-full w-auto h-auto object-cover" muted playsinline>
+                <video id="hero-video" class="min-w-full min-h-full w-auto h-auto object-cover" muted playsinline webkit-playsinline preload="auto">
                     <source src="hero-video.mp4" type="video/mp4">
                 </video>
                 <div class="absolute inset-0 bg-black/20"></div>
@@ -701,38 +701,60 @@
             const heroContent = document.getElementById('hero-content');
             const scrollIndicator = document.getElementById('scroll-indicator');
 
-            // Set video to first frame
-            heroVideo.currentTime = 0;
-
             // Calculate scroll distance based on video duration (5 seconds)
             // Using 500px per second of video for smooth playback
             const videoDuration = 5; // 5 second video
             const scrollPerSecond = 500; // pixels of scroll per second of video
             const totalScrollDistance = videoDuration * scrollPerSecond; // 2500px total
 
-            ScrollTrigger.create({
-                trigger: "#ch1",
-                start: "top top",
-                end: () => `+=${totalScrollDistance}`,
-                pin: heroVideoContainer,
-                pinSpacing: true,
-                scrub: 0.5,
-                onUpdate: (self) => {
-                    // Update video playback based on scroll position
-                    if (heroVideo.duration) {
-                        heroVideo.currentTime = heroVideo.duration * self.progress;
-                    }
+            // Function to initialize video scroll
+            function initVideoScroll() {
+                // Set video to first frame
+                heroVideo.currentTime = 0;
 
-                    // Show content when video is 80% through
-                    if (self.progress > 0.8) {
-                        heroContent.style.opacity = '1';
-                        heroContent.style.pointerEvents = 'auto';
-                    } else {
-                        heroContent.style.opacity = '0';
-                        heroContent.style.pointerEvents = 'none';
+                ScrollTrigger.create({
+                    trigger: "#ch1",
+                    start: "top top",
+                    end: () => `+=${totalScrollDistance}`,
+                    pin: heroVideoContainer,
+                    pinSpacing: true,
+                    scrub: 0.5,
+                    onUpdate: (self) => {
+                        // Update video playback based on scroll position
+                        if (heroVideo.duration && !isNaN(heroVideo.duration)) {
+                            const targetTime = heroVideo.duration * self.progress;
+                            if (!isNaN(targetTime)) {
+                                heroVideo.currentTime = targetTime;
+                            }
+                        }
+
+                        // Show content when video is 80% through
+                        if (self.progress > 0.8) {
+                            heroContent.style.opacity = '1';
+                            heroContent.style.pointerEvents = 'auto';
+                        } else {
+                            heroContent.style.opacity = '0';
+                            heroContent.style.pointerEvents = 'none';
+                        }
                     }
+                });
+            }
+
+            // Wait for video metadata to load before initializing scroll
+            if (heroVideo.readyState >= 1) {
+                // Metadata already loaded
+                initVideoScroll();
+            } else {
+                // Wait for metadata to load
+                heroVideo.addEventListener('loadedmetadata', initVideoScroll);
+            }
+
+            // Fallback: Initialize after short delay if metadata doesn't load
+            setTimeout(() => {
+                if (heroVideo.readyState < 1) {
+                    heroVideo.load();
                 }
-            });
+            }, 1000);
 
             // 1. HUD Progress & Logic
             const sections = document.querySelectorAll("section");
