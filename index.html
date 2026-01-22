@@ -955,8 +955,8 @@
                     if (!activated) {
                         console.log('iOS video activation deferred - waiting for user interaction');
 
-                        // Show the tap-to-activate overlay on iOS
-                        showIOSOverlay();
+                        // Don't show overlay - let user interact naturally with the page
+                        // Video will activate on first scroll or touch
 
                         // Add one-time touch/click listener to activate video
                         const activateOnInteraction = async (e) => {
