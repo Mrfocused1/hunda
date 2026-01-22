@@ -113,6 +113,49 @@
             stroke-dasharray: 1000;
             stroke-dashoffset: 1000;
         }
+
+        /* iOS Video Scroll Support */
+        #hero-video-container {
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #hero-video {
+            /* Prevent iOS from showing native controls */
+            pointer-events: none;
+        }
+
+        /* iOS tap to activate overlay */
+        .ios-video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 15;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .ios-video-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .ios-video-overlay svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
     </style>
 </head>
 <body class="antialiased overflow-x-hidden">
@@ -219,10 +262,27 @@
         <section id="ch1" class="relative overflow-hidden" data-hud="Campaign" data-icon="flag">
             <!-- Video Container - Will be pinned by GSAP -->
             <div id="hero-video-container" class="w-full h-screen overflow-hidden flex items-center justify-center bg-black">
-                <video id="hero-video" class="min-w-full min-h-full w-auto h-auto object-cover" muted playsinline webkit-playsinline preload="auto">
-                    <source src="hero-video.mp4" type="video/mp4">
+                <video id="hero-video"
+                       class="min-w-full min-h-full w-auto h-auto object-cover"
+                       muted
+                       playsinline
+                       webkit-playsinline
+                       preload="auto"
+                       x-webkit-airplay="deny"
+                       disablePictureInPicture
+                       disableRemotePlayback>
+                    <source src="hero-video.mp4" type="video/mp4; codecs=avc1.42E01E,mp4a.40.2">
                 </video>
                 <div class="absolute inset-0 bg-black/20"></div>
+
+                <!-- iOS tap to activate overlay (hidden by default, shown only on iOS if needed) -->
+                <div id="ios-video-overlay" class="ios-video-overlay hidden" aria-label="Tap to activate video">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Tap to enable scroll animation</p>
+                </div>
 
                 <!-- Text Content - Appears after video scroll -->
                 <div id="hero-content" class="absolute inset-0 flex items-center justify-center z-10 opacity-0 pointer-events-none transition-opacity duration-700">
@@ -707,24 +767,119 @@
             const scrollPerSecond = 500; // pixels of scroll per second of video
             const totalScrollDistance = videoDuration * scrollPerSecond; // 2500px total
 
+            // iOS Detection
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+            // Video state tracking
+            let videoReady = false;
+            let videoActivated = false;
+            let lastSeekTime = 0;
+            let pendingSeek = null;
+            let scrollTriggerInstance = null;
+
+            // iOS requires video to be "activated" by playing first before seeking works
+            async function activateVideoForIOS() {
+                if (videoActivated) return true;
+
+                try {
+                    // On iOS, we need to play then immediately pause to "unlock" the video
+                    // This must happen in response to user interaction or page load
+                    heroVideo.muted = true; // Ensure muted for autoplay policy
+
+                    // Try to play - this activates the video on iOS
+                    const playPromise = heroVideo.play();
+
+                    if (playPromise !== undefined) {
+                        await playPromise;
+                        // Immediately pause after successful play
+                        heroVideo.pause();
+                        heroVideo.currentTime = 0;
+                        videoActivated = true;
+                        console.log('Video activated for iOS');
+                        return true;
+                    }
+                } catch (error) {
+                    console.log('Video activation failed:', error.message);
+                    // On iOS, if autoplay fails, we need user interaction
+                    return false;
+                }
+                return false;
+            }
+
+            // Debounced seeking for smoother scrubbing on iOS
+            function seekVideoTo(time) {
+                if (!videoReady || !heroVideo.duration || isNaN(heroVideo.duration)) return;
+
+                const clampedTime = Math.max(0, Math.min(time, heroVideo.duration));
+                if (isNaN(clampedTime)) return;
+
+                // On iOS, throttle seek operations to prevent stuttering
+                if (isIOS) {
+                    const now = Date.now();
+                    if (now - lastSeekTime < 50) {
+                        // Store pending seek and execute on next frame
+                        pendingSeek = clampedTime;
+                        return;
+                    }
+                    lastSeekTime = now;
+                }
+
+                // Use requestAnimationFrame for smoother seeking
+                requestAnimationFrame(() => {
+                    try {
+                        heroVideo.currentTime = clampedTime;
+                    } catch (e) {
+                        console.log('Seek error:', e.message);
+                    }
+                });
+            }
+
+            // Process pending seeks (for iOS throttling)
+            function processPendingSeek() {
+                if (pendingSeek !== null && videoReady) {
+                    const time = pendingSeek;
+                    pendingSeek = null;
+                    lastSeekTime = Date.now();
+                    try {
+                        heroVideo.currentTime = time;
+                    } catch (e) {
+                        console.log('Pending seek error:', e.message);
+                    }
+                }
+                requestAnimationFrame(processPendingSeek);
+            }
+
+            // Start processing pending seeks
+            if (isIOS) {
+                requestAnimationFrame(processPendingSeek);
+            }
+
             // Function to initialize video scroll
             function initVideoScroll() {
-                // Set video to first frame
-                heroVideo.currentTime = 0;
+                if (scrollTriggerInstance) return; // Prevent double initialization
 
-                ScrollTrigger.create({
+                // Set video to first frame
+                try {
+                    heroVideo.currentTime = 0;
+                } catch (e) {
+                    console.log('Initial seek failed:', e.message);
+                }
+
+                scrollTriggerInstance = ScrollTrigger.create({
                     trigger: "#ch1",
                     start: "top top",
                     end: () => `+=${totalScrollDistance}`,
                     pin: heroVideoContainer,
                     pinSpacing: true,
-                    scrub: 0.5,
+                    scrub: isIOS ? 1 : 0.5, // Slower scrub on iOS for smoother playback
                     onUpdate: (self) => {
                         // Update video playback based on scroll position
-                        if (heroVideo.duration && !isNaN(heroVideo.duration)) {
+                        if (videoReady && heroVideo.duration && !isNaN(heroVideo.duration)) {
                             const targetTime = heroVideo.duration * self.progress;
                             if (!isNaN(targetTime)) {
-                                heroVideo.currentTime = targetTime;
+                                seekVideoTo(targetTime);
                             }
                         }
 
@@ -740,21 +895,153 @@
                 });
             }
 
-            // Wait for video metadata to load before initializing scroll
-            if (heroVideo.readyState >= 1) {
-                // Metadata already loaded
-                initVideoScroll();
-            } else {
-                // Wait for metadata to load
-                heroVideo.addEventListener('loadedmetadata', initVideoScroll);
+            // iOS overlay element
+            const iosOverlay = document.getElementById('ios-video-overlay');
+
+            // Show/hide iOS overlay
+            function showIOSOverlay() {
+                if (iosOverlay) {
+                    iosOverlay.classList.remove('hidden');
+                }
             }
 
-            // Fallback: Initialize after short delay if metadata doesn't load
-            setTimeout(() => {
-                if (heroVideo.readyState < 1) {
-                    heroVideo.load();
+            function hideIOSOverlay() {
+                if (iosOverlay) {
+                    iosOverlay.classList.add('hidden');
                 }
-            }, 1000);
+            }
+
+            // Main video initialization function
+            async function initializeVideo() {
+                // For iOS, try to activate video first
+                if (isIOS) {
+                    const activated = await activateVideoForIOS();
+                    if (!activated) {
+                        console.log('iOS video activation deferred - waiting for user interaction');
+
+                        // Show the tap-to-activate overlay on iOS
+                        showIOSOverlay();
+
+                        // Add one-time touch/click listener to activate video
+                        const activateOnInteraction = async (e) => {
+                            // Prevent default to ensure we capture the interaction
+                            if (e.target === iosOverlay || iosOverlay?.contains(e.target)) {
+                                e.preventDefault();
+                            }
+
+                            document.removeEventListener('touchstart', activateOnInteraction);
+                            document.removeEventListener('click', activateOnInteraction);
+                            if (iosOverlay) {
+                                iosOverlay.removeEventListener('click', activateOnInteraction);
+                            }
+
+                            const success = await activateVideoForIOS();
+                            if (success) {
+                                hideIOSOverlay();
+                                if (!videoReady && heroVideo.readyState >= 2) {
+                                    videoReady = true;
+                                }
+                            }
+                        };
+
+                        // Add listeners for both touch and click
+                        document.addEventListener('touchstart', activateOnInteraction, { once: true, passive: false });
+                        document.addEventListener('click', activateOnInteraction, { once: true });
+
+                        // Also add direct listener on the overlay
+                        if (iosOverlay) {
+                            iosOverlay.addEventListener('click', activateOnInteraction, { once: true });
+                        }
+                    } else {
+                        // Video activated successfully, hide overlay
+                        hideIOSOverlay();
+                    }
+                }
+
+                // Initialize scroll regardless - it will work once video is ready
+                initVideoScroll();
+            }
+
+            // Event handlers for video readiness
+            function onVideoCanPlay() {
+                console.log('Video can play through');
+                videoReady = true;
+                // Try to set initial time
+                try {
+                    heroVideo.currentTime = 0;
+                } catch (e) {
+                    console.log('Could not set initial time:', e.message);
+                }
+            }
+
+            function onVideoLoadedMetadata() {
+                console.log('Video metadata loaded, duration:', heroVideo.duration);
+                // On non-iOS, we can initialize immediately
+                if (!isIOS) {
+                    videoReady = true;
+                }
+            }
+
+            // Listen for video events
+            heroVideo.addEventListener('loadedmetadata', onVideoLoadedMetadata);
+            heroVideo.addEventListener('canplay', onVideoCanPlay);
+            heroVideo.addEventListener('canplaythrough', onVideoCanPlay);
+
+            // Handle seeking events for iOS debugging
+            heroVideo.addEventListener('seeking', () => {
+                console.log('Video seeking to:', heroVideo.currentTime);
+            });
+
+            heroVideo.addEventListener('seeked', () => {
+                console.log('Video seeked to:', heroVideo.currentTime);
+            });
+
+            heroVideo.addEventListener('error', (e) => {
+                console.error('Video error:', heroVideo.error?.message || 'Unknown error');
+            });
+
+            // Check if video is already loaded
+            if (heroVideo.readyState >= 2) {
+                console.log('Video already loaded');
+                videoReady = true;
+                initializeVideo();
+            } else if (heroVideo.readyState >= 1) {
+                // Metadata loaded but not enough data
+                console.log('Video metadata ready, waiting for data');
+                initializeVideo();
+            } else {
+                // Wait for metadata
+                heroVideo.addEventListener('loadedmetadata', () => {
+                    initializeVideo();
+                }, { once: true });
+            }
+
+            // Fallback: Initialize after short delay if events don't fire
+            setTimeout(() => {
+                if (!scrollTriggerInstance) {
+                    console.log('Fallback initialization');
+                    heroVideo.load(); // Force reload
+                    initializeVideo();
+                }
+            }, 2000);
+
+            // Additional iOS fallback - initialize on first scroll if not ready
+            if (isIOS) {
+                let firstScrollHandled = false;
+                window.addEventListener('scroll', () => {
+                    if (!firstScrollHandled && !videoActivated) {
+                        firstScrollHandled = true;
+                        activateVideoForIOS().then((success) => {
+                            if (success) {
+                                hideIOSOverlay();
+                            }
+                            if (heroVideo.readyState >= 2) {
+                                videoReady = true;
+                            }
+                        });
+                    }
+                }, { once: true, passive: true });
+            }
 
             // 1. HUD Progress & Logic
             const sections = document.querySelectorAll("section");
