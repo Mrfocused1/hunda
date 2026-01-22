@@ -750,8 +750,17 @@
             gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, MotionPathPlugin);
 
             // 0. Intro Loader
-            const loaderTl = gsap.timeline();
-            loaderTl.to("#loader img", { opacity: 0, duration: 0.5, delay: 0.8 })
+            const loaderTl = gsap.timeline({
+                onComplete: () => {
+                    // Ensure page is scrollable after loader completes
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Prevent scrolling during loader
+            document.body.style.overflow = 'hidden';
+
+            loaderTl.to("#loader img", { opacity: 0, duration: 0.5, delay: 1.5 })
                     .to("#loader", { height: 0, duration: 0.8, ease: "power4.inOut" })
                     .from("#main-header", { y: -100, duration: 0.5 }, "-=0.3");
 
