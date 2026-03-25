@@ -14,11 +14,12 @@ const state = {
 
 // --- PRODUCT DATA ---
 const products = [
-    { id: 1, title: "Symbol Vision Tee", price: 45, category: "Tops", image: "product-1.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White", "Cream"] },
-    { id: 5, title: "Certified Boss Tee", price: 45, category: "Tops", image: "product-5.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "Cream"] },
-    { id: 6, title: "Gang Street Tee", price: 45, category: "Tops", image: "product-6.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"] },
-    { id: 7, title: "Classic Logo Tee", price: 45, category: "Tops", image: "product-7.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White", "Cream", "Grey"] },
-    { id: 8, title: "Pop Art Vision Tee", price: 45, category: "Tops", image: "product-8.svg", sizes: ["S", "M", "L"], colors: ["Black", "White"] },
+    { id: 1, title: "1H Colorway Cap", price: 35, category: "Hats", image: "product-1.jpeg", sizes: ["One Size"], colors: ["White/Black"] },
+    { id: 2, title: "Endless Possibilities Jacket", price: 120, category: "Jackets", image: "product-2.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Blue"] },
+    { id: 3, title: "1H Signature Jacket", price: 140, category: "Jackets", image: "product-3.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black"] },
+    { id: 4, title: "Knight Vision Tee", price: 55, category: "Tops", image: "product-4.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"] },
+    { id: 5, title: "Engineered For Champions Tee", price: 55, category: "Tops", image: "product-5.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"] },
+    { id: 6, title: "1H Vintage Cap", price: 35, category: "Hats", image: "product-6.png", sizes: ["One Size"], colors: ["White/Black"] },
 ];
 
 const categories = [
