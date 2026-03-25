@@ -205,6 +205,7 @@
                 font-size: 0.875rem;
                 border-collapse: separate;
                 border-spacing: 0;
+                table-layout: auto;
             }
             .data-table th,
             .data-table td {
@@ -257,17 +258,22 @@
                     border-left: none;
                     border-right: none;
                     overflow-x: scroll;
-                    touch-action: pan-x;
+                    touch-action: pan-x pan-y;
+                    -webkit-overflow-scrolling: touch;
+                    scrollbar-width: thin;
                 }
                 .data-table {
-                    min-width: 720px;
-                    width: auto;
+                    min-width: 700px;
+                    width: max-content;
+                    table-layout: fixed;
                 }
                 .data-table th,
                 .data-table td {
-                    padding: 0.875rem 0.5rem;
+                    padding: 0.75rem 0.5rem;
                     font-size: 0.8125rem;
                     white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
                 /* Sticky first column - Product/Order/Name */
                 .data-table th:first-child,
@@ -276,10 +282,12 @@
                     left: 0;
                     background: white;
                     z-index: 20;
+                    width: 130px;
                     min-width: 130px;
-                    max-width: 150px;
+                    max-width: 130px;
                     border-right: 2px solid #e5e7eb;
                     white-space: normal;
+                    overflow: visible;
                 }
                 .data-table th:first-child {
                     z-index: 30;
@@ -650,7 +658,6 @@
                     <!-- Products Section -->
                     <section id="products" class="admin-section">
                         <div class="section-header">
-                            <h3 class="section-title">Products</h3>
                             <button class="btn btn-primary btn-sm" onclick="openProductModal()">
                                 <i data-lucide="plus" class="w-4 h-4 inline mr-1"></i>
                                 Add Product
@@ -660,13 +667,13 @@
                             <table class="data-table" id="products-table">
                                 <thead>
                                     <tr>
-                                        <th style="min-width: 140px">Product</th>
-                                        <th style="min-width: 50px">Img</th>
-                                        <th style="min-width: 75px">Category</th>
-                                        <th style="min-width: 65px">Price</th>
-                                        <th style="min-width: 55px">Stock</th>
-                                        <th style="min-width: 75px">Status</th>
-                                        <th style="min-width: 95px">Actions</th>
+                                        <th style="width: 150px; min-width: 150px">Product</th>
+                                        <th style="width: 60px; min-width: 60px">Img</th>
+                                        <th style="width: 90px; min-width: 90px">Category</th>
+                                        <th style="width: 80px; min-width: 80px">Price</th>
+                                        <th style="width: 70px; min-width: 70px">Stock</th>
+                                        <th style="width: 90px; min-width: 90px">Status</th>
+                                        <th style="width: 100px; min-width: 100px">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="products-table-body">
@@ -679,7 +686,6 @@
                     <!-- Orders Section -->
                     <section id="orders" class="admin-section">
                         <div class="section-header">
-                            <h3 class="section-title">Orders</h3>
                             <div class="flex gap-2">
                                 <select
                                     class="form-input"
@@ -698,13 +704,13 @@
                             <table class="data-table" id="orders-table">
                                 <thead>
                                     <tr>
-                                        <th style="min-width: 110px">Order #</th>
-                                        <th style="min-width: 80px">Date</th>
-                                        <th style="min-width: 130px">Customer</th>
-                                        <th style="min-width: 60px" class="hidden sm:table-cell">Items</th>
-                                        <th style="min-width: 70px" class="hidden sm:table-cell">Total</th>
-                                        <th style="min-width: 100px">Status</th>
-                                        <th style="min-width: 70px">Actions</th>
+                                        <th style="width: 120px; min-width: 120px">Order #</th>
+                                        <th style="width: 90px; min-width: 90px">Date</th>
+                                        <th style="width: 140px; min-width: 140px">Customer</th>
+                                        <th style="width: 70px; min-width: 70px" class="hidden sm:table-cell">Items</th>
+                                        <th style="width: 80px; min-width: 80px" class="hidden sm:table-cell">Total</th>
+                                        <th style="width: 110px; min-width: 110px">Status</th>
+                                        <th style="width: 80px; min-width: 80px">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="orders-table-body">
@@ -716,18 +722,18 @@
 
                     <!-- Customers Section -->
                     <section id="customers" class="admin-section">
-                        <div class="section-header">
-                            <h3 class="section-title">Customers</h3>
-                        </div>
+                        <div class="section-header" style="display: none"></div>
                         <div class="table-wrapper">
                             <table class="data-table" id="customers-table">
                                 <thead>
                                     <tr>
-                                        <th style="min-width: 130px">Name</th>
-                                        <th style="min-width: 160px" class="hidden sm:table-cell">Email</th>
-                                        <th style="min-width: 60px">Orders</th>
-                                        <th style="min-width: 90px">Total Spent</th>
-                                        <th style="min-width: 80px">Joined</th>
+                                        <th style="width: 140px; min-width: 140px">Name</th>
+                                        <th style="width: 180px; min-width: 180px" class="hidden sm:table-cell">
+                                            Email
+                                        </th>
+                                        <th style="width: 70px; min-width: 70px">Orders</th>
+                                        <th style="width: 100px; min-width: 100px">Total Spent</th>
+                                        <th style="width: 90px; min-width: 90px">Joined</th>
                                     </tr>
                                 </thead>
                                 <tbody id="customers-table-body">
@@ -739,9 +745,6 @@
 
                     <!-- Email Automation Section -->
                     <section id="emails" class="admin-section">
-                        <div class="section-header">
-                            <h3 class="section-title">Email Automation</h3>
-                        </div>
                         <p class="text-gray-600 mb-6">
                             Configure automated emails sent to customers based on their actions.
                         </p>
@@ -817,8 +820,7 @@
 
                     <!-- Content Section -->
                     <section id="content" class="admin-section">
-                        <div class="section-header">
-                            <h3 class="section-title">Store Content</h3>
+                        <div class="section-header" style="justify-content: flex-end">
                             <button class="btn btn-primary btn-sm" onclick="saveContent()">Save Changes</button>
                         </div>
                         <div class="bg-white border border-gray-200 p-6 max-w-2xl">
