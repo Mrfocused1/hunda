@@ -1449,18 +1449,38 @@ body {
 
 /* Mobile header centering */
 @media (max-width: 767px) {
+    #main-header .container-main {
+        position: relative;
+    }
+
     #main-header .container-main > div {
-        justify-content: center;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        justify-items: center;
     }
 
     #main-header .container-main > div > div:first-child {
-        position: absolute;
-        left: 1rem;
+        grid-column: 1;
+        justify-self: start;
+        gap: 0 !important;
+    }
+
+    #main-header .container-main > div > div:first-child button {
+        margin-right: 1rem;
     }
 
     #main-header .container-main > div > div:last-child {
-        position: absolute;
-        right: 1rem;
+        grid-column: 3;
+        justify-self: end;
+    }
+
+    #main-header .container-main > div > nav {
+        display: none !important;
+    }
+
+    #main-header .container-main > div > div:nth-child(3) {
+        display: none !important;
     }
 }
 
