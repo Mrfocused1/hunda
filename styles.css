@@ -1456,17 +1456,23 @@ body {
 
     #main-header .container-main > div > div:first-child {
         position: absolute !important;
-        left: 1rem;
-        flex: 0 0 auto !important;
+        left: 0 !important;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0 !important;
+    }
+
+    #main-header .container-main > div > div:first-child button {
+        position: absolute !important;
+        left: 1rem !important;
     }
 
     #main-header .container-main > div > div:first-child a {
-        position: absolute !important;
-        left: calc(50% - 1rem) !important;
-        transform: translateX(-50%) !important;
-        top: 50% !important;
-        margin-left: 0 !important;
-        margin-top: -0.5rem !important;
+        position: static !important;
+        transform: none !important;
+        margin: 0 !important;
     }
 
     #main-header .container-main > div > div:last-child {
