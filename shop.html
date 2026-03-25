@@ -406,22 +406,16 @@
     <script>
         // Extended product data for shop page
         const allProducts = [
-            { id: 1, title: "Symbol Vision Tee", price: 45, category: "tops", image: "product-1.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White", "Cream"], isNew: true },
-            { id: 2, title: "Money Vision Tee", price: 45, category: "tops", image: "product-2.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"], isNew: true },
-            { id: 3, title: "Pop Art Tee", price: 45, category: "tops", image: "product-3.png", sizes: ["S", "M", "L"], colors: ["Black", "White", "Cream"], isNew: false },
-            { id: 4, title: "Cap Vision Tee", price: 45, category: "tops", image: "product-4.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"], isNew: true },
-            { id: 5, title: "Certified Boss Tee", price: 45, category: "tops", image: "product-5.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "Cream"], isNew: false },
-            { id: 6, title: "Gang Street Tee", price: 45, category: "tops", image: "product-6.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"], isNew: false },
-            { id: 7, title: "Classic Logo Tee", price: 45, category: "tops", image: "product-tshirt.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White", "Cream", "Grey"], isNew: true },
-            { id: 8, title: "Pop Art Vision Tee", price: 45, category: "tops", image: "product-tshirt-2.png", sizes: ["S", "M", "L"], colors: ["Black", "White"], isNew: false },
-            { id: 9, title: "Cap Vision Hoodie", price: 65, category: "hoodies", image: "trend-hoodie.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "Grey"], isNew: true },
-            { id: 10, title: "Street Legend Hoodie", price: 65, category: "hoodies", image: "trend-hoodie-woman.png", sizes: ["S", "M", "L"], colors: ["Black", "White"], isNew: true },
-            { id: 11, title: "Urban Culture Hoodie", price: 55, category: "hoodies", image: "trend-urban-style.png", sizes: ["M", "L", "XL"], colors: ["Black"], isNew: false },
-            { id: 12, title: "Sunset Dreams Tee", price: 40, category: "tops", image: "trend-sunset-style.png", sizes: ["S", "M", "L", "XL"], colors: ["White", "Cream"], isNew: false },
+            { id: 1, title: "1H Colorway Cap", price: 35, category: "hats", image: "product-1.jpeg", sizes: ["One Size"], colors: ["White/Black"], isNew: true },
+            { id: 2, title: "Endless Possibilities Jacket", price: 120, category: "jackets", image: "product-2.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Blue"], isNew: true },
+            { id: 3, title: "1H Signature Jacket", price: 140, category: "jackets", image: "product-3.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black"], isNew: true },
+            { id: 4, title: "Knight Vision Tee", price: 55, category: "tops", image: "product-4.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"], isNew: true },
+            { id: 5, title: "Engineered For Champions Tee", price: 55, category: "tops", image: "product-5.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"], isNew: true },
+            { id: 6, title: "1H Vintage Cap", price: 35, category: "hats", image: "product-6.png", sizes: ["One Size"], colors: ["White/Black"], isNew: false },
         ];
 
         let currentFilters = {
-            categories: ['tops'],
+            categories: [],
             sizes: [],
             colors: [],
             priceRanges: [],
