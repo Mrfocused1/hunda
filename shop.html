@@ -88,7 +88,7 @@
             <h4 class="filter-title">Category</h4>
             <div class="filter-options">
                 <label class="filter-option">
-                    <input type="checkbox" name="category" value="tops" checked>
+                    <input type="checkbox" name="category" value="tops">
                     <span>Tops</span>
                 </label>
                 <label class="filter-option">
@@ -285,7 +285,7 @@
                             <h4 class="filter-title">Category</h4>
                             <div class="filter-options" id="category-filters">
                                 <label class="filter-option">
-                                    <input type="checkbox" name="category" value="tops" checked>
+                                    <input type="checkbox" name="category" value="tops">
                                     <span>Tops</span>
                                 </label>
                                 <label class="filter-option">
@@ -406,12 +406,12 @@
     <script>
         // Extended product data for shop page
         const allProducts = [
-            { id: 1, title: "1H Colorway Cap", price: 35, category: "hats", image: "product-1.jpeg", sizes: ["One Size"], colors: ["White/Black"], isNew: true },
-            { id: 2, title: "Endless Possibilities Jacket", price: 120, category: "jackets", image: "product-2.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Blue"], isNew: true },
-            { id: 3, title: "1H Signature Jacket", price: 140, category: "jackets", image: "product-3.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black"], isNew: true },
-            { id: 4, title: "Knight Vision Tee", price: 55, category: "tops", image: "product-4.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"], isNew: true },
-            { id: 5, title: "Engineered For Champions Tee", price: 55, category: "tops", image: "product-5.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"], isNew: true },
-            { id: 6, title: "1H Vintage Cap", price: 35, category: "hats", image: "product-6.png", sizes: ["One Size"], colors: ["White/Black"], isNew: false },
+            { id: 1, title: "Racer Trophy Tee", price: 45, category: "tops", image: "product-1.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"], isNew: true },
+            { id: 2, title: "Champions Engineered Tee", price: 45, category: "tops", image: "product-2.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"], isNew: false },
+            { id: 3, title: "1H Vintage Trucker Hat", price: 35, category: "hats", image: "product-3.png", sizes: ["One Size"], colors: ["White/Black"], isNew: true },
+            { id: 4, title: "Silence Expression Hoodie", price: 65, category: "hoodies", image: "product-4.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black"], isNew: false },
+            { id: 5, title: "Endless Possibilities Hoodie", price: 65, category: "hoodies", image: "product-5.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Blue"], isNew: true },
+            { id: 6, title: "1H Colorway Trucker Hat", price: 35, category: "hats", image: "product-6.jpeg", sizes: ["One Size"], colors: ["White/Black"], isNew: false },
         ];
 
         let currentFilters = {
@@ -422,6 +422,14 @@
             sort: 'recommended',
             search: ''
         };
+
+        // Update checkbox states based on currentFilters
+        function updateFilterCheckboxes() {
+            // Category checkboxes
+            document.querySelectorAll('input[name="category"]').forEach(cb => {
+                cb.checked = currentFilters.categories.includes(cb.value);
+            });
+        }
 
         // Parse URL params
         function parseUrlParams() {
@@ -434,6 +442,7 @@
                 currentFilters.categories = [category];
                 document.getElementById('category-title').textContent = category.charAt(0).toUpperCase() + category.slice(1);
                 document.getElementById('page-title').textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                updateFilterCheckboxes();
             }
             
             if (isNew) {
@@ -589,7 +598,7 @@
 
         function clearFilters() {
             currentFilters = {
-                categories: ['tops'],
+                categories: [],
                 sizes: [],
                 colors: [],
                 priceRanges: [],
@@ -597,8 +606,7 @@
                 search: ''
             };
             
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = cb.name !== 'category');
-            document.querySelectorAll('input[name="category"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
             document.querySelectorAll('.size-option, .color-swatch').forEach(btn => btn.classList.remove('active'));
             document.getElementById('sort-select').value = 'recommended';
             
