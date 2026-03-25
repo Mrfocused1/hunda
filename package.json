@@ -11,7 +11,9 @@
         "lint": "stylelint '**/*.css'",
         "lint:fix": "stylelint '**/*.css' --fix",
         "format": "prettier --write '**/*.{html,css,js,json}'",
-        "prepare": "husky"
+        "prepare": "husky",
+        "screenshot": "node scripts/screenshot-capture.js",
+        "screenshot:view": "node scripts/screenshot-capture.js list"
     },
     "devDependencies": {
         "husky": "^9.1.7",
