@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | 1 HUNDRED</title>
+    <meta name="description" content="Secure checkout at 1 HUNDRED.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .checkout-step-content { display: none; }
+        .checkout-step-content.active { display: block; }
+        .step-indicator.active { background: #111; color: white; border-color: #111; }
+        .step-indicator.completed { background: #22c55e; color: white; border-color: #22c55e; }
+        .step-line.active { background: #111; }
+    </style>
+</head>
+<body class="antialiased bg-gray-50">
+
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <img src="logo.svg" alt="1 HUNDRED">
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">
+        <i data-lucide="check-circle" class="w-5 h-5"></i>
+        <span id="toast-msg">Added to bag</span>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="menu-overlay" class="mobile-menu-overlay"></div>
+
+    <!-- Mobile Menu -->
+    <nav id="mobile-menu" class="mobile-menu">
+        <div class="mobile-menu-header">
+            <a href="index.html">
+                <img src="logo.svg" alt="1 HUNDRED" class="h-8">
+            </a>
+            <button id="menu-toggle-close" class="p-2">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <div class="mobile-search">
+            <div class="relative">
+                <input type="text" placeholder="Search..." class="w-full bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+            </div>
+        </div>
+
+        <div class="flex flex-col">
+            <a href="shop.html" class="mobile-nav-link">Shop All</a>
+            <a href="shop.html?new=true" class="mobile-nav-link">New In</a>
+
+            <div class="border-t border-gray-200 mt-4 pt-4">
+                <a href="account.html" class="mobile-nav-link">
+                    <span>My Account</span>
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </a>
+                <a href="wishlist.html" class="mobile-nav-link">
+                    <span>Wishlist</span>
+                    <i data-lucide="heart" class="w-5 h-5"></i>
+                </a>
+                <a href="cart.html" class="mobile-nav-link">
+                    <span>Shopping Bag</span>
+                    <div class="flex items-center gap-2">
+                        <span id="cart-count-mobile" class="badge hidden">0</span>
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header id="main-header" class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+        <div class="container-main">
+            <div class="h-16 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button id="menu-toggle" class="hamburger hide-desktop">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <a href="index.html" class="flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img">
+                    </a>
+                </div>
+
+                <nav class="hidden lg:flex items-center gap-8">
+                    <a href="shop.html" class="nav-link">Shop All</a>
+                    <a href="shop.html?new=true" class="nav-link">New In</a>
+                </nav>
+
+                <div class="hidden lg:block search-container">
+                    <i data-lucide="search" class="search-icon w-4 h-4"></i>
+                    <input type="text" placeholder="Search..." class="search-input">
+                </div>
+
+                <div class="flex items-center gap-2 md:gap-4">
+                    <button class="lg:hidden header-action" aria-label="Search">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+                    <a href="account.html" class="header-action hidden sm:flex" aria-label="Account">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </a>
+                    <a href="wishlist.html" class="header-action hidden sm:flex" aria-label="Wishlist">
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                    </a>
+                    <button id="cart-trigger" class="header-action" aria-label="Cart">
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        <span id="cart-count" class="badge hidden">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Drawer -->
+    <div id="cart-overlay" class="mobile-menu-overlay"></div>
+    <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+            <h2 class="font-display font-bold uppercase text-xl">Bag (<span id="mini-cart-count">0</span>)</h2>
+            <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div id="mini-cart-items" class="flex-1 overflow-y-auto p-6"></div>
+        <div class="p-6 border-t border-gray-100 bg-gray-50">
+            <div class="flex justify-between font-bold text-lg mb-4">
+                <span>Subtotal</span>
+                <span id="mini-cart-subtotal">£0.00</span>
+            </div>
+            <a href="checkout.html" class="btn btn-primary btn-full mb-3">Checkout</a>
+            <a href="cart.html" class="btn btn-secondary btn-full">View Bag</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="container-main py-8 md:py-12 pt-24">
+        <!-- Checkout Steps -->
+        <div class="mb-8 md:mb-12">
+            <div class="flex items-center justify-center max-w-2xl mx-auto">
+                <div class="flex items-center flex-1">
+                    <div id="step-1-indicator" class="step-indicator w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm transition-all">1</div>
+                    <div id="line-1" class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
+                </div>
+                <div class="flex items-center flex-1">
+                    <div id="step-2-indicator" class="step-indicator w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm transition-all">2</div>
+                    <div id="line-2" class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
+                </div>
+                <div class="flex items-center">
+                    <div id="step-3-indicator" class="step-indicator w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center font-bold text-sm transition-all">3</div>
+                </div>
+            </div>
+            <div class="flex justify-center max-w-2xl mx-auto mt-2 text-xs font-medium text-gray-500">
+                <span class="flex-1 text-center">Shipping</span>
+                <span class="flex-1 text-center">Payment</span>
+                <span class="flex-1 text-center">Confirm</span>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
+            <!-- Checkout Form -->
+            <div class="lg:col-span-2">
+                <!-- Step 1: Shipping -->
+                <div id="step-1" class="checkout-step-content active">
+                    <div class="bg-white rounded-lg shadow-sm p-6 md:p-8">
+                        <h2 class="text-2xl font-display font-bold uppercase mb-6">Shipping Address</h2>
+                        
+                        <form id="shipping-form" onsubmit="event.preventDefault(); goToStep(2);">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">First Name *</label>
+                                    <input type="text" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Last Name *</label>
+                                    <input type="text" class="form-input" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Phone *</label>
+                                <input type="tel" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Address Line 1 *</label>
+                                <input type="text" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Address Line 2</label>
+                                <input type="text" class="form-input">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">City *</label>
+                                    <input type="text" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Postcode *</label>
+                                    <input type="text" class="form-input" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Country *</label>
+                                <select class="form-input">
+                                    <option>United Kingdom</option>
+                                    <option>United States</option>
+                                    <option>Canada</option>
+                                    <option>Australia</option>
+                                    <option>Germany</option>
+                                    <option>France</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-2 mt-4">
+                                <input type="checkbox" id="save-address" class="w-4 h-4">
+                                <label for="save-address" class="text-sm">Save this address for next time</label>
+                            </div>
+
+                            <div class="mt-8">
+                                <button type="submit" class="btn btn-primary btn-full">Continue to Payment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Step 2: Payment -->
+                <div id="step-2" class="checkout-step-content">
+                    <div class="bg-white rounded-lg shadow-sm p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-display font-bold uppercase">Payment</h2>
+                            <button onclick="goToStep(1)" class="text-sm underline">Back to Shipping</button>
+                        </div>
+                        
+                        <div class="space-y-4 mb-8">
+                            <label class="payment-method selected">
+                                <input type="radio" name="payment" value="card" checked class="w-5 h-5 accent-black">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="credit-card" class="w-6 h-6"></i>
+                                    <div>
+                                        <div class="font-medium">Credit / Debit Card</div>
+                                        <div class="text-sm text-gray-500">Visa, Mastercard, Amex</div>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="paypal" class="w-5 h-5 accent-black">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.77.77 0 0 1 .757-.629h6.724c2.838 0 5.098.835 5.908 2.788.442.983.544 1.858.416 2.694-.21 1.4-.927 2.324-1.793 2.927-.387.258-.81.464-1.262.625.43.139.78.348 1.082.64.622.6.88 1.477.79 2.63-.128 1.634-.754 2.96-1.63 3.924-.929 1.021-2.13 1.69-3.434 2.02-1.203.305-2.558.455-3.957.455h-.47z"/>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium">PayPal</div>
+                                        <div class="text-sm text-gray-500">Pay with your PayPal account</div>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="apple" class="w-5 h-5 accent-black">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.1 1.87-2.54 6.98.22 8.13-.57 1.5-1.31 2.99-2.27 4.08zm-5.85-15.1c.07-1.04.58-1.97 1.38-2.58.88-.69 2.07-.98 3.18-.78-.15 1.17-.64 2.22-1.41 2.94-.84.78-1.97 1.15-3.15.93-.18-1.02-.09-1.34 0-1.51z"/>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium">Apple Pay</div>
+                                        <div class="text-sm text-gray-500">Pay with Apple Pay</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="card-form">
+                            <div class="form-group">
+                                <label class="form-label">Card Number *</label>
+                                <div class="relative">
+                                    <input type="text" class="form-input pl-12" placeholder="1234 5678 9012 3456" maxlength="19">
+                                    <i data-lucide="credit-card" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Expiry Date *</label>
+                                    <input type="text" class="form-input" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">CVV *</label>
+                                    <div class="relative">
+                                        <input type="text" class="form-input" placeholder="123" maxlength="3">
+                                        <i data-lucide="help-circle" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Name on Card *</label>
+                                <input type="text" class="form-input" placeholder="JOHN SMITH">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 mt-4">
+                            <input type="checkbox" id="save-card" class="w-4 h-4">
+                            <label for="save-card" class="text-sm">Save card for future purchases</label>
+                        </div>
+
+                        <div class="mt-8">
+                            <button onclick="goToStep(3)" class="btn btn-primary btn-full">Review Order</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Review -->
+                <div id="step-3" class="checkout-step-content">
+                    <div class="bg-white rounded-lg shadow-sm p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-display font-bold uppercase">Review Order</h2>
+                            <button onclick="goToStep(2)" class="text-sm underline">Back to Payment</button>
+                        </div>
+                        
+                        <!-- Order Items -->
+                        <div class="border-b border-gray-200 pb-6 mb-6">
+                            <h3 class="font-bold uppercase text-sm mb-4">Items</h3>
+                            <div id="review-items" class="space-y-4">
+                                <!-- Items rendered by JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- Shipping Address -->
+                        <div class="border-b border-gray-200 pb-6 mb-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="font-bold uppercase text-sm">Shipping Address</h3>
+                                <button onclick="goToStep(1)" class="text-sm underline">Edit</button>
+                            </div>
+                            <p class="text-gray-600 text-sm">
+                                John Smith<br>
+                                123 Street Name<br>
+                                London, SW1A 1AA<br>
+                                United Kingdom
+                            </p>
+                        </div>
+                        
+                        <!-- Payment Method -->
+                        <div class="border-b border-gray-200 pb-6 mb-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="font-bold uppercase text-sm">Payment Method</h3>
+                                <button onclick="goToStep(2)" class="text-sm underline">Edit</button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="credit-card" class="w-6 h-6"></i>
+                                <span class="text-sm">Visa ending in 4242</span>
+                            </div>
+                        </div>
+
+                        <!-- Terms -->
+                        <div class="flex items-start gap-2 mb-8">
+                            <input type="checkbox" id="terms" class="w-4 h-4 mt-0.5" required>
+                            <label for="terms" class="text-sm text-gray-600">
+                                I agree to the <a href="#" class="underline">Terms & Conditions</a> and <a href="#" class="underline">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <button onclick="placeOrder()" class="btn btn-primary btn-full">Place Order</button>
+                    </div>
+                </div>
+
+                <!-- Success Message -->
+                <div id="success-message" class="hidden">
+                    <div class="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i data-lucide="check" class="w-10 h-10 text-green-600"></i>
+                        </div>
+                        <h2 class="text-3xl font-display font-bold uppercase mb-4">Order Confirmed!</h2>
+                        <p class="text-gray-600 mb-2">Thank you for your order.</p>
+                        <p class="text-gray-600 mb-6">Order number: <span class="font-bold">#1H-2026-001</span></p>
+                        <p class="text-gray-500 text-sm mb-8">A confirmation email has been sent to your email address.</p>
+                        <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+                    <h3 class="font-display font-bold uppercase text-lg mb-6">Order Summary</h3>
+                    
+                    <div id="summary-items" class="space-y-4 mb-6 max-h-64 overflow-y-auto">
+                        <!-- Summary items rendered by JS -->
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span id="checkout-subtotal" class="font-medium">£0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Shipping</span>
+                            <span id="checkout-shipping" class="font-medium">Free</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Tax</span>
+                            <span id="checkout-tax" class="font-medium">£0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 mt-4 pt-4">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg">Total</span>
+                            <span id="checkout-total" class="font-bold text-2xl">£0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="main.js"></script>
+    <script>
+        let currentStep = 1;
+
+        function goToStep(step) {
+            // Update step indicators
+            document.querySelectorAll('.checkout-step-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            // Update step indicators styling
+            for (let i = 1; i <= 3; i++) {
+                const indicator = document.getElementById(`step-${i}-indicator`);
+                const line = document.getElementById(`line-${i}`);
+                
+                if (i < step) {
+                    indicator.classList.add('completed');
+                    indicator.classList.remove('active');
+                    indicator.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i>';
+                    if (line) line.classList.add('active');
+                } else if (i === step) {
+                    indicator.classList.add('active');
+                    indicator.classList.remove('completed');
+                    indicator.textContent = i;
+                } else {
+                    indicator.classList.remove('active', 'completed');
+                    indicator.textContent = i;
+                }
+            }
+            
+            currentStep = step;
+            lucide.createIcons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderCheckoutSummary() {
+            const container = document.getElementById('summary-items');
+            const reviewContainer = document.getElementById('review-items');
+            
+            if (state.cart.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">Your bag is empty</p>';
+                return;
+            }
+            
+            const itemsHtml = state.cart.map(item => `
+                <div class="flex gap-4">
+                    <div class="w-16 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-medium text-sm uppercase truncate">${item.title}</h4>
+                        <p class="text-xs text-gray-500">${item.color} / ${item.size}</p>
+                        <p class="text-sm font-medium mt-1">Qty: ${item.quantity}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-medium text-sm">£${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = itemsHtml;
+            if (reviewContainer) reviewContainer.innerHTML = itemsHtml;
+            
+            // Update totals
+            const subtotal = getCartTotal();
+            const shipping = subtotal >= 50 ? 0 : 4.99;
+            const tax = subtotal * 0.2;
+            const total = subtotal + shipping + tax;
+            
+            document.getElementById('checkout-subtotal').textContent = `£${subtotal.toFixed(2)}`;
+            document.getElementById('checkout-shipping').textContent = shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`;
+            document.getElementById('checkout-tax').textContent = `£${tax.toFixed(2)}`;
+            document.getElementById('checkout-total').textContent = `£${total.toFixed(2)}`;
+        }
+
+        function placeOrder() {
+            if (!document.getElementById('terms').checked) {
+                showToast('Please agree to the terms');
+                return;
+            }
+            
+            // Show success
+            document.querySelectorAll('.checkout-step-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('success-message').classList.remove('hidden');
+            
+            // Clear cart
+            state.cart = [];
+            saveCart();
+            updateBadges();
+            
+            lucide.createIcons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCheckoutSummary();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

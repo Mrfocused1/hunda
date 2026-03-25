@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account | 1 HUNDRED</title>
+    <meta name="description" content="Manage your 1 HUNDRED account.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .account-tab { position: relative; }
+        .account-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #111;
+            transform: scaleX(0);
+            transition: transform 0.2s;
+        }
+        .account-tab.active::after { transform: scaleX(1); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <img src="logo.svg" alt="1 HUNDRED">
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">
+        <i data-lucide="check-circle" class="w-5 h-5"></i>
+        <span id="toast-msg">Added to bag</span>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="menu-overlay" class="mobile-menu-overlay"></div>
+
+    <!-- Mobile Menu -->
+    <nav id="mobile-menu" class="mobile-menu">
+        <div class="mobile-menu-header">
+            <a href="index.html">
+                <img src="logo.svg" alt="1 HUNDRED" class="h-8">
+            </a>
+            <button id="menu-toggle-close" class="p-2">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <div class="mobile-search">
+            <div class="relative">
+                <input type="text" placeholder="Search..." class="w-full bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+            </div>
+        </div>
+        
+        <div class="flex flex-col">
+            <a href="shop.html" class="mobile-nav-link">Shop All</a>
+            <a href="shop.html?new=true" class="mobile-nav-link">New In</a>
+            
+            <div class="border-t border-gray-200 mt-4 pt-4">
+                <a href="wishlist.html" class="mobile-nav-link">
+                    <span>Wishlist</span>
+                    <i data-lucide="heart" class="w-5 h-5"></i>
+                </a>
+                <a href="cart.html" class="mobile-nav-link">
+                    <span>Shopping Bag</span>
+                    <div class="flex items-center gap-2">
+                        <span id="cart-count-mobile" class="badge hidden">0</span>
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header id="main-header" class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+        <div class="container-main">
+            <div class="h-16 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button id="menu-toggle" class="hamburger hide-desktop">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <a href="index.html" class="flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img">
+                    </a>
+                </div>
+
+                <nav class="hidden lg:flex items-center gap-8">
+                    <a href="shop.html" class="nav-link">Shop All</a>
+                    <a href="shop.html?new=true" class="nav-link">New In</a>
+                </nav>
+
+                <div class="hidden lg:block search-container">
+                    <i data-lucide="search" class="search-icon w-4 h-4"></i>
+                    <input type="text" placeholder="Search..." class="search-input">
+                </div>
+
+                <div class="flex items-center gap-2 md:gap-4">
+                    <button class="lg:hidden header-action" aria-label="Search">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+                    <a href="account.html" class="header-action hidden sm:flex" aria-label="Account">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </a>
+                    <a href="wishlist.html" class="header-action hidden sm:flex" aria-label="Wishlist">
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                    </a>
+                    <button id="cart-trigger" class="header-action" aria-label="Cart">
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        <span id="cart-count" class="badge hidden">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Drawer -->
+    <div id="cart-overlay" class="mobile-menu-overlay"></div>
+    <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+            <h2 class="font-display font-bold uppercase text-xl">Bag (<span id="mini-cart-count">0</span>)</h2>
+            <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div id="mini-cart-items" class="flex-1 overflow-y-auto p-6"></div>
+        <div class="p-6 border-t border-gray-100 bg-gray-50">
+            <div class="flex justify-between font-bold text-lg mb-4">
+                <span>Subtotal</span>
+                <span id="mini-cart-subtotal">£0.00</span>
+            </div>
+            <a href="checkout.html" class="btn btn-primary btn-full mb-3">Checkout</a>
+            <a href="cart.html" class="btn btn-secondary btn-full">View Bag</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="pt-16">
+        <!-- Page Header -->
+        <div class="bg-gray-50 border-b border-gray-200">
+            <div class="container-main py-8 md:py-12">
+                <nav class="breadcrumbs">
+                    <a href="index.html">Home</a>
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    <span>My Account</span>
+                </nav>
+                <h1 class="text-3xl md:text-4xl font-display font-bold uppercase">My Account</h1>
+                <p class="text-gray-500 mt-2">Welcome back, <span id="user-name">Guest</span></p>
+            </div>
+        </div>
+
+        <!-- Account Dashboard -->
+        <section class="container-main py-8 md:py-12">
+            <!-- Tabs -->
+            <div class="account-tabs border-b border-gray-200 mb-8 overflow-x-auto">
+                <button class="account-tab active" data-tab="orders">My Orders</button>
+                <button class="account-tab" data-tab="addresses">Addresses</button>
+                <button class="account-tab" data-tab="details">Account Details</button>
+                <button class="account-tab" data-tab="wishlist">Wishlist</button>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="orders" class="tab-content active">
+                <h2 class="text-xl font-bold uppercase mb-6">Order History</h2>
+                
+                <div class="space-y-4">
+                    <!-- Order 1 -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <div class="font-bold">Order #1H-2026-089</div>
+                                <div class="text-sm text-gray-500">Placed on 15 Mar 2026</div>
+                            </div>
+                            <span class="order-status delivered">Delivered</span>
+                        </div>
+                        <div class="flex gap-4 mb-4">
+                            <img src="product-1.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
+                            <img src="product-2.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                            <span class="font-bold">Total: £90.00</span>
+                            <div class="flex gap-2">
+                                <button class="btn btn-secondary btn-sm">View Order</button>
+                                <button class="btn btn-primary btn-sm">Track</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order 2 -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <div class="font-bold">Order #1H-2026-092</div>
+                                <div class="text-sm text-gray-500">Placed on 18 Mar 2026</div>
+                            </div>
+                            <span class="order-status shipped">Shipped</span>
+                        </div>
+                        <div class="flex gap-4 mb-4">
+                            <img src="trend-hoodie.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                            <span class="font-bold">Total: £65.00</span>
+                            <div class="flex gap-2">
+                                <button class="btn btn-secondary btn-sm">View Order</button>
+                                <button class="btn btn-primary btn-sm">Track</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order 3 -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <div class="font-bold">Order #1H-2026-105</div>
+                                <div class="text-sm text-gray-500">Placed on 21 Mar 2026</div>
+                            </div>
+                            <span class="order-status processing">Processing</span>
+                        </div>
+                        <div class="flex gap-4 mb-4">
+                            <img src="product-3.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
+                            <img src="product-5.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
+                            <img src="product-tshirt.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                            <span class="font-bold">Total: £135.00</span>
+                            <div class="flex gap-2">
+                                <button class="btn btn-secondary btn-sm">View Order</button>
+                                <button class="btn btn-primary btn-sm" disabled>Track</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Addresses Tab -->
+            <div id="addresses" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold uppercase">Saved Addresses</h2>
+                    <button class="btn btn-primary btn-sm" onclick="showToast('Add address feature coming soon')">Add New</button>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="border border-gray-200 p-6 rounded-lg relative">
+                        <span class="absolute top-4 right-4 bg-black text-white text-xs px-2 py-1 uppercase font-bold">Default</span>
+                        <h3 class="font-bold mb-2">John Smith</h3>
+                        <p class="text-gray-600 text-sm">
+                            123 Street Name<br>
+                            London<br>
+                            SW1A 1AA<br>
+                            United Kingdom
+                        </p>
+                        <div class="flex gap-2 mt-4">
+                            <button class="text-sm underline" onclick="showToast('Edit feature coming soon')">Edit</button>
+                            <button class="text-sm underline text-red-500" onclick="showToast('Delete feature coming soon')">Delete</button>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 p-6 rounded-lg">
+                        <h3 class="font-bold mb-2">Jane Smith</h3>
+                        <p class="text-gray-600 text-sm">
+                            456 Another Street<br>
+                            Manchester<br>
+                            M1 1AA<br>
+                            United Kingdom
+                        </p>
+                        <div class="flex gap-2 mt-4">
+                            <button class="text-sm underline" onclick="showToast('Edit feature coming soon')">Edit</button>
+                            <button class="text-sm underline" onclick="showToast('Set as default coming soon')">Set as Default</button>
+                            <button class="text-sm underline text-red-500" onclick="showToast('Delete feature coming soon')">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Details Tab -->
+            <div id="details" class="tab-content">
+                <h2 class="text-xl font-bold uppercase mb-6">Account Details</h2>
+                
+                <form class="max-w-xl" onsubmit="event.preventDefault(); showToast('Details updated successfully');">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-input" value="John">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-input" value="Smith">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" value="john.smith@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-input" value="+44 123 456 7890">
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-6 mt-6">
+                        <h3 class="font-bold uppercase mb-4">Change Password</h3>
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-input">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-4">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- Wishlist Tab -->
+            <div id="wishlist" class="tab-content">
+                <h2 class="text-xl font-bold uppercase mb-6">My Wishlist</h2>
+                
+                <div id="wishlist-grid" class="wishlist-grid">
+                    <!-- Wishlist items rendered by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container-main">
+            <div class="footer-grid">
+                <div>
+                    <img src="logo.svg" alt="1 HUNDRED" class="h-10 mb-6" style="filter: brightness(0) invert(1);">
+                    <p class="text-gray-400 text-sm max-w-xs">Premium streetwear for the modern individual.</p>
+                </div>
+                <div>
+                    <h4 class="footer-title">Shop</h4>
+                    <div class="footer-links">
+                        <a href="shop.html" class="footer-link">Shop All</a>
+                        <a href="shop.html?new=true" class="footer-link">New Arrivals</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Help</h4>
+                    <div class="footer-links">
+                        <a href="#" class="footer-link">Help Centre</a>
+                        <a href="#" class="footer-link">Delivery & Returns</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Join The List</h4>
+                    <form class="footer-input-group" onsubmit="event.preventDefault(); showToast('Thanks for subscribing!');">
+                        <input type="email" placeholder="Email Address" class="footer-input" required>
+                        <button type="submit" class="footer-submit">Join</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="text-gray-500 text-sm">© 2026 1 HUNDRED Ltd.</div>
+                <div class="flex gap-6 text-sm">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms & Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        const allProducts = [
+            { id: 1, title: "Symbol Vision Tee", price: 45, image: "product-1.png", category: "Tops" },
+            { id: 2, title: "Money Vision Tee", price: 45, image: "product-2.png", category: "Tops" },
+            { id: 3, title: "Pop Art Tee", price: 45, image: "product-3.png", category: "Tops" },
+            { id: 9, title: "Cap Vision Hoodie", price: 65, image: "trend-hoodie.png", category: "Hoodies" },
+        ];
+
+        // Tab switching
+        document.querySelectorAll('.account-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                if (tab.dataset.tab === 'wishlist') {
+                    renderWishlistTab();
+                }
+            });
+        });
+
+        function renderWishlistTab() {
+            const container = document.getElementById('wishlist-grid');
+            
+            if (state.wishlist.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full empty-state">
+                        <i data-lucide="heart" class="empty-state-icon mx-auto"></i>
+                        <h3 class="empty-state-title">Your wishlist is empty</h3>
+                        <p class="empty-state-text">Save items you love for later</p>
+                        <a href="shop.html" class="btn btn-primary mt-4">Start Shopping</a>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            const wishlistProducts = allProducts.filter(p => state.wishlist.includes(p.id));
+            
+            container.innerHTML = wishlistProducts.map(p => `
+                <div class="wishlist-item">
+                    <div class="product-image-wrapper">
+                        <a href="product.html?id=${p.id}">
+                            <img src="${p.image}" alt="${p.title}" class="product-image">
+                        </a>
+                        <button class="remove-wishlist-btn" onclick="removeFromWishlist(${p.id})">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <a href="product.html?id=${p.id}">
+                        <div class="product-info mt-3">
+                            <h3 class="product-title">${p.title}</h3>
+                            <span class="product-price">£${p.price.toFixed(2)}</span>
+                        </div>
+                        <p class="product-category">${p.category}</p>
+                    </a>
+                    <button onclick="addToCart(${p.id}, 'M', 'Black', 1)" class="btn btn-primary btn-full btn-sm mt-3">Add to Bag</button>
+                </div>
+            `).join('');
+            
+            lucide.createIcons();
+        }
+
+        function removeFromWishlist(productId) {
+            toggleWishlist(productId);
+            renderWishlistTab();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set user name if logged in
+            if (state.user) {
+                document.getElementById('user-name').textContent = state.user.name || 'Member';
+            }
+        });
+    </script>
+</body>
+</html>
