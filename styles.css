@@ -53,6 +53,18 @@ body {
     background: var(--brand-black);
 }
 
+/* Hide scrollbar on mobile */
+@media (max-width: 767px) {
+    ::-webkit-scrollbar {
+        width: 0;
+    }
+
+    body {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+}
+
 /* Container */
 .container-main {
     max-width: 1920px;
