@@ -1447,6 +1447,23 @@ body {
     }
 }
 
+/* Mobile header centering */
+@media (max-width: 767px) {
+    #main-header .container-main > div {
+        justify-content: center;
+    }
+
+    #main-header .container-main > div > div:first-child {
+        position: absolute;
+        left: 1rem;
+    }
+
+    #main-header .container-main > div > div:last-child {
+        position: absolute;
+        right: 1rem;
+    }
+}
+
 @media (min-width: 768px) {
     .hide-desktop {
         display: none !important;
