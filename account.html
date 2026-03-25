@@ -233,6 +233,19 @@
 
             <!-- Account Dashboard -->
             <section class="container-main py-8 md:py-12">
+                <!-- User Info Bar -->
+                <div
+                    class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-gray-200">
+                    <div>
+                        <h2 class="text-xl font-bold uppercase" id="user-fullname">Welcome</h2>
+                        <p class="text-gray-500 text-sm" id="user-email-display"></p>
+                    </div>
+                    <button onclick="logout()" class="btn btn-secondary btn-sm mt-4 md:mt-0 flex items-center gap-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        Sign Out
+                    </button>
+                </div>
+
                 <!-- Tabs -->
                 <div class="account-tabs border-b border-gray-200 mb-8 overflow-x-auto">
                     <button class="account-tab active" data-tab="orders">My Orders</button>
@@ -393,6 +406,30 @@
         </footer>
 
         <script src="main.js"></script>
+        <script src="auth.js"></script>
+        <script>
+            // Check authentication
+            if (!Auth.isLoggedIn()) {
+                window.location.href = '/login?redirect=/account';
+            }
+
+            // Load user data
+            const user = Auth.getUser();
+            if (user) {
+                document.getElementById('user-name').textContent = user.firstName || 'Member';
+                document.getElementById('user-fullname').textContent = `Welcome, ${user.firstName || 'Member'}`;
+                document.getElementById('user-email-display').textContent = user.email;
+                document.getElementById('user-firstname').value = user.firstName || '';
+                document.getElementById('user-lastname').value = user.lastName || '';
+                document.getElementById('user-email').value = user.email;
+            }
+
+            // Logout function
+            function logout() {
+                Auth.logout();
+                window.location.href = '/';
+            }
+        </script>
         <script>
             const allProducts = [
                 { id: 1, title: 'Racer Trophy Tee', price: 45, image: 'product-1.png', category: 'Tops' },

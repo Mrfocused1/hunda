@@ -1,13 +1,15 @@
 {
-  "rewrites": [
-    { "source": "/shop", "destination": "/shop.html" },
-    { "source": "/shop/:path*", "destination": "/shop.html" },
-    { "source": "/product", "destination": "/product.html" },
-    { "source": "/product/:path*", "destination": "/product.html" },
-    { "source": "/cart", "destination": "/cart.html" },
-    { "source": "/checkout", "destination": "/checkout.html" },
-    { "source": "/wishlist", "destination": "/wishlist.html" },
-    { "source": "/account", "destination": "/account.html" },
-    { "source": "/about", "destination": "/about.html" }
-  ]
+    "rewrites": [
+        { "source": "/shop", "destination": "/shop.html" },
+        { "source": "/shop/:path*", "destination": "/shop.html" },
+        { "source": "/product", "destination": "/product.html" },
+        { "source": "/product/:path*", "destination": "/product.html" },
+        { "source": "/cart", "destination": "/cart.html" },
+        { "source": "/checkout", "destination": "/checkout.html" },
+        { "source": "/wishlist", "destination": "/wishlist.html" },
+        { "source": "/account", "destination": "/account.html" },
+        { "source": "/about", "destination": "/about.html" },
+        { "source": "/login", "destination": "/login.html" },
+        { "source": "/signup", "destination": "/signup.html" }
+    ]
 }

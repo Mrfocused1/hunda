@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login | 1 HUNDRED</title>
+        <meta name="description" content="Sign in to your 1 HUNDRED account." />
+
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link rel="stylesheet" href="styles.css" />
+        <style>
+            .auth-container {
+                min-height: calc(100vh - 64px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1rem;
+                background: var(--brand-grey);
+            }
+            .auth-box {
+                width: 100%;
+                max-width: 420px;
+                background: var(--white);
+                padding: 2.5rem;
+            }
+            @media (min-width: 640px) {
+                .auth-box {
+                    padding: 3rem;
+                    border: 1px solid var(--brand-light-grey);
+                }
+            }
+            .auth-title {
+                font-family: 'Oswald', sans-serif;
+                font-size: 1.875rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                text-align: center;
+                margin-bottom: 0.5rem;
+            }
+            .auth-subtitle {
+                text-align: center;
+                color: var(--brand-mid-grey);
+                margin-bottom: 2rem;
+                font-size: 0.875rem;
+            }
+            .auth-footer {
+                text-align: center;
+                margin-top: 1.5rem;
+                padding-top: 1.5rem;
+                border-top: 1px solid var(--brand-light-grey);
+                font-size: 0.875rem;
+            }
+            .auth-link {
+                color: var(--brand-black);
+                font-weight: 600;
+                text-decoration: underline;
+            }
+            .auth-link:hover {
+                opacity: 0.7;
+            }
+            .form-options {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                font-size: 0.875rem;
+            }
+            .remember-me {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+            }
+            .remember-me input {
+                width: 18px;
+                height: 18px;
+                accent-color: var(--brand-black);
+                cursor: pointer;
+            }
+            .forgot-link {
+                color: var(--brand-mid-grey);
+                font-size: 0.875rem;
+            }
+            .forgot-link:hover {
+                color: var(--brand-black);
+            }
+            .error-message {
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+                color: #dc2626;
+                padding: 0.75rem 1rem;
+                margin-bottom: 1rem;
+                font-size: 0.875rem;
+                display: none;
+            }
+            .error-message.show {
+                display: block;
+            }
+        </style>
+    </head>
+    <body class="antialiased">
+        <!-- Page Loader -->
+        <div id="page-loader" class="page-loader">
+            <img src="logo.svg" alt="1 HUNDRED" />
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span id="toast-msg">Message</span>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="menu-overlay" class="mobile-menu-overlay"></div>
+
+        <!-- Mobile Menu -->
+        <nav id="mobile-menu" class="mobile-menu">
+            <div class="mobile-menu-header">
+                <a href="/">
+                    <img src="logo.svg" alt="1 HUNDRED" class="h-8" />
+                </a>
+                <button id="menu-toggle-close" class="p-2">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <div class="mobile-search">
+                <div class="relative">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        class="w-full bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm" />
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                </div>
+            </div>
+
+            <div class="flex flex-col">
+                <a href="/shop" class="mobile-nav-link">Shop All</a>
+                <a href="/shop?new=true" class="mobile-nav-link">New In</a>
+                <a href="/about" class="mobile-nav-link">About Us</a>
+
+                <div class="border-t border-gray-200 mt-4 pt-4">
+                    <a href="/login" class="mobile-nav-link">
+                        <span>Sign In</span>
+                        <i data-lucide="log-in" class="w-5 h-5"></i>
+                    </a>
+                    <a href="/wishlist" class="mobile-nav-link">
+                        <span>Wishlist</span>
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                    </a>
+                    <a href="/cart" class="mobile-nav-link">
+                        <span>Shopping Bag</span>
+                        <div class="flex items-center gap-2">
+                            <span id="cart-count-mobile" class="badge hidden">0</span>
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Cart Drawer -->
+        <div id="cart-overlay" class="mobile-menu-overlay"></div>
+        <aside
+            id="cart-drawer"
+            class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="font-display font-bold uppercase text-xl">Bag (<span id="mini-cart-count">0</span>)</h2>
+                <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="mini-cart-items" class="flex-1 overflow-y-auto p-6"></div>
+            <div class="p-6 border-t border-gray-100 bg-gray-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Subtotal</span>
+                    <span id="mini-cart-subtotal">£0.00</span>
+                </div>
+                <a href="/checkout" class="btn btn-primary btn-full mb-3">Checkout</a>
+                <a href="/cart" class="btn btn-secondary btn-full">View Bag</a>
+            </div>
+        </aside>
+
+        <!-- Header -->
+        <header id="main-header" class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+            <div class="container-main">
+                <!-- Desktop Header Layout -->
+                <div class="h-16 hidden lg:flex items-center justify-between">
+                    <a href="/" class="flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+
+                    <nav class="flex items-center gap-8">
+                        <a href="/shop" class="nav-link">Shop All</a>
+                        <a href="/shop?new=true" class="nav-link">New In</a>
+                        <a href="/about" class="nav-link">About Us</a>
+                    </nav>
+
+                    <div class="search-container">
+                        <i data-lucide="search" class="search-icon w-4 h-4"></i>
+                        <input type="text" placeholder="Search for items, brands..." class="search-input" />
+                        <div class="search-dropdown">
+                            <div class="text-xs text-gray-400 font-bold uppercase mb-2">Trending</div>
+                            <ul class="text-sm space-y-2">
+                                <li>
+                                    <a
+                                        href="/shop?q=oversized"
+                                        class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"
+                                        ><span>Oversized Blazer</span> <span class="text-gray-300">Category</span></a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="/shop?q=cargo"
+                                        class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"
+                                        ><span>Cargo Pants</span> <span class="text-gray-300">Category</span></a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="/shop?q=nike"
+                                        class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"
+                                        ><span>Nike Dunk</span> <span class="text-gray-300">Brand</span></a
+                                    >
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <a href="/login" class="header-action" aria-label="Sign In">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </a>
+                        <a href="/wishlist" class="header-action" aria-label="Wishlist">
+                            <i data-lucide="heart" class="w-5 h-5"></i>
+                            <span id="wishlist-count" class="badge hidden">0</span>
+                        </a>
+                        <button id="cart-trigger" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Header Layout -->
+                <div class="h-16 lg:hidden flex items-center justify-between relative">
+                    <button id="menu-toggle" class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+
+                    <a href="/" class="absolute left-1/2 -translate-x-1/2 flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+
+                    <div class="flex items-center gap-3">
+                        <button class="header-action" aria-label="Search">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                        </button>
+                        <button id="cart-trigger-mobile" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count-mobile-header" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="pt-16">
+            <div class="auth-container">
+                <div class="auth-box">
+                    <h1 class="auth-title">Welcome Back</h1>
+                    <p class="auth-subtitle">Sign in to access your account and orders</p>
+
+                    <div id="error-message" class="error-message"></div>
+
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-input"
+                                placeholder="you@example.com"
+                                required
+                                autocomplete="email" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-input"
+                                placeholder="••••••••"
+                                required
+                                autocomplete="current-password" />
+                        </div>
+
+                        <div class="form-options">
+                            <label class="remember-me">
+                                <input type="checkbox" id="remember-me" name="remember-me" />
+                                <span>Remember me</span>
+                            </label>
+                            <a
+                                href="#"
+                                class="forgot-link"
+                                onclick="
+                                    showForgotPassword();
+                                    return false;
+                                "
+                                >Forgot password?</a
+                            >
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full mb-4">Sign In</button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p>Don't have an account? <a href="/signup" class="auth-link">Create one</a></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-black text-white py-12 md:py-16">
+            <div class="container-main">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                    <div class="col-span-2 md:col-span-1">
+                        <img src="logo.svg" alt="1 HUNDRED" class="h-12 mb-6 brightness-0 invert" />
+                        <p class="text-gray-400 text-sm">
+                            Premium streetwear for the modern individual. Designed in London, worn worldwide.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold uppercase mb-4 text-sm">Shop</h4>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li><a href="/shop" class="hover:text-white transition-colors">Shop All</a></li>
+                            <li>
+                                <a href="/shop?new=true" class="hover:text-white transition-colors">New Arrivals</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold uppercase mb-4 text-sm">Help</h4>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Help Centre</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Delivery & Returns</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold uppercase mb-4 text-sm">Join The List</h4>
+                        <p class="text-gray-400 text-sm mb-4">
+                            Get 15% off your first order and exclusive access to drops.
+                        </p>
+                        <div class="flex border-b border-gray-700">
+                            <input
+                                type="email"
+                                placeholder="Email Address"
+                                class="bg-transparent py-2 flex-1 text-sm outline-none placeholder-gray-600" />
+                            <button class="text-sm font-bold py-2 hover:text-gray-300 transition-colors">JOIN</button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+                    <p>&copy; 2026 1 HUNDRED Ltd. All rights reserved.</p>
+                    <div class="flex gap-6">
+                        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="hover:text-white transition-colors">Terms & Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script src="main.js"></script>
+        <script src="auth.js"></script>
+        <script>
+            // Login form handling
+            document.getElementById('login-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const rememberMe = document.getElementById('remember-me').checked;
+                const errorDiv = document.getElementById('error-message');
+
+                // Simple validation
+                if (!email || !password) {
+                    errorDiv.textContent = 'Please fill in all fields';
+                    errorDiv.classList.add('show');
+                    return;
+                }
+
+                // Attempt login
+                const result = Auth.login(email, password, rememberMe);
+
+                if (result.success) {
+                    // Redirect to account or intended page
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirect = urlParams.get('redirect') || '/account';
+                    window.location.href = redirect;
+                } else {
+                    errorDiv.textContent = result.message;
+                    errorDiv.classList.add('show');
+                }
+            });
+
+            function showForgotPassword() {
+                showToast('Password reset coming soon');
+            }
+
+            // Check if already logged in
+            if (Auth.isLoggedIn()) {
+                window.location.href = '/account';
+            }
+        </script>
+    </body>
+</html>
