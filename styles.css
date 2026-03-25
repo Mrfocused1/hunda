@@ -1449,37 +1449,33 @@ body {
 
 /* Mobile header centering */
 @media (max-width: 767px) {
-    #main-header .container-main {
-        position: relative;
-    }
-
     #main-header .container-main > div {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        align-items: center;
-        justify-items: center;
+        position: relative !important;
+        justify-content: center !important;
     }
 
     #main-header .container-main > div > div:first-child {
-        grid-column: 1;
-        justify-self: start;
-        gap: 0 !important;
+        position: absolute !important;
+        left: 1rem;
+        flex: 0 0 auto !important;
     }
 
-    #main-header .container-main > div > div:first-child button {
-        margin-right: 1rem;
+    #main-header .container-main > div > div:first-child a {
+        position: absolute !important;
+        left: calc(50% - 1rem) !important;
+        transform: translateX(-50%) !important;
+        top: 50% !important;
+        margin-left: 0 !important;
+        margin-top: -0.5rem !important;
     }
 
     #main-header .container-main > div > div:last-child {
-        grid-column: 3;
-        justify-self: end;
+        position: absolute !important;
+        right: 1rem !important;
     }
 
-    #main-header .container-main > div > nav {
-        display: none !important;
-    }
-
-    #main-header .container-main > div > div:nth-child(3) {
+    #main-header .container-main > div > nav,
+    #main-header .container-main > div > .search-container {
         display: none !important;
     }
 }
