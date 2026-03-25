@@ -196,36 +196,14 @@
                     <button class="btn btn-primary btn-sm" onclick="showToast('Add address feature coming soon')">Add New</button>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div class="border border-gray-200 p-6 rounded-lg relative">
-                        <span class="absolute top-4 right-4 bg-black text-white text-xs px-2 py-1 uppercase font-bold">Default</span>
-                        <h3 class="font-bold mb-2">John Smith</h3>
-                        <p class="text-gray-600 text-sm">
-                            123 Street Name<br>
-                            London<br>
-                            SW1A 1AA<br>
-                            United Kingdom
-                        </p>
-                        <div class="flex gap-2 mt-4">
-                            <button class="text-sm underline" onclick="showToast('Edit feature coming soon')">Edit</button>
-                            <button class="text-sm underline text-red-500" onclick="showToast('Delete feature coming soon')">Delete</button>
-                        </div>
-                    </div>
-
-                    <div class="border border-gray-200 p-6 rounded-lg">
-                        <h3 class="font-bold mb-2">Jane Smith</h3>
-                        <p class="text-gray-600 text-sm">
-                            456 Another Street<br>
-                            Manchester<br>
-                            M1 1AA<br>
-                            United Kingdom
-                        </p>
-                        <div class="flex gap-2 mt-4">
-                            <button class="text-sm underline" onclick="showToast('Edit feature coming soon')">Edit</button>
-                            <button class="text-sm underline" onclick="showToast('Set as default coming soon')">Set as Default</button>
-                            <button class="text-sm underline text-red-500" onclick="showToast('Delete feature coming soon')">Delete</button>
-                        </div>
-                    </div>
+                <div id="addresses-list" class="grid md:grid-cols-2 gap-4">
+                    <!-- Addresses will be rendered here dynamically -->
+                </div>
+                
+                <div id="no-addresses" class="text-center py-12">
+                    <i data-lucide="map-pin" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i>
+                    <h3 class="text-lg font-bold mb-2">No saved addresses</h3>
+                    <p class="text-gray-500 mb-6">You haven't saved any delivery addresses yet.</p>
                 </div>
             </div>
 
@@ -237,22 +215,22 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">First Name</label>
-                            <input type="text" class="form-input" value="John">
+                            <input type="text" class="form-input" id="user-firstname" placeholder="Enter first name">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Last Name</label>
-                            <input type="text" class="form-input" value="Smith">
+                            <input type="text" class="form-input" id="user-lastname" placeholder="Enter last name">
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Email</label>
-                        <input type="email" class="form-input" value="john.smith@example.com">
+                        <input type="email" class="form-input" id="user-email" placeholder="Enter email address">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Phone</label>
-                        <input type="tel" class="form-input" value="+44 123 456 7890">
+                        <input type="tel" class="form-input" id="user-phone" placeholder="Enter phone number">
                     </div>
 
                     <div class="border-t border-gray-200 pt-6 mt-6">
@@ -441,6 +419,52 @@
             `).join('');
         }
 
+        // Render addresses
+        function renderAddresses() {
+            const addressesList = document.getElementById('addresses-list');
+            const noAddresses = document.getElementById('no-addresses');
+            
+            // Get addresses from localStorage or use empty array
+            const addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+            
+            if (addresses.length === 0) {
+                addressesList.classList.add('hidden');
+                noAddresses.classList.remove('hidden');
+                return;
+            }
+            
+            addressesList.classList.remove('hidden');
+            noAddresses.classList.add('hidden');
+            
+            addressesList.innerHTML = addresses.map((address, index) => `
+                <div class="border border-gray-200 p-6 rounded-lg ${address.isDefault ? 'relative' : ''}">
+                    ${address.isDefault ? '<span class="absolute top-4 right-4 bg-black text-white text-xs px-2 py-1 uppercase font-bold">Default</span>' : ''}
+                    <h3 class="font-bold mb-2">${address.name}</h3>
+                    <p class="text-gray-600 text-sm">
+                        ${address.street}<br>
+                        ${address.city}<br>
+                        ${address.postcode}<br>
+                        ${address.country}
+                    </p>
+                    <div class="flex gap-2 mt-4">
+                        <button class="text-sm underline" onclick="showToast('Edit feature coming soon')">Edit</button>
+                        ${!address.isDefault ? '<button class="text-sm underline" onclick="showToast(\'Set as default coming soon\')">Set as Default</button>' : ''}
+                        <button class="text-sm underline text-red-500" onclick="showToast('Delete feature coming soon')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load account details
+        function loadAccountDetails() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            document.getElementById('user-firstname').value = user.firstName || '';
+            document.getElementById('user-lastname').value = user.lastName || '';
+            document.getElementById('user-email').value = user.email || '';
+            document.getElementById('user-phone').value = user.phone || '';
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Set user name if logged in
             if (state.user) {
@@ -449,6 +473,13 @@
             
             // Render orders
             renderOrders();
+            
+            // Render addresses
+            renderAddresses();
+            
+            // Load account details
+            loadAccountDetails();
+            
             lucide.createIcons();
         });
     </script>
