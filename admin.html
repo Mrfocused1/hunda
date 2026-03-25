@@ -96,6 +96,35 @@
                 padding: 2rem;
             }
 
+            /* Mobile Responsive Adjustments */
+            @media (max-width: 640px) {
+                .admin-main {
+                    margin-left: 0;
+                }
+                .admin-header {
+                    padding: 0.75rem 1rem;
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                }
+                .admin-content {
+                    padding: 1rem;
+                }
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                    margin-bottom: 1.5rem;
+                }
+                .section-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 0.75rem;
+                    margin-bottom: 1rem;
+                }
+                .section-title {
+                    font-size: 1.25rem;
+                }
+            }
+
             /* Stats Cards */
             .stats-grid {
                 display: grid;
@@ -152,10 +181,16 @@
             }
 
             /* Data Tables */
-            .data-table {
-                width: 100%;
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
                 background: white;
                 border: 1px solid #e5e7eb;
+            }
+            .data-table {
+                width: 100%;
+                min-width: 600px;
+                background: white;
                 font-size: 0.875rem;
             }
             .data-table th,
@@ -178,6 +213,18 @@
                 width: 48px;
                 height: 48px;
                 object-fit: cover;
+            }
+
+            /* Mobile Table Adjustments */
+            @media (max-width: 640px) {
+                .data-table th,
+                .data-table td {
+                    padding: 0.75rem 0.5rem;
+                }
+                .data-table img {
+                    width: 40px;
+                    height: 40px;
+                }
             }
 
             /* Buttons */
