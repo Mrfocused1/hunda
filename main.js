@@ -14,14 +14,14 @@ const state = {
 
 // --- PRODUCT DATA ---
 const products = [
-    { id: 1, title: "Symbol Vision Tee", price: 45, category: "Tops", image: "product-1.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White", "Cream"] },
-    { id: 2, title: "Money Vision Tee", price: 45, category: "Tops", image: "product-2.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"] },
-    { id: 3, title: "Pop Art Tee", price: 45, category: "Tops", image: "product-3.png", sizes: ["S", "M", "L"], colors: ["Black", "White", "Cream"] },
-    { id: 4, title: "Cap Vision Tee", price: 45, category: "Tops", image: "product-4.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"] },
-    { id: 5, title: "Certified Boss Tee", price: 45, category: "Tops", image: "product-5.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "Cream"] },
-    { id: 6, title: "Gang Street Tee", price: 45, category: "Tops", image: "product-6.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"] },
-    { id: 7, title: "Classic Logo Tee", price: 45, category: "Tops", image: "product-tshirt.png", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White", "Cream", "Grey"] },
-    { id: 8, title: "Pop Art Vision Tee", price: 45, category: "Tops", image: "product-tshirt-2.png", sizes: ["S", "M", "L"], colors: ["Black", "White"] },
+    { id: 1, title: "Symbol Vision Tee", price: 45, category: "Tops", image: "product-1.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White", "Cream"] },
+    { id: 2, title: "Money Vision Tee", price: 45, category: "Tops", image: "product-2.jpg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"] },
+    { id: 3, title: "Pop Art Tee", price: 45, category: "Tops", image: "product-3.jpeg", sizes: ["S", "M", "L"], colors: ["Black", "White", "Cream"] },
+    { id: 4, title: "Cap Vision Tee", price: 45, category: "Tops", image: "product-4.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"] },
+    { id: 5, title: "Certified Boss Tee", price: 45, category: "Tops", image: "product-5.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "Cream"] },
+    { id: 6, title: "Gang Street Tee", price: 45, category: "Tops", image: "product-6.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White"] },
+    { id: 7, title: "Classic Logo Tee", price: 45, category: "Tops", image: "product-7.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black", "White", "Cream", "Grey"] },
+    { id: 8, title: "Pop Art Vision Tee", price: 45, category: "Tops", image: "product-8.svg", sizes: ["S", "M", "L"], colors: ["Black", "White"] },
 ];
 
 const categories = [
