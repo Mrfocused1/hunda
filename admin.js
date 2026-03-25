@@ -528,6 +528,21 @@ function logoutAdmin() {
     window.location.href = '/admin-login';
 }
 
+// Mobile Menu Functions
+function toggleMobileMenu() {
+    const sidebar = document.getElementById('admin-sidebar');
+    const overlay = document.getElementById('admin-overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+}
+
+function closeMobileMenu() {
+    const sidebar = document.getElementById('admin-sidebar');
+    const overlay = document.getElementById('admin-overlay');
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function () {
     initNavigation();
@@ -537,5 +552,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Close modal on overlay click
     document.getElementById('product-modal').addEventListener('click', function (e) {
         if (e.target === this) closeProductModal();
+    });
+
+    // Close mobile menu when clicking nav items
+    document.querySelectorAll('.admin-nav-item[data-section]').forEach((item) => {
+        item.addEventListener('click', closeMobileMenu);
     });
 });
