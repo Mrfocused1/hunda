@@ -177,72 +177,15 @@
             <div id="orders" class="tab-content active">
                 <h2 class="text-xl font-bold uppercase mb-6">Order History</h2>
                 
-                <div class="space-y-4">
-                    <!-- Order 1 -->
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div>
-                                <div class="font-bold">Order #1H-2026-089</div>
-                                <div class="text-sm text-gray-500">Placed on 15 Mar 2026</div>
-                            </div>
-                            <span class="order-status delivered">Delivered</span>
-                        </div>
-                        <div class="flex gap-4 mb-4">
-                            <img src="product-1.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
-                            <img src="product-2.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
-                        </div>
-                        <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                            <span class="font-bold">Total: £90.00</span>
-                            <div class="flex gap-2">
-                                <button class="btn btn-secondary btn-sm">View Order</button>
-                                <button class="btn btn-primary btn-sm">Track</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Order 2 -->
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div>
-                                <div class="font-bold">Order #1H-2026-092</div>
-                                <div class="text-sm text-gray-500">Placed on 18 Mar 2026</div>
-                            </div>
-                            <span class="order-status shipped">Shipped</span>
-                        </div>
-                        <div class="flex gap-4 mb-4">
-                            <img src="product-4.jpeg" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
-                        </div>
-                        <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                            <span class="font-bold">Total: £65.00</span>
-                            <div class="flex gap-2">
-                                <button class="btn btn-secondary btn-sm">View Order</button>
-                                <button class="btn btn-primary btn-sm">Track</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Order 3 -->
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div>
-                                <div class="font-bold">Order #1H-2026-105</div>
-                                <div class="text-sm text-gray-500">Placed on 21 Mar 2026</div>
-                            </div>
-                            <span class="order-status processing">Processing</span>
-                        </div>
-                        <div class="flex gap-4 mb-4">
-                            <img src="product-3.png" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
-                            <img src="product-5.jpeg" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
-                            <img src="product-6.jpeg" alt="Product" class="w-16 h-20 object-cover rounded bg-gray-100">
-                        </div>
-                        <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                            <span class="font-bold">Total: £135.00</span>
-                            <div class="flex gap-2">
-                                <button class="btn btn-secondary btn-sm">View Order</button>
-                                <button class="btn btn-primary btn-sm" disabled>Track</button>
-                            </div>
-                        </div>
-                    </div>
+                <div id="orders-list" class="space-y-4">
+                    <!-- Orders will be rendered here dynamically -->
+                </div>
+                
+                <div id="no-orders" class="text-center py-12">
+                    <i data-lucide="package" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i>
+                    <h3 class="text-lg font-bold mb-2">No orders yet</h3>
+                    <p class="text-gray-500 mb-6">You haven't placed any orders yet.</p>
+                    <a href="/shop" class="btn btn-primary">Start Shopping</a>
                 </div>
             </div>
 
@@ -456,11 +399,57 @@
             renderWishlistTab();
         }
 
+        // Render orders
+        function renderOrders() {
+            const ordersList = document.getElementById('orders-list');
+            const noOrders = document.getElementById('no-orders');
+            
+            // Get orders from localStorage or use empty array
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            
+            if (orders.length === 0) {
+                ordersList.classList.add('hidden');
+                noOrders.classList.remove('hidden');
+                return;
+            }
+            
+            ordersList.classList.remove('hidden');
+            noOrders.classList.add('hidden');
+            
+            ordersList.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="font-bold">Order #${order.id}</div>
+                            <div class="text-sm text-gray-500">Placed on ${order.date}</div>
+                        </div>
+                        <span class="order-status ${order.status.toLowerCase()}">${order.status}</span>
+                    </div>
+                    <div class="flex gap-4 mb-4">
+                        ${order.items.map(item => `
+                            <img src="${item.image}" alt="${item.title}" class="w-16 h-20 object-cover rounded bg-gray-100">
+                        `).join('')}
+                    </div>
+                    <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                        <span class="font-bold">Total: £${order.total.toFixed(2)}</span>
+                        <div class="flex gap-2">
+                            <button class="btn btn-secondary btn-sm">View Order</button>
+                            <button class="btn btn-primary btn-sm" ${order.status === 'Processing' ? 'disabled' : ''}>Track</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Set user name if logged in
             if (state.user) {
                 document.getElementById('user-name').textContent = state.user.name || 'Member';
             }
+            
+            // Render orders
+            renderOrders();
+            lucide.createIcons();
         });
     </script>
 </body>
