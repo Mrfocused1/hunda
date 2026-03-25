@@ -14,12 +14,12 @@ const state = {
 
 // --- PRODUCT DATA ---
 const products = [
-    { id: 1, title: "1H Colorway Cap", price: 35, category: "Hats", image: "product-1.jpeg", sizes: ["One Size"], colors: ["White/Black"] },
-    { id: 2, title: "Endless Possibilities Jacket", price: 120, category: "Jackets", image: "product-2.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Blue"] },
-    { id: 3, title: "1H Signature Jacket", price: 140, category: "Jackets", image: "product-3.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black"] },
-    { id: 4, title: "Knight Vision Tee", price: 55, category: "Tops", image: "product-4.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"] },
-    { id: 5, title: "Engineered For Champions Tee", price: 55, category: "Tops", image: "product-5.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"] },
-    { id: 6, title: "1H Vintage Cap", price: 35, category: "Hats", image: "product-6.png", sizes: ["One Size"], colors: ["White/Black"] },
+    { id: 1, title: "Product 1", price: 45, category: "Tops", image: "product-1.png", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
+    { id: 2, title: "Product 2", price: 45, category: "Tops", image: "product-2.png", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
+    { id: 3, title: "Product 3", price: 45, category: "Tops", image: "product-3.png", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
+    { id: 4, title: "Product 4", price: 45, category: "Tops", image: "product-4.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
+    { id: 5, title: "Product 5", price: 45, category: "Tops", image: "product-5.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
+    { id: 6, title: "Product 6", price: 45, category: "Tops", image: "product-6.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
 ];
 
 const categories = [
