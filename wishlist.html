@@ -48,19 +48,19 @@
         </div>
         
         <div class="flex flex-col">
-            <a href="shop.html" class="mobile-nav-link">Shop All</a>
-            <a href="shop.html?new=true" class="mobile-nav-link">New In</a>
+            <a href="/shop" class="mobile-nav-link">Shop All</a>
+            <a href="/shop?new=true" class="mobile-nav-link">New In</a>
             
             <div class="border-t border-gray-200 mt-4 pt-4">
-                <a href="account.html" class="mobile-nav-link">
+                <a href="/account" class="mobile-nav-link">
                     <span>My Account</span>
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </a>
-                <a href="wishlist.html" class="mobile-nav-link">
+                <a href="/wishlist" class="mobile-nav-link">
                     <span>Wishlist</span>
                     <i data-lucide="heart" class="w-5 h-5"></i>
                 </a>
-                <a href="cart.html" class="mobile-nav-link">
+                <a href="/cart" class="mobile-nav-link">
                     <span>Shopping Bag</span>
                     <div class="flex items-center gap-2">
                         <span id="cart-count-mobile" class="badge hidden">0</span>
@@ -87,8 +87,8 @@
                 </div>
 
                 <nav class="hidden lg:flex items-center gap-8">
-                    <a href="shop.html" class="nav-link">Shop All</a>
-                    <a href="shop.html?new=true" class="nav-link">New In</a>
+                    <a href="/shop" class="nav-link">Shop All</a>
+                    <a href="/shop?new=true" class="nav-link">New In</a>
                 </nav>
 
                 <div class="hidden lg:block search-container">
@@ -100,10 +100,10 @@
                     <button class="lg:hidden header-action" aria-label="Search">
                         <i data-lucide="search" class="w-5 h-5"></i>
                     </button>
-                    <a href="account.html" class="header-action hidden sm:flex" aria-label="Account">
+                    <a href="/account" class="header-action hidden sm:flex" aria-label="Account">
                         <i data-lucide="user" class="w-5 h-5"></i>
                     </a>
-                    <a href="wishlist.html" class="header-action hidden sm:flex" aria-label="Wishlist">
+                    <a href="/wishlist" class="header-action hidden sm:flex" aria-label="Wishlist">
                         <i data-lucide="heart" class="w-5 h-5"></i>
                     </a>
                     <button id="cart-trigger" class="header-action" aria-label="Cart">
@@ -130,8 +130,8 @@
                 <span>Subtotal</span>
                 <span id="mini-cart-subtotal">£0.00</span>
             </div>
-            <a href="checkout.html" class="btn btn-primary btn-full mb-3">Checkout</a>
-            <a href="cart.html" class="btn btn-secondary btn-full">View Bag</a>
+            <a href="/checkout" class="btn btn-primary btn-full mb-3">Checkout</a>
+            <a href="/cart" class="btn btn-secondary btn-full">View Bag</a>
         </div>
     </aside>
 
@@ -160,7 +160,7 @@
                     </div>
                     <h2 class="empty-state-title">Your wishlist is empty</h2>
                     <p class="empty-state-text">Save your favourite items to buy them later or share with friends.</p>
-                    <a href="shop.html" class="btn btn-primary btn-lg mt-6">Start Shopping</a>
+                    <a href="/shop" class="btn btn-primary btn-lg mt-6">Start Shopping</a>
                 </div>
             </div>
 
@@ -206,8 +206,8 @@
                 <div>
                     <h4 class="footer-title">Shop</h4>
                     <div class="footer-links">
-                        <a href="shop.html" class="footer-link">Shop All</a>
-                        <a href="shop.html?new=true" class="footer-link">New Arrivals</a>
+                        <a href="/shop" class="footer-link">Shop All</a>
+                        <a href="/shop?new=true" class="footer-link">New Arrivals</a>
                     </div>
                 </div>
                 <div>
@@ -275,14 +275,14 @@
             container.innerHTML = wishlistProducts.map(p => `
                 <div class="group">
                     <div class="product-image-wrapper mb-3">
-                        <a href="product.html?id=${p.id}">
+                        <a href="/product?id=${p.id}">
                             <img src="${p.image}" alt="${p.title}" class="product-image">
                         </a>
                         <button class="remove-wishlist-btn" onclick="removeFromWishlist(${p.id})" title="Remove from wishlist">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
-                    <a href="product.html?id=${p.id}">
+                    <a href="/product?id=${p.id}">
                         <div class="product-info">
                             <h3 class="product-title">${p.title}</h3>
                             <span class="product-price">£${p.price.toFixed(2)}</span>
@@ -333,7 +333,7 @@
                             <i data-lucide="heart" class="w-4 h-4" style="fill: ${isInWishlist(p.id) ? 'currentColor' : 'none'}"></i>
                         </button>
                     </div>
-                    <a href="product.html?id=${p.id}">
+                    <a href="/product?id=${p.id}">
                         <div class="product-info">
                             <h3 class="product-title">${p.title}</h3>
                             <span class="product-price">£${p.price.toFixed(2)}</span>

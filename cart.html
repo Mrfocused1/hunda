@@ -48,15 +48,15 @@
         </div>
         
         <div class="flex flex-col">
-            <a href="shop.html" class="mobile-nav-link">Shop All</a>
-            <a href="shop.html?new=true" class="mobile-nav-link">New In</a>
+            <a href="/shop" class="mobile-nav-link">Shop All</a>
+            <a href="/shop?new=true" class="mobile-nav-link">New In</a>
             
             <div class="border-t border-gray-200 mt-4 pt-4">
-                <a href="account.html" class="mobile-nav-link">
+                <a href="/account" class="mobile-nav-link">
                     <span>My Account</span>
                     <i data-lucide="user" class="w-5 h-5"></i>
                 </a>
-                <a href="wishlist.html" class="mobile-nav-link">
+                <a href="/wishlist" class="mobile-nav-link">
                     <span>Wishlist</span>
                     <i data-lucide="heart" class="w-5 h-5"></i>
                 </a>
@@ -80,8 +80,8 @@
                 </div>
 
                 <nav class="hidden lg:flex items-center gap-8">
-                    <a href="shop.html" class="nav-link">Shop All</a>
-                    <a href="shop.html?new=true" class="nav-link">New In</a>
+                    <a href="/shop" class="nav-link">Shop All</a>
+                    <a href="/shop?new=true" class="nav-link">New In</a>
                 </nav>
 
                 <div class="hidden lg:block search-container">
@@ -93,13 +93,13 @@
                     <button class="lg:hidden header-action" aria-label="Search">
                         <i data-lucide="search" class="w-5 h-5"></i>
                     </button>
-                    <a href="account.html" class="header-action hidden sm:flex" aria-label="Account">
+                    <a href="/account" class="header-action hidden sm:flex" aria-label="Account">
                         <i data-lucide="user" class="w-5 h-5"></i>
                     </a>
-                    <a href="wishlist.html" class="header-action hidden sm:flex" aria-label="Wishlist">
+                    <a href="/wishlist" class="header-action hidden sm:flex" aria-label="Wishlist">
                         <i data-lucide="heart" class="w-5 h-5"></i>
                     </a>
-                    <a href="cart.html" class="header-action" aria-label="Cart">
+                    <a href="/cart" class="header-action" aria-label="Cart">
                         <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                         <span id="cart-count" class="badge hidden">0</span>
                     </a>
@@ -130,7 +130,7 @@
                     <i data-lucide="shopping-bag" class="empty-state-icon mx-auto"></i>
                     <h2 class="empty-state-title">Your bag is empty</h2>
                     <p class="empty-state-text">Looks like you haven't added anything yet.</p>
-                    <a href="shop.html" class="btn btn-primary btn-lg mt-6">Continue Shopping</a>
+                    <a href="/shop" class="btn btn-primary btn-lg mt-6">Continue Shopping</a>
                 </div>
             </div>
 
@@ -184,7 +184,7 @@
                             <p class="text-xs text-gray-500 mt-1">Including VAT</p>
                         </div>
 
-                        <a href="checkout.html" class="btn btn-primary btn-full mt-6">Proceed to Checkout</a>
+                        <a href="/checkout" class="btn btn-primary btn-full mt-6">Proceed to Checkout</a>
                         
                         <div class="mt-6 space-y-3">
                             <div class="flex items-center gap-2 text-sm text-gray-600">
@@ -227,8 +227,8 @@
                 <div>
                     <h4 class="footer-title">Shop</h4>
                     <div class="footer-links">
-                        <a href="shop.html" class="footer-link">Shop All</a>
-                        <a href="shop.html?new=true" class="footer-link">New Arrivals</a>
+                        <a href="/shop" class="footer-link">Shop All</a>
+                        <a href="/shop?new=true" class="footer-link">New Arrivals</a>
                     </div>
                 </div>
                 <div>
@@ -356,10 +356,10 @@
         function renderRecommended() {
             document.getElementById('recommended-products').innerHTML = recommendedProducts.map(p => `
                 <div class="product-card">
-                    <a href="product.html?id=${p.id}" class="product-image-wrapper">
+                    <a href="/product?id=${p.id}" class="product-image-wrapper">
                         <img src="${p.image}" alt="${p.title}" class="product-image">
                     </a>
-                    <a href="product.html?id=${p.id}">
+                    <a href="/product?id=${p.id}">
                         <div class="product-info">
                             <h3 class="product-title">${p.title}</h3>
                             <span class="product-price">£${p.price.toFixed(2)}</span>

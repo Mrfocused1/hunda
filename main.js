@@ -245,7 +245,7 @@ function renderMiniCart() {
             <div class="empty-state" style="padding: 3rem 1rem;">
                 <i data-lucide="shopping-bag" class="empty-state-icon"></i>
                 <p class="empty-state-text">Your bag is empty</p>
-                <a href="shop.html" class="btn btn-primary btn-sm">Continue Shopping</a>
+                <a href="/shop" class="btn btn-primary btn-sm">Continue Shopping</a>
             </div>
         `;
     } else {
