@@ -240,24 +240,24 @@ function loadProducts() {
         .map(
             (product) => `
         <tr>
-            <td><img src="${product.image}" alt="${product.title}"></td>
             <td>
-                <p class="font-medium">${product.title}</p>
-                <p class="text-xs text-gray-500">${product.description?.substring(0, 50) || ''}...</p>
+                <p class="font-medium line-clamp-2">${product.title}</p>
+                <p class="text-xs text-gray-500 hidden sm:block">${product.description?.substring(0, 40) || ''}...</p>
             </td>
-            <td>${product.category}</td>
-            <td>£${product.price.toFixed(2)}</td>
+            <td><img src="${product.image}" alt="${product.title}" loading="lazy"></td>
+            <td><span class="capitalize">${product.category}</span></td>
+            <td class="font-medium">£${product.price.toFixed(2)}</td>
             <td>${product.stock}</td>
             <td>
                 <span class="status-badge ${product.stock < 10 ? 'low-stock' : 'in-stock'}">
-                    ${product.stock < 10 ? 'Low Stock' : 'In Stock'}
+                    ${product.stock < 10 ? 'Low' : 'In Stock'}
                 </span>
             </td>
             <td>
-                <button class="btn btn-secondary btn-sm btn-icon" onclick="editProduct(${product.id})">
+                <button class="btn btn-secondary btn-sm btn-icon" onclick="editProduct(${product.id})" aria-label="Edit">
                     <i data-lucide="edit" class="w-4 h-4"></i>
                 </button>
-                <button class="btn btn-secondary btn-sm btn-icon" onclick="deleteProduct(${product.id})">
+                <button class="btn btn-secondary btn-sm btn-icon" onclick="deleteProduct(${product.id})" aria-label="Delete">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
             </td>
@@ -357,13 +357,17 @@ function loadOrders(filter = 'all') {
             (order) => `
         <tr>
             <td class="font-medium">${order.id}</td>
-            <td>${new Date(order.date).toLocaleDateString()}</td>
-            <td>${order.customer}</td>
-            <td>${order.items} items</td>
-            <td>£${order.total.toFixed(2)}</td>
+            <td>${new Date(order.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}</td>
             <td>
-                <select class="form-input text-xs" style="width: auto; padding: 0.25rem 0.5rem; height: auto;" 
-                        onchange="updateOrderStatus('${order.id}', this.value)">
+                <p class="font-medium">${order.customer}</p>
+                <p class="text-xs text-gray-500 sm:hidden">${order.items} items · £${order.total.toFixed(2)}</p>
+            </td>
+            <td class="hidden sm:table-cell">${order.items}</td>
+            <td class="hidden sm:table-cell font-medium">£${order.total.toFixed(2)}</td>
+            <td>
+                <select class="form-input status-select" 
+                        onchange="updateOrderStatus('${order.id}', this.value)"
+                        aria-label="Order status">
                     <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
                     <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
                     <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
@@ -418,11 +422,14 @@ function loadCustomers() {
         .map(
             (customer) => `
         <tr>
-            <td>${customer.firstName} ${customer.lastName}</td>
-            <td>${customer.email}</td>
+            <td>
+                <p class="font-medium">${customer.firstName} ${customer.lastName}</p>
+                <p class="text-xs text-gray-500 sm:hidden">${customer.email}</p>
+            </td>
+            <td class="hidden sm:table-cell">${customer.email}</td>
             <td>${customer.orders || 0}</td>
-            <td>£${(customer.totalSpent || 0).toFixed(2)}</td>
-            <td>${new Date(customer.joined).toLocaleDateString()}</td>
+            <td class="font-medium">£${(customer.totalSpent || 0).toFixed(2)}</td>
+            <td>${new Date(customer.joined).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}</td>
         </tr>
     `
         )
