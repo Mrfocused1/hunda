@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin Login | 1 HUNDRED</title>
+        <meta name="description" content="Admin access for 1 HUNDRED store management." />
+
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link rel="stylesheet" href="styles.css" />
+        <style>
+            .admin-login-container {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #111111 0%, #333333 100%);
+                padding: 2rem 1rem;
+            }
+            .admin-login-box {
+                width: 100%;
+                max-width: 420px;
+                background: var(--white);
+                padding: 3rem;
+            }
+            .admin-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                background: #111;
+                color: white;
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 1.5rem;
+            }
+            .admin-title {
+                font-family: 'Oswald', sans-serif;
+                font-size: 2rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                margin-bottom: 0.5rem;
+            }
+            .admin-subtitle {
+                color: var(--brand-mid-grey);
+                margin-bottom: 2rem;
+                font-size: 0.875rem;
+            }
+            .error-message {
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+                color: #dc2626;
+                padding: 0.75rem 1rem;
+                margin-bottom: 1rem;
+                font-size: 0.875rem;
+                display: none;
+            }
+            .error-message.show {
+                display: block;
+            }
+            .back-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: var(--brand-mid-grey);
+                font-size: 0.875rem;
+                margin-top: 2rem;
+                transition: color 0.2s;
+            }
+            .back-link:hover {
+                color: var(--brand-black);
+            }
+        </style>
+    </head>
+    <body class="antialiased">
+        <div class="admin-login-container">
+            <div class="admin-login-box">
+                <div class="text-center mb-8">
+                    <img src="logo.svg" alt="1 HUNDRED" class="h-10 mx-auto mb-6" />
+                    <div class="admin-badge">
+                        <i data-lucide="shield" class="w-4 h-4"></i>
+                        Admin Access
+                    </div>
+                    <h1 class="admin-title">Store Management</h1>
+                    <p class="admin-subtitle">Sign in to manage your store</p>
+                </div>
+
+                <div id="error-message" class="error-message"></div>
+
+                <form id="admin-login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="email">Admin Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-input"
+                            placeholder="admin@1hundred.com"
+                            required
+                            autocomplete="email" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            placeholder="••••••••"
+                            required
+                            autocomplete="current-password" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Sign In to Admin</button>
+                </form>
+
+                <div class="text-center">
+                    <a href="/" class="back-link">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        Back to Store
+                    </a>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+                    <p class="text-xs text-gray-400">Demo: admin@1hundred.com / admin123</p>
+                </div>
+            </div>
+        </div>
+
+        <script src="main.js"></script>
+        <script>
+            // Admin credentials (in production, this would be backend authenticated)
+            const ADMIN_CREDENTIALS = {
+                email: 'admin@1hundred.com',
+                password: 'admin123'
+            };
+
+            // Check if already logged in as admin
+            if (sessionStorage.getItem('1hundred_admin_session')) {
+                window.location.href = '/admin';
+            }
+
+            document.getElementById('admin-login-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const errorDiv = document.getElementById('error-message');
+
+                // Validate credentials
+                if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+                    // Create admin session
+                    sessionStorage.setItem(
+                        '1hundred_admin_session',
+                        JSON.stringify({
+                            email: email,
+                            loggedInAt: new Date().toISOString()
+                        })
+                    );
+
+                    // Redirect to admin dashboard
+                    window.location.href = '/admin';
+                } else {
+                    errorDiv.textContent = 'Invalid admin credentials';
+                    errorDiv.classList.add('show');
+                }
+            });
+        </script>
+    </body>
+</html>
