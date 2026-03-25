@@ -1,0 +1,10 @@
+{
+    // Chrome DevTools Mobile Device Presets
+    // Open DevTools (Cmd+Option+I / Ctrl+Shift+I)
+    // Click "Toggle Device Toolbar" (Cmd+Shift+M / Ctrl+Shift+M)
+    // Select these devices from the dropdown:
+
+    "editor.tokenColorCustomizations": {
+        "comments": "#6b7280"
+    }
+}

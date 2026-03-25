@@ -4,17 +4,19 @@
 
 /* CSS Variables */
 :root {
-    --brand-black: #111111;
+    --brand-black: #111;
     --brand-grey: #f8f8f8;
-    --brand-mid-grey: #999999;
+    --brand-mid-grey: #999;
     --brand-light-grey: #e5e7eb;
-    --electric-blue: #111111;
-    --white: #ffffff;
+    --electric-blue: #111;
+    --white: #fff;
     --red: #ef4444;
 }
 
 /* Reset & Base */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
@@ -22,15 +24,15 @@ html {
     scroll-behavior: smooth;
 }
 
-html, body {
+html,
+body {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden auto;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     background-color: var(--white);
     color: var(--brand-black);
     -webkit-font-smoothing: antialiased;
@@ -39,7 +41,7 @@ body {
 
 /* Typography */
 .font-display {
-    font-family: 'Oswald', sans-serif;
+    font-family: Oswald, sans-serif;
 }
 
 /* Scrollbar */
@@ -56,7 +58,7 @@ body {
 }
 
 /* Hide scrollbar on mobile */
-@media (max-width: 767px) {
+@media (width <= 767px) {
     ::-webkit-scrollbar {
         width: 0;
     }
@@ -75,21 +77,21 @@ body {
     padding-right: 0.75rem;
 }
 
-@media (min-width: 480px) {
+@media (width >= 480px) {
     .container-main {
         padding-left: 1rem;
         padding-right: 1rem;
     }
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .container-main {
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .container-main {
         padding-left: 2rem;
         padding-right: 2rem;
@@ -105,7 +107,7 @@ body {
 }
 
 #main-header.scrolled {
-    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 20px rgb(0 0 0 / 8%);
 }
 
 /* Logo */
@@ -114,7 +116,7 @@ body {
     width: auto;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .logo-img {
         height: 2.5rem;
     }
@@ -163,7 +165,7 @@ body {
     width: 800px;
     background: var(--white);
     border: 1px solid #f3f4f6;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 15%);
     padding: 2rem;
     opacity: 0;
     visibility: hidden;
@@ -202,7 +204,7 @@ body {
 .mobile-menu-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgb(0 0 0 / 50%);
     z-index: 45;
     opacity: 0;
     visibility: hidden;
@@ -311,7 +313,7 @@ body {
     left: 0;
     width: 100%;
     background: var(--white);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 40px rgb(0 0 0 / 10%);
     border-radius: 0 0 0.75rem 0.75rem;
     padding: 1rem;
     opacity: 0;
@@ -328,8 +330,8 @@ body {
 
 /* Mobile Search */
 .mobile-search {
-    padding: 1rem;
-    border-bottom: 1px solid var(--brand-light-grey);
+    padding: 0.75rem 1rem;
+    background: var(--brand-grey);
 }
 
 /* Header Actions */
@@ -405,28 +407,28 @@ body {
     gap: 0.75rem;
 }
 
-@media (min-width: 480px) {
+@media (width >= 480px) {
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
     }
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
     .product-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
     }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .product-grid {
         grid-template-columns: repeat(4, 1fr);
         gap: 1.5rem;
     }
 }
 
-@media (min-width: 1280px) {
+@media (width >= 1280px) {
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
@@ -462,7 +464,7 @@ body {
     left: 0;
     right: 0;
     padding: 0.5rem;
-    background: rgba(255,255,255,0.9);
+    background: rgb(255 255 255 / 90%);
     backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
@@ -498,7 +500,7 @@ body {
     opacity: 0;
     transform: scale(0.8);
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .product-card:hover .wishlist-btn {
@@ -601,7 +603,7 @@ body {
     display: none !important; /* Hidden by default - mobile only */
 }
 
-@media (max-width: 1023px) {
+@media (width <= 1023px) {
     .filter-sidebar {
         display: block !important;
         position: fixed;
@@ -617,14 +619,14 @@ body {
         overflow-y: auto;
         padding: 1.5rem;
     }
-    
+
     .filter-sidebar.active {
         transform: translateX(0);
     }
 }
 
 /* Desktop sidebar styles */
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .desktop-sidebar {
         width: 280px;
         flex-shrink: 0;
@@ -668,7 +670,7 @@ body {
     color: var(--brand-black);
 }
 
-.filter-option input[type="checkbox"] {
+.filter-option input[type='checkbox'] {
     width: 18px;
     height: 18px;
     border: 1px solid var(--brand-light-grey);
@@ -730,7 +732,7 @@ body {
     gap: 2rem;
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .pdp-container {
         grid-template-columns: 1fr 1fr;
         gap: 4rem;
@@ -786,7 +788,7 @@ body {
     padding-top: 1rem;
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .pdp-info {
         padding-top: 2rem;
     }
@@ -802,7 +804,7 @@ body {
 }
 
 .pdp-title {
-    font-family: 'Oswald', sans-serif;
+    font-family: Oswald, sans-serif;
     font-size: 1.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -810,7 +812,7 @@ body {
     line-height: 1.2;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .pdp-title {
         font-size: 2.5rem;
     }
@@ -1025,7 +1027,7 @@ body {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border: 2px solid currentColor;
+    border: 2px solid currentcolor;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1137,7 +1139,7 @@ body {
     border-bottom: 1px solid var(--brand-light-grey);
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .order-header {
         flex-direction: column;
         gap: 0.5rem;
@@ -1178,13 +1180,13 @@ body {
     gap: 1rem;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
     .wishlist-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .wishlist-grid {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -1206,7 +1208,7 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 10;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
     transition: all 0.2s ease;
 }
 
@@ -1229,13 +1231,13 @@ body {
     gap: 2rem;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
     .footer-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .footer-grid {
         grid-template-columns: 2fr 1fr 1fr 2fr;
     }
@@ -1313,7 +1315,7 @@ body {
     gap: 1rem;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .footer-bottom {
         flex-direction: row;
         justify-content: space-between;
@@ -1403,7 +1405,7 @@ body {
     z-index: 100;
     opacity: 0;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 40px rgb(0 0 0 / 20%);
 }
 
 #toast.show {
@@ -1428,7 +1430,7 @@ body {
 }
 
 .empty-state-title {
-    font-family: 'Oswald', sans-serif;
+    font-family: Oswald, sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -1452,7 +1454,9 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
+    transition:
+        opacity 0.5s ease,
+        visibility 0.5s ease;
 }
 
 .page-loader.hidden {
@@ -1469,57 +1473,25 @@ body {
    RESPONSIVE UTILITIES
    ======================================== */
 
-@media (max-width: 767px) {
+@media (width <= 767px) {
     .hide-mobile {
         display: none !important;
     }
 }
 
-/* Mobile header centering */
-@media (max-width: 767px) {
+/* Mobile header adjustments */
+@media (width <= 1023px) {
     #main-header .container-main {
         padding: 0 1rem;
     }
 
-    #main-header .container-main > div {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    #main-header .container-main > div > div:first-child {
-        position: absolute;
-        left: 1rem;
-        z-index: 10;
-    }
-
-    #main-header .container-main > div > div:first-child button {
-        margin: 0;
-        padding: 0.5rem;
-    }
-
-    #main-header .container-main > div > div:first-child a {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0;
-    }
-
-    #main-header .container-main > div > div:last-child {
-        position: absolute;
-        right: 1rem;
-        z-index: 10;
-    }
-
-    #main-header .container-main > div > nav,
-    #main-header .container-main > div > .search-container {
+    /* Force hide desktop header on mobile */
+    #main-header .container-main > div.hidden {
         display: none !important;
     }
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .hide-desktop {
         display: none !important;
     }

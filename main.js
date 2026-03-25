@@ -14,18 +14,66 @@ const state = {
 
 // --- PRODUCT DATA ---
 const products = [
-    { id: 1, title: "Racer Trophy Tee", price: 45, category: "Tops", image: "product-1.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"] },
-    { id: 2, title: "Champions Engineered Tee", price: 45, category: "Tops", image: "product-2.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"] },
-    { id: 3, title: "1H Vintage Trucker Hat", price: 35, category: "Hats", image: "product-3.png", sizes: ["One Size"], colors: ["White/Black"] },
-    { id: 4, title: "Silence Expression Hoodie", price: 65, category: "Hoodies", image: "product-4.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black"] },
-    { id: 5, title: "Endless Possibilities Hoodie", price: 65, category: "Hoodies", image: "product-5.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Blue"] },
-    { id: 6, title: "1H Colorway Trucker Hat", price: 35, category: "Hats", image: "product-6.jpeg", sizes: ["One Size"], colors: ["White/Black"] },
+    {
+        id: 1,
+        title: 'Racer Trophy Tee',
+        price: 45,
+        category: 'Tops',
+        image: 'product-1.png',
+        sizes: ['S', 'M', 'L', 'XL'],
+        colors: ['Grey']
+    },
+    {
+        id: 2,
+        title: 'Champions Engineered Tee',
+        price: 45,
+        category: 'Tops',
+        image: 'product-2.png',
+        sizes: ['S', 'M', 'L', 'XL'],
+        colors: ['Grey']
+    },
+    {
+        id: 3,
+        title: '1H Vintage Trucker Hat',
+        price: 35,
+        category: 'Hats',
+        image: 'product-3.png',
+        sizes: ['One Size'],
+        colors: ['White/Black']
+    },
+    {
+        id: 4,
+        title: 'Silence Expression Hoodie',
+        price: 65,
+        category: 'Hoodies',
+        image: 'product-4.jpeg',
+        sizes: ['S', 'M', 'L', 'XL'],
+        colors: ['Black']
+    },
+    {
+        id: 5,
+        title: 'Endless Possibilities Hoodie',
+        price: 65,
+        category: 'Hoodies',
+        image: 'product-5.jpeg',
+        sizes: ['S', 'M', 'L', 'XL'],
+        colors: ['Blue']
+    },
+    {
+        id: 6,
+        title: '1H Colorway Trucker Hat',
+        price: 35,
+        category: 'Hats',
+        image: 'product-6.jpeg',
+        sizes: ['One Size'],
+        colors: ['White/Black']
+    }
 ];
 
 const categories = [
-    { name: "Tops", slug: "tops", count: 2 },
-    { name: "Hoodies", slug: "hoodies", count: 2 },
-    { name: "Hats", slug: "hats", count: 2 },
+    { name: 'Tops', slug: 'tops', count: 2 },
+    { name: 'Hoodies', slug: 'hoodies', count: 2 },
+    { name: 'Hats', slug: 'hats', count: 2 }
 ];
 
 // ========================================
@@ -70,13 +118,13 @@ function initHeader() {
     }
 
     // Mobile submenu toggles
-    document.querySelectorAll('.mobile-nav-link[data-submenu]').forEach(link => {
+    document.querySelectorAll('.mobile-nav-link[data-submenu]').forEach((link) => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const submenuId = link.dataset.submenu;
             const submenu = document.getElementById(submenuId);
             const icon = link.querySelector('.submenu-icon');
-            
+
             if (submenu) {
                 submenu.classList.toggle('open');
                 if (icon) icon.style.transform = submenu.classList.contains('open') ? 'rotate(180deg)' : '';
@@ -115,7 +163,7 @@ function closeMobileMenu() {
     const menuToggle = document.getElementById('menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
     const menuOverlay = document.getElementById('menu-overlay');
-    
+
     state.isMenuOpen = false;
     if (menuToggle) menuToggle.classList.remove('active');
     if (mobileMenu) mobileMenu.classList.remove('active');
@@ -127,7 +175,7 @@ function toggleCart(open) {
     state.isCartOpen = open;
     const cartDrawer = document.getElementById('cart-drawer');
     const cartOverlay = document.getElementById('cart-overlay');
-    
+
     if (cartDrawer) {
         cartDrawer.classList.toggle('translate-x-full', !open);
     }
@@ -135,7 +183,7 @@ function toggleCart(open) {
         cartOverlay.classList.toggle('active', open);
     }
     document.body.style.overflow = open ? 'hidden' : '';
-    
+
     if (open) renderMiniCart();
 }
 
@@ -144,12 +192,10 @@ function toggleCart(open) {
 // ========================================
 
 function addToCart(productId, size, color, quantity = 1) {
-    const product = products.find(p => p.id === productId);
+    const product = products.find((p) => p.id === productId);
     if (!product) return;
 
-    const existingItem = state.cart.find(item => 
-        item.id === productId && item.size === size && item.color === color
-    );
+    const existingItem = state.cart.find((item) => item.id === productId && item.size === size && item.color === color);
 
     if (existingItem) {
         existingItem.quantity += quantity;
@@ -171,13 +217,11 @@ function addToCart(productId, size, color, quantity = 1) {
 }
 
 function removeFromCart(productId, size, color) {
-    state.cart = state.cart.filter(item => 
-        !(item.id === productId && item.size === size && item.color === color)
-    );
+    state.cart = state.cart.filter((item) => !(item.id === productId && item.size === size && item.color === color));
     saveCart();
     updateBadges();
     renderMiniCart();
-    
+
     // If on cart page, re-render
     if (document.getElementById('cart-items-container')) {
         renderCartPage();
@@ -185,10 +229,8 @@ function removeFromCart(productId, size, color) {
 }
 
 function updateCartQuantity(productId, size, color, quantity) {
-    const item = state.cart.find(item => 
-        item.id === productId && item.size === size && item.color === color
-    );
-    
+    const item = state.cart.find((item) => item.id === productId && item.size === size && item.color === color);
+
     if (item) {
         if (quantity <= 0) {
             removeFromCart(productId, size, color);
@@ -197,7 +239,7 @@ function updateCartQuantity(productId, size, color, quantity) {
             saveCart();
             updateBadges();
             renderMiniCart();
-            
+
             if (document.getElementById('cart-items-container')) {
                 renderCartPage();
             }
@@ -210,7 +252,7 @@ function saveCart() {
 }
 
 function getCartTotal() {
-    return state.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return state.cart.reduce((total, item) => total + item.price * item.quantity, 0);
 }
 
 function getCartCount() {
@@ -221,8 +263,8 @@ function updateBadges() {
     const cartCount = getCartCount();
     const cartBadge = document.getElementById('cart-count');
     const cartBadgeMobile = document.getElementById('cart-count-mobile');
-    
-    [cartBadge, cartBadgeMobile].forEach(badge => {
+
+    [cartBadge, cartBadgeMobile].forEach((badge) => {
         if (badge) {
             badge.textContent = cartCount;
             badge.classList.toggle('hidden', cartCount === 0);
@@ -231,7 +273,7 @@ function updateBadges() {
 
     const wishlistCount = state.wishlist.length;
     const wishlistBadge = document.getElementById('wishlist-count');
-    
+
     if (wishlistBadge) {
         wishlistBadge.textContent = wishlistCount;
         wishlistBadge.classList.toggle('hidden', wishlistCount === 0);
@@ -242,9 +284,9 @@ function renderMiniCart() {
     const container = document.getElementById('mini-cart-items');
     const subtotalEl = document.getElementById('mini-cart-subtotal');
     const countEl = document.getElementById('mini-cart-count');
-    
+
     if (!container) return;
-    
+
     if (state.cart.length === 0) {
         container.innerHTML = `
             <div class="empty-state" style="padding: 3rem 1rem;">
@@ -254,7 +296,9 @@ function renderMiniCart() {
             </div>
         `;
     } else {
-        container.innerHTML = state.cart.map(item => `
+        container.innerHTML = state.cart
+            .map(
+                (item) => `
             <div class="flex gap-4 mb-4">
                 <div class="w-20 h-24 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                     <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
@@ -275,12 +319,14 @@ function renderMiniCart() {
                     </div>
                 </div>
             </div>
-        `).join('');
+        `
+            )
+            .join('');
     }
-    
+
     if (subtotalEl) subtotalEl.textContent = `£${getCartTotal().toFixed(2)}`;
     if (countEl) countEl.textContent = state.cart.length;
-    
+
     // Re-initialize Lucide icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
@@ -293,7 +339,7 @@ function renderMiniCart() {
 
 function toggleWishlist(productId) {
     const index = state.wishlist.indexOf(productId);
-    
+
     if (index > -1) {
         state.wishlist.splice(index, 1);
         showToast('Removed from wishlist');
@@ -301,7 +347,7 @@ function toggleWishlist(productId) {
         state.wishlist.push(productId);
         showToast('Added to wishlist');
     }
-    
+
     localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
     updateBadges();
     updateWishlistButtons();
@@ -312,18 +358,18 @@ function isInWishlist(productId) {
 }
 
 function updateWishlistButtons() {
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+    document.querySelectorAll('.wishlist-btn').forEach((btn) => {
         const productId = parseInt(btn.dataset.productId);
         const isActive = isInWishlist(productId);
         btn.classList.toggle('active', isActive);
-        
+
         const icon = btn.querySelector('i');
         if (icon) {
             icon.setAttribute('data-lucide', isActive ? 'heart' : 'heart');
             icon.style.fill = isActive ? 'currentColor' : 'none';
         }
     });
-    
+
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
@@ -336,11 +382,11 @@ function updateWishlistButtons() {
 function showToast(message, duration = 3000) {
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toast-msg');
-    
+
     if (toast && toastMsg) {
         toastMsg.textContent = message;
         toast.classList.add('show');
-        
+
         setTimeout(() => {
             toast.classList.remove('show');
         }, duration);
@@ -356,32 +402,36 @@ function formatPrice(price) {
 // ========================================
 
 function openQuickView(productId) {
-    const product = products.find(p => p.id === productId);
+    const product = products.find((p) => p.id === productId);
     if (!product) return;
-    
+
     const modal = document.getElementById('quick-view-modal');
     const overlay = document.getElementById('quick-view-overlay');
-    
+
     if (!modal || !overlay) return;
-    
+
     // Populate modal
     document.getElementById('qv-image').src = product.image;
     document.getElementById('qv-title').textContent = product.title;
     document.getElementById('qv-price').textContent = formatPrice(product.price);
     document.getElementById('qv-category').textContent = product.category;
-    
+
     // Render sizes
     const sizeContainer = document.getElementById('qv-sizes');
     if (sizeContainer) {
-        sizeContainer.innerHTML = product.sizes.map(size => `
+        sizeContainer.innerHTML = product.sizes
+            .map(
+                (size) => `
             <button class="size-option" data-size="${size}" onclick="selectQVSize('${size}')">${size}</button>
-        `).join('');
+        `
+            )
+            .join('');
     }
-    
+
     // Store current product
     modal.dataset.productId = productId;
     modal.dataset.selectedSize = '';
-    
+
     // Show modal
     overlay.classList.remove('invisible', 'opacity-0');
     modal.classList.remove('scale-95', 'opacity-0');
@@ -392,7 +442,7 @@ function openQuickView(productId) {
 function closeQuickView() {
     const modal = document.getElementById('quick-view-modal');
     const overlay = document.getElementById('quick-view-overlay');
-    
+
     if (modal && overlay) {
         overlay.classList.add('invisible', 'opacity-0');
         modal.classList.add('scale-95', 'opacity-0');
@@ -404,8 +454,8 @@ function closeQuickView() {
 function selectQVSize(size) {
     const modal = document.getElementById('quick-view-modal');
     if (modal) modal.dataset.selectedSize = size;
-    
-    document.querySelectorAll('#qv-sizes .size-option').forEach(btn => {
+
+    document.querySelectorAll('#qv-sizes .size-option').forEach((btn) => {
         btn.classList.toggle('active', btn.dataset.size === size);
     });
 }
@@ -413,15 +463,15 @@ function selectQVSize(size) {
 function addToCartFromQV() {
     const modal = document.getElementById('quick-view-modal');
     if (!modal) return;
-    
+
     const productId = parseInt(modal.dataset.productId);
     const size = modal.dataset.selectedSize;
-    
+
     if (!size) {
         showToast('Please select a size');
         return;
     }
-    
+
     addToCart(productId, size, 'Black', 1);
     closeQuickView();
 }
@@ -450,12 +500,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initLoader();
     updateBadges();
     updateWishlistButtons();
-    
+
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
-    
+
     // Close modals on escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {

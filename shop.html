@@ -1,543 +1,662 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop | 1 HUNDRED</title>
-    <meta name="description" content="Shop the latest collection at 1 HUNDRED. Premium streetwear and fashion essentials.">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Shop | 1 HUNDRED</title>
+        <meta
+            name="description"
+            content="Shop the latest collection at 1 HUNDRED. Premium streetwear and fashion essentials." />
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body class="antialiased">
-
-    <!-- Page Loader -->
-    <div id="page-loader" class="page-loader">
-        <img src="logo.svg" alt="1 HUNDRED">
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast">
-        <i data-lucide="check-circle" class="w-5 h-5"></i>
-        <span id="toast-msg">Added to bag</span>
-    </div>
-
-    <!-- Mobile Menu Overlay -->
-    <div id="menu-overlay" class="mobile-menu-overlay"></div>
-
-    <!-- Mobile Menu -->
-    <nav id="mobile-menu" class="mobile-menu">
-        <div class="mobile-menu-header">
-            <a href="/">
-                <img src="logo.svg" alt="1 HUNDRED" class="h-8">
-            </a>
-            <button id="menu-toggle-close" class="p-2">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body class="antialiased">
+        <!-- Page Loader -->
+        <div id="page-loader" class="page-loader">
+            <img src="logo.svg" alt="1 HUNDRED" />
         </div>
-        
-        <div class="mobile-search">
-            <div class="relative">
-                <input type="text" placeholder="Search..." class="w-full bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm">
-                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-            </div>
+
+        <!-- Toast Notification -->
+        <div id="toast">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span id="toast-msg">Added to bag</span>
         </div>
-        
-        <div class="flex flex-col">
-            <a href="/shop" class="mobile-nav-link">Shop All</a>
-            <a href="/shop?new=true" class="mobile-nav-link">New In</a>
-            
-            <div class="border-t border-gray-200 mt-4 pt-4">
-                <a href="/account" class="mobile-nav-link">
-                    <span>My Account</span>
-                    <i data-lucide="user" class="w-5 h-5"></i>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="menu-overlay" class="mobile-menu-overlay"></div>
+
+        <!-- Mobile Menu -->
+        <nav id="mobile-menu" class="mobile-menu">
+            <div class="mobile-menu-header">
+                <a href="/">
+                    <img src="logo.svg" alt="1 HUNDRED" class="h-8" />
                 </a>
-                <a href="/wishlist" class="mobile-nav-link">
-                    <span>Wishlist</span>
-                    <i data-lucide="heart" class="w-5 h-5"></i>
-                </a>
-                <a href="/cart" class="mobile-nav-link">
-                    <span>Shopping Bag</span>
-                    <div class="flex items-center gap-2">
-                        <span id="cart-count-mobile" class="badge hidden">0</span>
-                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                    </div>
-                </a>
+                <button id="menu-toggle-close" class="p-2">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
             </div>
-        </div>
-    </nav>
 
-    <!-- Filter Sidebar Mobile Overlay -->
-    <div id="filter-overlay" class="mobile-menu-overlay"></div>
-
-    <!-- Filter Sidebar Mobile -->
-    <aside id="filter-sidebar" class="filter-sidebar">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="font-display font-bold uppercase text-xl">Filters</h3>
-            <button id="close-filters" class="p-2 hover:bg-gray-100 rounded-full">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-        </div>
-        
-        <!-- Mobile Filters Content -->
-        <div class="filter-section">
-            <h4 class="filter-title">Category</h4>
-            <div class="filter-options">
-                <label class="filter-option">
-                    <input type="checkbox" name="category" value="tops">
-                    <span>Tops</span>
-                </label>
-                <label class="filter-option">
-                    <input type="checkbox" name="category" value="hoodies">
-                    <span>Hoodies</span>
-                </label>
-                <label class="filter-option">
-                    <input type="checkbox" name="category" value="jackets">
-                    <span>Jackets</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="filter-section">
-            <h4 class="filter-title">Size</h4>
-            <div class="size-grid">
-                <button class="size-option" data-size="S">S</button>
-                <button class="size-option" data-size="M">M</button>
-                <button class="size-option" data-size="L">L</button>
-                <button class="size-option" data-size="XL">XL</button>
-            </div>
-        </div>
-
-        <div class="filter-section">
-            <h4 class="filter-title">Color</h4>
-            <div class="flex flex-wrap gap-2">
-                <button class="color-swatch bg-black" style="background: #111;" data-color="Black"></button>
-                <button class="color-swatch bg-white border" style="background: #fff;" data-color="White"></button>
-                <button class="color-swatch" style="background: #f5f5dc;" data-color="Cream"></button>
-                <button class="color-swatch" style="background: #808080;" data-color="Grey"></button>
-            </div>
-        </div>
-
-        <div class="filter-section">
-            <h4 class="filter-title">Price Range</h4>
-            <div class="space-y-2">
-                <label class="filter-option">
-                    <input type="checkbox" name="price" value="0-25">
-                    <span>Under £25</span>
-                </label>
-                <label class="filter-option">
-                    <input type="checkbox" name="price" value="25-50">
-                    <span>£25 - £50</span>
-                </label>
-                <label class="filter-option">
-                    <input type="checkbox" name="price" value="50-100">
-                    <span>£50 - £100</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="mt-6 space-y-3">
-            <button onclick="applyFilters()" class="btn btn-primary btn-full">Apply Filters</button>
-            <button onclick="clearFilters()" class="btn btn-secondary btn-full">Clear All</button>
-        </div>
-    </aside>
-
-    <!-- Header -->
-    <header id="main-header" class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
-        <div class="container-main">
-            <!-- Desktop Header Layout -->
-            <div class="h-16 hidden lg:flex items-center justify-between">
-                <!-- Left: Logo -->
-                <a href="/" class="flex items-center">
-                    <img src="logo.svg" alt="1 HUNDRED" class="logo-img">
-                </a>
-
-                <!-- Center: Desktop Navigation -->
-                <nav class="flex items-center gap-8">
-                    <a href="/shop" class="nav-link">Shop All</a>
-                    <a href="/shop?new=true" class="nav-link">New In</a>
-                </nav>
-
-                <!-- Center: Search -->
-                <div class="search-container">
-                    <i data-lucide="search" class="search-icon w-4 h-4"></i>
-                    <input type="text" placeholder="Search for items, brands..." class="search-input" id="search-input">
-                    <div class="search-dropdown">
-                        <div class="text-xs text-gray-400 font-bold uppercase mb-2">Trending</div>
-                        <ul class="text-sm space-y-2">
-                            <li><a href="/shop?q=oversized" class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"><span>Oversized Blazer</span> <span class="text-gray-300">Category</span></a></li>
-                            <li><a href="/shop?q=cargo" class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"><span>Cargo Pants</span> <span class="text-gray-300">Category</span></a></li>
-                            <li><a href="/shop?q=nike" class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"><span>Nike Dunk</span> <span class="text-gray-300">Brand</span></a></li>
-                        </ul>
-                    </div>
+            <div class="mobile-search">
+                <div class="relative">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        class="w-full bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm" />
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
                 </div>
+            </div>
 
-                <!-- Right: Actions -->
-                <div class="flex items-center gap-4">
-                    <a href="/account" class="header-action" aria-label="Account">
+            <div class="flex flex-col">
+                <a href="/shop" class="mobile-nav-link">Shop All</a>
+                <a href="/shop?new=true" class="mobile-nav-link">New In</a>
+                <a href="/about" class="mobile-nav-link">About Us</a>
+
+                <div class="border-t border-gray-200 mt-4 pt-4">
+                    <a href="/account" class="mobile-nav-link">
+                        <span>My Account</span>
                         <i data-lucide="user" class="w-5 h-5"></i>
                     </a>
-                    <a href="/wishlist" class="header-action" aria-label="Wishlist">
+                    <a href="/wishlist" class="mobile-nav-link">
+                        <span>Wishlist</span>
                         <i data-lucide="heart" class="w-5 h-5"></i>
-                        <span id="wishlist-count" class="badge hidden">0</span>
                     </a>
-                    <button id="cart-trigger" class="header-action" aria-label="Cart">
-                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                        <span id="cart-count" class="badge hidden">0</span>
-                    </button>
+                    <a href="/cart" class="mobile-nav-link">
+                        <span>Shopping Bag</span>
+                        <div class="flex items-center gap-2">
+                            <span id="cart-count-mobile" class="badge hidden">0</span>
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        </div>
+                    </a>
                 </div>
             </div>
+        </nav>
 
-            <!-- Mobile Header Layout -->
-            <div class="h-16 lg:hidden flex items-center justify-between relative">
-                <!-- Left: Hamburger Menu -->
-                <button id="menu-toggle" class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+        <!-- Filter Sidebar Mobile Overlay -->
+        <div id="filter-overlay" class="mobile-menu-overlay"></div>
+
+        <!-- Filter Sidebar Mobile -->
+        <aside id="filter-sidebar" class="filter-sidebar">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-display font-bold uppercase text-xl">Filters</h3>
+                <button id="close-filters" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
-
-                <!-- Center: Logo (absolutely centered) -->
-                <a href="/" class="absolute left-1/2 -translate-x-1/2 flex items-center">
-                    <img src="logo.svg" alt="1 HUNDRED" class="logo-img">
-                </a>
-
-                <!-- Right: Actions -->
-                <div class="flex items-center gap-3">
-                    <button class="header-action" aria-label="Search">
-                        <i data-lucide="search" class="w-5 h-5"></i>
-                    </button>
-                    <button id="cart-trigger-mobile" class="header-action" aria-label="Cart">
-                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                        <span id="cart-count-mobile-header" class="badge hidden">0</span>
-                    </button>
-                </div>
             </div>
-        </div>
-    </header>
 
-    <!-- Cart Drawer -->
-    <div id="cart-overlay" class="mobile-menu-overlay"></div>
-    <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
-        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h2 class="font-display font-bold uppercase text-xl">Bag (<span id="mini-cart-count">0</span>)</h2>
-            <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-        </div>
-        <div id="mini-cart-items" class="flex-1 overflow-y-auto p-6"></div>
-        <div class="p-6 border-t border-gray-100 bg-gray-50">
-            <div class="flex justify-between font-bold text-lg mb-4">
-                <span>Subtotal</span>
-                <span id="mini-cart-subtotal">£0.00</span>
-            </div>
-            <a href="/checkout" class="btn btn-primary btn-full mb-3">Checkout</a>
-            <a href="/cart" class="btn btn-secondary btn-full">View Bag</a>
-        </div>
-    </aside>
-
-    <!-- Quick View Modal -->
-    <div id="quick-view-overlay" class="fixed inset-0 bg-black/80 z-[80] opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4">
-        <div id="quick-view-modal" class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl transform scale-95 opacity-0 transition-all duration-300">
-            <div class="grid md:grid-cols-2">
-                <div class="aspect-square bg-gray-100">
-                    <img id="qv-image" src="" alt="" class="w-full h-full object-cover">
-                </div>
-                <div class="p-8 relative">
-                    <button onclick="closeQuickView()" class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                    <div class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2" id="qv-category">Category</div>
-                    <h2 id="qv-title" class="font-display text-2xl font-bold uppercase mb-2">Product Title</h2>
-                    <div id="qv-price" class="text-xl font-bold mb-6">£0.00</div>
-                    <p class="text-gray-500 text-sm mb-6 leading-relaxed">Premium quality garment featuring unique design elements.</p>
-                    <div class="mb-6">
-                        <div class="flex justify-between text-xs font-bold uppercase mb-3">
-                            <span>Select Size</span>
-                        </div>
-                        <div id="qv-sizes" class="size-grid"></div>
-                    </div>
-                    <button onclick="addToCartFromQV()" class="btn btn-primary btn-full">Add to Bag</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="pt-16">
-        <!-- Page Header -->
-        <div class="bg-gray-50 border-b border-gray-200">
-            <div class="container-main py-8 md:py-12">
-                <nav class="breadcrumbs">
-                    <a href="/">Home</a>
-                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                    <span id="page-title">Shop All</span>
-                </nav>
-                <h1 id="category-title" class="text-3xl md:text-5xl font-display font-bold uppercase">Shop All</h1>
-                <p id="category-description" class="text-gray-500 mt-2 max-w-2xl">Discover our complete collection of premium streetwear essentials.</p>
-            </div>
-        </div>
-
-        <!-- Shop Layout -->
-        <div class="container-main py-8">
-            <!-- Toolbar -->
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-6 border-b border-gray-200">
-                <div class="flex items-center gap-4">
-                    <button id="open-filters" class="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg font-medium text-sm">
-                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-                        Filters
-                    </button>
-                    <span class="text-sm text-gray-500 hidden sm:block"><span id="product-count" class="font-bold text-black">0</span> products</span>
-                </div>
-                
-                <div class="flex items-center gap-4">
-                    <label class="text-sm text-gray-500 hidden sm:block">Sort by:</label>
-                    <select id="sort-select" class="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black">
-                        <option value="recommended">Recommended</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="newest">Newest In</option>
-                    </select>
+            <!-- Mobile Filters Content -->
+            <div class="filter-section">
+                <h4 class="filter-title">Category</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="tops" />
+                        <span>Tops</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="hoodies" />
+                        <span>Hoodies</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="jackets" />
+                        <span>Jackets</span>
+                    </label>
                 </div>
             </div>
 
-            <div class="flex gap-8 items-start">
-                <!-- Desktop Sidebar -->
-                <aside class="hidden lg:block w-64 flex-shrink-0">
-                    <div class="sticky top-24">
-                        <h3 class="font-bold uppercase text-sm mb-4">Filters</h3>
-                        
-                        <div class="filter-section">
-                            <h4 class="filter-title">Category</h4>
-                            <div class="filter-options" id="category-filters">
-                                <label class="filter-option">
-                                    <input type="checkbox" name="category" value="tops">
-                                    <span>Tops</span>
-                                </label>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="category" value="hoodies">
-                                    <span>Hoodies</span>
-                                </label>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="category" value="hats">
-                                    <span>Hats</span>
-                                </label>
-                            </div>
+            <div class="filter-section">
+                <h4 class="filter-title">Size</h4>
+                <div class="size-grid">
+                    <button class="size-option" data-size="S">S</button>
+                    <button class="size-option" data-size="M">M</button>
+                    <button class="size-option" data-size="L">L</button>
+                    <button class="size-option" data-size="XL">XL</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h4 class="filter-title">Color</h4>
+                <div class="flex flex-wrap gap-2">
+                    <button class="color-swatch bg-black" style="background: #111" data-color="Black"></button>
+                    <button class="color-swatch bg-white border" style="background: #fff" data-color="White"></button>
+                    <button class="color-swatch" style="background: #f5f5dc" data-color="Cream"></button>
+                    <button class="color-swatch" style="background: #808080" data-color="Grey"></button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h4 class="filter-title">Price Range</h4>
+                <div class="space-y-2">
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="0-25" />
+                        <span>Under £25</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="25-50" />
+                        <span>£25 - £50</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="price" value="50-100" />
+                        <span>£50 - £100</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-6 space-y-3">
+                <button onclick="applyFilters()" class="btn btn-primary btn-full">Apply Filters</button>
+                <button onclick="clearFilters()" class="btn btn-secondary btn-full">Clear All</button>
+            </div>
+        </aside>
+
+        <!-- Header -->
+        <header id="main-header" class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+            <div class="container-main">
+                <!-- Desktop Header Layout -->
+                <div class="h-16 hidden lg:flex items-center justify-between">
+                    <!-- Left: Logo -->
+                    <a href="/" class="flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+
+                    <!-- Center: Desktop Navigation -->
+                    <nav class="flex items-center gap-8">
+                        <a href="/shop" class="nav-link">Shop All</a>
+                        <a href="/shop?new=true" class="nav-link">New In</a>
+                        <a href="/about" class="nav-link">About Us</a>
+                    </nav>
+
+                    <!-- Center: Search -->
+                    <div class="search-container">
+                        <i data-lucide="search" class="search-icon w-4 h-4"></i>
+                        <input
+                            type="text"
+                            placeholder="Search for items, brands..."
+                            class="search-input"
+                            id="search-input" />
+                        <div class="search-dropdown">
+                            <div class="text-xs text-gray-400 font-bold uppercase mb-2">Trending</div>
+                            <ul class="text-sm space-y-2">
+                                <li>
+                                    <a
+                                        href="/shop?q=oversized"
+                                        class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"
+                                        ><span>Oversized Blazer</span> <span class="text-gray-300">Category</span></a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="/shop?q=cargo"
+                                        class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"
+                                        ><span>Cargo Pants</span> <span class="text-gray-300">Category</span></a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="/shop?q=nike"
+                                        class="flex justify-between hover:bg-gray-50 p-2 rounded cursor-pointer"
+                                        ><span>Nike Dunk</span> <span class="text-gray-300">Brand</span></a
+                                    >
+                                </li>
+                            </ul>
                         </div>
-
-                        <div class="filter-section">
-                            <h4 class="filter-title">Size</h4>
-                            <div class="size-grid" id="size-filters">
-                                <button class="size-option" data-size="S">S</button>
-                                <button class="size-option" data-size="M">M</button>
-                                <button class="size-option" data-size="L">L</button>
-                                <button class="size-option" data-size="XL">XL</button>
-                            </div>
-                        </div>
-
-                        <div class="filter-section">
-                            <h4 class="filter-title">Color</h4>
-                            <div class="flex flex-wrap gap-2" id="color-filters">
-                                <button class="color-swatch" style="background: #111;" data-color="Black"></button>
-                                <button class="color-swatch" style="background: #fff; border: 1px solid #ddd;" data-color="White"></button>
-                                <button class="color-swatch" style="background: #f5f5dc;" data-color="Cream"></button>
-                                <button class="color-swatch" style="background: #808080;" data-color="Grey"></button>
-                            </div>
-                        </div>
-
-                        <div class="filter-section">
-                            <h4 class="filter-title">Price</h4>
-                            <div class="filter-options" id="price-filters">
-                                <label class="filter-option">
-                                    <input type="checkbox" name="price" value="0-35">
-                                    <span>Under £35</span>
-                                </label>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="price" value="35-50">
-                                    <span>£35 - £50</span>
-                                </label>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="price" value="50+">
-                                    <span>£50+</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <button onclick="clearFilters()" class="text-sm underline hover:no-underline mt-4">Clear all filters</button>
-                    </div>
-                </aside>
-
-                <!-- Product Grid -->
-                <div class="flex-1 min-w-0">
-                    <div class="product-grid" id="product-grid">
-                        <!-- Products rendered by JS -->
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="pagination" id="pagination">
-                        <button class="page-btn active">1</button>
-                        <button class="page-btn">2</button>
-                        <button class="page-btn">3</button>
-                        <button class="page-btn">
-                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    <!-- Right: Actions -->
+                    <div class="flex items-center gap-4">
+                        <a href="/account" class="header-action" aria-label="Account">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </a>
+                        <a href="/wishlist" class="header-action" aria-label="Wishlist">
+                            <i data-lucide="heart" class="w-5 h-5"></i>
+                            <span id="wishlist-count" class="badge hidden">0</span>
+                        </a>
+                        <button id="cart-trigger" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Header Layout -->
+                <div class="h-16 lg:hidden flex items-center justify-between relative">
+                    <!-- Left: Hamburger Menu -->
+                    <button id="menu-toggle" class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+
+                    <!-- Center: Logo (absolutely centered) -->
+                    <a href="/" class="absolute left-1/2 -translate-x-1/2 flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+
+                    <!-- Right: Actions -->
+                    <div class="flex items-center gap-3">
+                        <button class="header-action" aria-label="Search">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                        </button>
+                        <button id="cart-trigger-mobile" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count-mobile-header" class="badge hidden">0</span>
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </header>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="container-main">
-            <div class="footer-grid">
-                <div>
-                    <img src="logo.svg" alt="1 HUNDRED" class="h-10 mb-6" style="filter: brightness(0) invert(1);">
-                    <p class="text-gray-400 text-sm max-w-xs">Premium streetwear for the modern individual.</p>
+        <!-- Cart Drawer -->
+        <div id="cart-overlay" class="mobile-menu-overlay"></div>
+        <aside
+            id="cart-drawer"
+            class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="font-display font-bold uppercase text-xl">Bag (<span id="mini-cart-count">0</span>)</h2>
+                <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="mini-cart-items" class="flex-1 overflow-y-auto p-6"></div>
+            <div class="p-6 border-t border-gray-100 bg-gray-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Subtotal</span>
+                    <span id="mini-cart-subtotal">£0.00</span>
                 </div>
-                <div>
-                    <h4 class="footer-title">Shop</h4>
-                    <div class="footer-links">
-                        <a href="/shop" class="footer-link">Shop All</a>
-                        <a href="/shop?new=true" class="footer-link">New Arrivals</a>
+                <a href="/checkout" class="btn btn-primary btn-full mb-3">Checkout</a>
+                <a href="/cart" class="btn btn-secondary btn-full">View Bag</a>
+            </div>
+        </aside>
+
+        <!-- Quick View Modal -->
+        <div
+            id="quick-view-overlay"
+            class="fixed inset-0 bg-black/80 z-[80] opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4">
+            <div
+                id="quick-view-modal"
+                class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl transform scale-95 opacity-0 transition-all duration-300">
+                <div class="grid md:grid-cols-2">
+                    <div class="aspect-square bg-gray-100">
+                        <img id="qv-image" src="" alt="" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-8 relative">
+                        <button
+                            onclick="closeQuickView()"
+                            class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                        <div class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2" id="qv-category">
+                            Category
+                        </div>
+                        <h2 id="qv-title" class="font-display text-2xl font-bold uppercase mb-2">Product Title</h2>
+                        <div id="qv-price" class="text-xl font-bold mb-6">£0.00</div>
+                        <p class="text-gray-500 text-sm mb-6 leading-relaxed">
+                            Premium quality garment featuring unique design elements.
+                        </p>
+                        <div class="mb-6">
+                            <div class="flex justify-between text-xs font-bold uppercase mb-3">
+                                <span>Select Size</span>
+                            </div>
+                            <div id="qv-sizes" class="size-grid"></div>
+                        </div>
+                        <button onclick="addToCartFromQV()" class="btn btn-primary btn-full">Add to Bag</button>
                     </div>
                 </div>
-                <div>
-                    <h4 class="footer-title">Help</h4>
-                    <div class="footer-links">
-                        <a href="#" class="footer-link">Help Centre</a>
-                        <a href="#" class="footer-link">Delivery & Returns</a>
-                        <a href="#" class="footer-link">Track Order</a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="footer-title">Join The List</h4>
-                    <form class="footer-input-group" onsubmit="event.preventDefault(); showToast('Thanks for subscribing!');">
-                        <input type="email" placeholder="Email Address" class="footer-input" required>
-                        <button type="submit" class="footer-submit">Join</button>
-                    </form>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="text-gray-500 text-sm">© 2026 1 HUNDRED Ltd.</div>
-                <div class="flex gap-6 text-sm">
-                    <a href="#" class="footer-link">Privacy Policy</a>
-                    <a href="#" class="footer-link">Terms & Conditions</a>
-                </div>
             </div>
         </div>
-    </footer>
 
-    <script src="main.js"></script>
-    <script>
-        // Extended product data for shop page
-        const allProducts = [
-            { id: 1, title: "Racer Trophy Tee", price: 45, category: "tops", image: "product-1.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"], isNew: true },
-            { id: 2, title: "Champions Engineered Tee", price: 45, category: "tops", image: "product-2.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"], isNew: false },
-            { id: 3, title: "1H Vintage Trucker Hat", price: 35, category: "hats", image: "product-3.png", sizes: ["One Size"], colors: ["White/Black"], isNew: true },
-            { id: 4, title: "Silence Expression Hoodie", price: 65, category: "hoodies", image: "product-4.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black"], isNew: false },
-            { id: 5, title: "Endless Possibilities Hoodie", price: 65, category: "hoodies", image: "product-5.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Blue"], isNew: true },
-            { id: 6, title: "1H Colorway Trucker Hat", price: 35, category: "hats", image: "product-6.jpeg", sizes: ["One Size"], colors: ["White/Black"], isNew: false },
-        ];
+        <!-- Main Content -->
+        <main class="pt-16">
+            <!-- Page Header -->
+            <div class="bg-gray-50 border-b border-gray-200">
+                <div class="container-main py-8 md:py-12">
+                    <nav class="breadcrumbs">
+                        <a href="/">Home</a>
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        <span id="page-title">Shop All</span>
+                    </nav>
+                    <h1 id="category-title" class="text-3xl md:text-5xl font-display font-bold uppercase">Shop All</h1>
+                    <p id="category-description" class="text-gray-500 mt-2 max-w-2xl">
+                        Discover our complete collection of premium streetwear essentials.
+                    </p>
+                </div>
+            </div>
 
-        let currentFilters = {
-            categories: [],
-            sizes: [],
-            colors: [],
-            priceRanges: [],
-            sort: 'recommended',
-            search: ''
-        };
+            <!-- Shop Layout -->
+            <div class="container-main py-8">
+                <!-- Toolbar -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-6 border-b border-gray-200">
+                    <div class="flex items-center gap-4">
+                        <button
+                            id="open-filters"
+                            class="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg font-medium text-sm">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                            Filters
+                        </button>
+                        <span class="text-sm text-gray-500 hidden sm:block"
+                            ><span id="product-count" class="font-bold text-black">0</span> products</span
+                        >
+                    </div>
 
-        // Update checkbox states based on currentFilters
-        function updateFilterCheckboxes() {
-            // Category checkboxes
-            document.querySelectorAll('input[name="category"]').forEach(cb => {
-                cb.checked = currentFilters.categories.includes(cb.value);
-            });
-        }
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm text-gray-500 hidden sm:block">Sort by:</label>
+                        <select
+                            id="sort-select"
+                            class="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-black">
+                            <option value="recommended">Recommended</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="newest">Newest In</option>
+                        </select>
+                    </div>
+                </div>
 
-        // Parse URL params
-        function parseUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const category = params.get('category');
-            const isNew = params.get('new');
-            const search = params.get('q');
+                <div class="flex gap-8 items-start">
+                    <!-- Desktop Sidebar -->
+                    <aside class="hidden lg:block w-64 flex-shrink-0">
+                        <div class="sticky top-24">
+                            <h3 class="font-bold uppercase text-sm mb-4">Filters</h3>
 
-            if (category) {
-                currentFilters.categories = [category];
-                document.getElementById('category-title').textContent = category.charAt(0).toUpperCase() + category.slice(1);
-                document.getElementById('page-title').textContent = category.charAt(0).toUpperCase() + category.slice(1);
-                updateFilterCheckboxes();
+                            <div class="filter-section">
+                                <h4 class="filter-title">Category</h4>
+                                <div class="filter-options" id="category-filters">
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="category" value="tops" />
+                                        <span>Tops</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="category" value="hoodies" />
+                                        <span>Hoodies</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="category" value="hats" />
+                                        <span>Hats</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <h4 class="filter-title">Size</h4>
+                                <div class="size-grid" id="size-filters">
+                                    <button class="size-option" data-size="S">S</button>
+                                    <button class="size-option" data-size="M">M</button>
+                                    <button class="size-option" data-size="L">L</button>
+                                    <button class="size-option" data-size="XL">XL</button>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <h4 class="filter-title">Color</h4>
+                                <div class="flex flex-wrap gap-2" id="color-filters">
+                                    <button class="color-swatch" style="background: #111" data-color="Black"></button>
+                                    <button
+                                        class="color-swatch"
+                                        style="background: #fff; border: 1px solid #ddd"
+                                        data-color="White"></button>
+                                    <button
+                                        class="color-swatch"
+                                        style="background: #f5f5dc"
+                                        data-color="Cream"></button>
+                                    <button class="color-swatch" style="background: #808080" data-color="Grey"></button>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <h4 class="filter-title">Price</h4>
+                                <div class="filter-options" id="price-filters">
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="price" value="0-35" />
+                                        <span>Under £35</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="price" value="35-50" />
+                                        <span>£35 - £50</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="price" value="50+" />
+                                        <span>£50+</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button onclick="clearFilters()" class="text-sm underline hover:no-underline mt-4">
+                                Clear all filters
+                            </button>
+                        </div>
+                    </aside>
+
+                    <!-- Product Grid -->
+                    <div class="flex-1 min-w-0">
+                        <div class="product-grid" id="product-grid">
+                            <!-- Products rendered by JS -->
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination" id="pagination">
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="container-main">
+                <div class="footer-grid">
+                    <div>
+                        <img src="logo.svg" alt="1 HUNDRED" class="h-10 mb-6" style="filter: brightness(0) invert(1)" />
+                        <p class="text-gray-400 text-sm max-w-xs">Premium streetwear for the modern individual.</p>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Shop</h4>
+                        <div class="footer-links">
+                            <a href="/shop" class="footer-link">Shop All</a>
+                            <a href="/shop?new=true" class="footer-link">New Arrivals</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Help</h4>
+                        <div class="footer-links">
+                            <a href="#" class="footer-link">Help Centre</a>
+                            <a href="#" class="footer-link">Delivery & Returns</a>
+                            <a href="#" class="footer-link">Track Order</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Join The List</h4>
+                        <form
+                            class="footer-input-group"
+                            onsubmit="
+                                event.preventDefault();
+                                showToast('Thanks for subscribing!');
+                            ">
+                            <input type="email" placeholder="Email Address" class="footer-input" required />
+                            <button type="submit" class="footer-submit">Join</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="text-gray-500 text-sm">© 2026 1 HUNDRED Ltd.</div>
+                    <div class="flex gap-6 text-sm">
+                        <a href="#" class="footer-link">Privacy Policy</a>
+                        <a href="#" class="footer-link">Terms & Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script src="main.js"></script>
+        <script>
+            // Extended product data for shop page
+            const allProducts = [
+                {
+                    id: 1,
+                    title: 'Racer Trophy Tee',
+                    price: 45,
+                    category: 'tops',
+                    image: 'product-1.png',
+                    sizes: ['S', 'M', 'L', 'XL'],
+                    colors: ['Grey'],
+                    isNew: true
+                },
+                {
+                    id: 2,
+                    title: 'Champions Engineered Tee',
+                    price: 45,
+                    category: 'tops',
+                    image: 'product-2.png',
+                    sizes: ['S', 'M', 'L', 'XL'],
+                    colors: ['Grey'],
+                    isNew: false
+                },
+                {
+                    id: 3,
+                    title: '1H Vintage Trucker Hat',
+                    price: 35,
+                    category: 'hats',
+                    image: 'product-3.png',
+                    sizes: ['One Size'],
+                    colors: ['White/Black'],
+                    isNew: true
+                },
+                {
+                    id: 4,
+                    title: 'Silence Expression Hoodie',
+                    price: 65,
+                    category: 'hoodies',
+                    image: 'product-4.jpeg',
+                    sizes: ['S', 'M', 'L', 'XL'],
+                    colors: ['Black'],
+                    isNew: false
+                },
+                {
+                    id: 5,
+                    title: 'Endless Possibilities Hoodie',
+                    price: 65,
+                    category: 'hoodies',
+                    image: 'product-5.jpeg',
+                    sizes: ['S', 'M', 'L', 'XL'],
+                    colors: ['Blue'],
+                    isNew: true
+                },
+                {
+                    id: 6,
+                    title: '1H Colorway Trucker Hat',
+                    price: 35,
+                    category: 'hats',
+                    image: 'product-6.jpeg',
+                    sizes: ['One Size'],
+                    colors: ['White/Black'],
+                    isNew: false
+                }
+            ];
+
+            let currentFilters = {
+                categories: [],
+                sizes: [],
+                colors: [],
+                priceRanges: [],
+                sort: 'recommended',
+                search: ''
+            };
+
+            // Update checkbox states based on currentFilters
+            function updateFilterCheckboxes() {
+                // Category checkboxes
+                document.querySelectorAll('input[name="category"]').forEach((cb) => {
+                    cb.checked = currentFilters.categories.includes(cb.value);
+                });
             }
-            
-            if (isNew) {
-                document.getElementById('category-title').textContent = 'New Arrivals';
-                document.getElementById('page-title').textContent = 'New In';
+
+            // Parse URL params
+            function parseUrlParams() {
+                const params = new URLSearchParams(window.location.search);
+                const category = params.get('category');
+                const isNew = params.get('new');
+                const search = params.get('q');
+
+                if (category) {
+                    currentFilters.categories = [category];
+                    document.getElementById('category-title').textContent =
+                        category.charAt(0).toUpperCase() + category.slice(1);
+                    document.getElementById('page-title').textContent =
+                        category.charAt(0).toUpperCase() + category.slice(1);
+                    updateFilterCheckboxes();
+                }
+
+                if (isNew) {
+                    document.getElementById('category-title').textContent = 'New Arrivals';
+                    document.getElementById('page-title').textContent = 'New In';
+                }
+
+                if (search) {
+                    currentFilters.search = search;
+                    document.getElementById('search-input').value = search;
+                    document.getElementById('category-title').textContent = `Search: "${search}"`;
+                }
             }
 
-            if (search) {
-                currentFilters.search = search;
-                document.getElementById('search-input').value = search;
-                document.getElementById('category-title').textContent = `Search: "${search}"`;
-            }
-        }
+            // Render products
+            function renderProducts() {
+                let filtered = allProducts.filter((p) => {
+                    // Category filter
+                    if (currentFilters.categories.length > 0 && !currentFilters.categories.includes(p.category)) {
+                        return false;
+                    }
+                    // Size filter
+                    if (currentFilters.sizes.length > 0 && !currentFilters.sizes.some((s) => p.sizes.includes(s))) {
+                        return false;
+                    }
+                    // Color filter
+                    if (currentFilters.colors.length > 0 && !currentFilters.colors.some((c) => p.colors.includes(c))) {
+                        return false;
+                    }
+                    // Price filter
+                    if (currentFilters.priceRanges.length > 0) {
+                        const price = p.price;
+                        const inRange = currentFilters.priceRanges.some((range) => {
+                            if (range === '0-35') return price < 35;
+                            if (range === '35-50') return price >= 35 && price <= 50;
+                            if (range === '50+') return price > 50;
+                            return true;
+                        });
+                        if (!inRange) return false;
+                    }
+                    // Search filter
+                    if (currentFilters.search) {
+                        return p.title.toLowerCase().includes(currentFilters.search.toLowerCase());
+                    }
+                    // New arrivals
+                    if (new URLSearchParams(window.location.search).get('new')) {
+                        return p.isNew;
+                    }
+                    return true;
+                });
 
-        // Render products
-        function renderProducts() {
-            let filtered = allProducts.filter(p => {
-                // Category filter
-                if (currentFilters.categories.length > 0 && !currentFilters.categories.includes(p.category)) {
-                    return false;
+                // Sort
+                if (currentFilters.sort === 'price-low') {
+                    filtered.sort((a, b) => a.price - b.price);
+                } else if (currentFilters.sort === 'price-high') {
+                    filtered.sort((a, b) => b.price - a.price);
+                } else if (currentFilters.sort === 'newest') {
+                    filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
                 }
-                // Size filter
-                if (currentFilters.sizes.length > 0 && !currentFilters.sizes.some(s => p.sizes.includes(s))) {
-                    return false;
-                }
-                // Color filter
-                if (currentFilters.colors.length > 0 && !currentFilters.colors.some(c => p.colors.includes(c))) {
-                    return false;
-                }
-                // Price filter
-                if (currentFilters.priceRanges.length > 0) {
-                    const price = p.price;
-                    const inRange = currentFilters.priceRanges.some(range => {
-                        if (range === '0-35') return price < 35;
-                        if (range === '35-50') return price >= 35 && price <= 50;
-                        if (range === '50+') return price > 50;
-                        return true;
-                    });
-                    if (!inRange) return false;
-                }
-                // Search filter
-                if (currentFilters.search) {
-                    return p.title.toLowerCase().includes(currentFilters.search.toLowerCase());
-                }
-                // New arrivals
-                if (new URLSearchParams(window.location.search).get('new')) {
-                    return p.isNew;
-                }
-                return true;
-            });
 
-            // Sort
-            if (currentFilters.sort === 'price-low') {
-                filtered.sort((a, b) => a.price - b.price);
-            } else if (currentFilters.sort === 'price-high') {
-                filtered.sort((a, b) => b.price - a.price);
-            } else if (currentFilters.sort === 'newest') {
-                filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-            }
+                document.getElementById('product-count').textContent = filtered.length;
 
-            document.getElementById('product-count').textContent = filtered.length;
-
-            const container = document.getElementById('product-grid');
-            if (filtered.length === 0) {
-                container.innerHTML = `
+                const container = document.getElementById('product-grid');
+                if (filtered.length === 0) {
+                    container.innerHTML = `
                     <div class="col-span-full empty-state py-16">
                         <i data-lucide="search-x" class="empty-state-icon mx-auto"></i>
                         <h3 class="empty-state-title">No products found</h3>
@@ -545,8 +664,10 @@
                         <button onclick="clearFilters()" class="btn btn-primary mt-4">Clear Filters</button>
                     </div>
                 `;
-            } else {
-                container.innerHTML = filtered.map(product => `
+                } else {
+                    container.innerHTML = filtered
+                        .map(
+                            (product) => `
                     <div class="product-card">
                         <div class="product-image-wrapper" onclick="openQuickView(${product.id})">
                             <img src="${product.image}" alt="${product.title}" class="product-image" loading="lazy">
@@ -571,109 +692,121 @@
                             <p class="product-category">${product.category}</p>
                         </a>
                     </div>
-                `).join('');
+                `
+                        )
+                        .join('');
+                }
+
+                lucide.createIcons();
             }
 
-            lucide.createIcons();
-        }
+            // Filter handlers
+            function setupFilters() {
+                // Category checkboxes
+                document.querySelectorAll('input[name="category"]').forEach((cb) => {
+                    cb.addEventListener('change', () => {
+                        currentFilters.categories = Array.from(
+                            document.querySelectorAll('input[name="category"]:checked')
+                        ).map((cb) => cb.value);
+                        renderProducts();
+                    });
+                });
 
-        // Filter handlers
-        function setupFilters() {
-            // Category checkboxes
-            document.querySelectorAll('input[name="category"]').forEach(cb => {
-                cb.addEventListener('change', () => {
-                    currentFilters.categories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
+                // Size buttons
+                document.querySelectorAll('.size-option').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        btn.classList.toggle('active');
+                        currentFilters.sizes = Array.from(document.querySelectorAll('.size-option.active')).map(
+                            (btn) => btn.dataset.size
+                        );
+                        renderProducts();
+                    });
+                });
+
+                // Color swatches
+                document.querySelectorAll('.color-swatch').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        btn.classList.toggle('active');
+                        currentFilters.colors = Array.from(document.querySelectorAll('.color-swatch.active')).map(
+                            (btn) => btn.dataset.color
+                        );
+                        renderProducts();
+                    });
+                });
+
+                // Price checkboxes
+                document.querySelectorAll('input[name="price"]').forEach((cb) => {
+                    cb.addEventListener('change', () => {
+                        currentFilters.priceRanges = Array.from(
+                            document.querySelectorAll('input[name="price"]:checked')
+                        ).map((cb) => cb.value);
+                        renderProducts();
+                    });
+                });
+
+                // Sort select
+                document.getElementById('sort-select').addEventListener('change', (e) => {
+                    currentFilters.sort = e.target.value;
                     renderProducts();
                 });
-            });
 
-            // Size buttons
-            document.querySelectorAll('.size-option').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btn.classList.toggle('active');
-                    currentFilters.sizes = Array.from(document.querySelectorAll('.size-option.active')).map(btn => btn.dataset.size);
+                // Search input
+                document.getElementById('search-input')?.addEventListener('input', (e) => {
+                    currentFilters.search = e.target.value;
                     renderProducts();
                 });
+            }
+
+            function clearFilters() {
+                currentFilters = {
+                    categories: [],
+                    sizes: [],
+                    colors: [],
+                    priceRanges: [],
+                    sort: 'recommended',
+                    search: ''
+                };
+
+                document.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
+                document
+                    .querySelectorAll('.size-option, .color-swatch')
+                    .forEach((btn) => btn.classList.remove('active'));
+                document.getElementById('sort-select').value = 'recommended';
+
+                renderProducts();
+            }
+
+            function applyFilters() {
+                document.getElementById('filter-sidebar').classList.remove('active');
+                document.getElementById('filter-overlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Mobile filter toggle
+            document.getElementById('open-filters')?.addEventListener('click', () => {
+                document.getElementById('filter-sidebar').classList.add('active');
+                document.getElementById('filter-overlay').classList.add('active');
+                document.body.style.overflow = 'hidden';
             });
 
-            // Color swatches
-            document.querySelectorAll('.color-swatch').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btn.classList.toggle('active');
-                    currentFilters.colors = Array.from(document.querySelectorAll('.color-swatch.active')).map(btn => btn.dataset.color);
-                    renderProducts();
-                });
+            document.getElementById('close-filters')?.addEventListener('click', () => {
+                document.getElementById('filter-sidebar').classList.remove('active');
+                document.getElementById('filter-overlay').classList.remove('active');
+                document.body.style.overflow = '';
             });
 
-            // Price checkboxes
-            document.querySelectorAll('input[name="price"]').forEach(cb => {
-                cb.addEventListener('change', () => {
-                    currentFilters.priceRanges = Array.from(document.querySelectorAll('input[name="price"]:checked')).map(cb => cb.value);
-                    renderProducts();
-                });
+            document.getElementById('filter-overlay')?.addEventListener('click', () => {
+                document.getElementById('filter-sidebar').classList.remove('active');
+                document.getElementById('filter-overlay').classList.remove('active');
+                document.body.style.overflow = '';
             });
 
-            // Sort select
-            document.getElementById('sort-select').addEventListener('change', (e) => {
-                currentFilters.sort = e.target.value;
+            // Initialize
+            document.addEventListener('DOMContentLoaded', () => {
+                parseUrlParams();
+                setupFilters();
                 renderProducts();
             });
-
-            // Search input
-            document.getElementById('search-input')?.addEventListener('input', (e) => {
-                currentFilters.search = e.target.value;
-                renderProducts();
-            });
-        }
-
-        function clearFilters() {
-            currentFilters = {
-                categories: [],
-                sizes: [],
-                colors: [],
-                priceRanges: [],
-                sort: 'recommended',
-                search: ''
-            };
-            
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-            document.querySelectorAll('.size-option, .color-swatch').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('sort-select').value = 'recommended';
-            
-            renderProducts();
-        }
-
-        function applyFilters() {
-            document.getElementById('filter-sidebar').classList.remove('active');
-            document.getElementById('filter-overlay').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // Mobile filter toggle
-        document.getElementById('open-filters')?.addEventListener('click', () => {
-            document.getElementById('filter-sidebar').classList.add('active');
-            document.getElementById('filter-overlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        document.getElementById('close-filters')?.addEventListener('click', () => {
-            document.getElementById('filter-sidebar').classList.remove('active');
-            document.getElementById('filter-overlay').classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        document.getElementById('filter-overlay')?.addEventListener('click', () => {
-            document.getElementById('filter-sidebar').classList.remove('active');
-            document.getElementById('filter-overlay').classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            parseUrlParams();
-            setupFilters();
-            renderProducts();
-        });
-    </script>
-</body>
+        </script>
+    </body>
 </html>

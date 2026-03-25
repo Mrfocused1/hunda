@@ -1,0 +1,16 @@
+{
+    "extends": ["stylelint-config-standard"],
+    "rules": {
+        "declaration-block-no-duplicate-properties": true,
+        "declaration-block-no-shorthand-property-overrides": true,
+        "selector-class-pattern": null,
+        "property-no-vendor-prefix": null,
+        "value-no-vendor-prefix": null,
+        "at-rule-no-unknown": [
+            true,
+            {
+                "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen"]
+            }
+        ]
+    }
+}

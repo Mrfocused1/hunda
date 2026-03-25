@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Chrome (Desktop)",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}",
+            "runtimeArgs": ["--window-size=1440,900"]
+        },
+        {
+            "name": "Launch Chrome (Mobile iPhone SE)",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}",
+            "runtimeArgs": ["--window-size=375,667", "--device-scale-factor=2"]
+        }
+    ]
+}
