@@ -323,12 +323,12 @@
                             <h4 class="filter-title">Price</h4>
                             <div class="filter-options" id="price-filters">
                                 <label class="filter-option">
-                                    <input type="checkbox" name="price" value="0-30">
-                                    <span>Under £30</span>
+                                    <input type="checkbox" name="price" value="0-35">
+                                    <span>Under £35</span>
                                 </label>
                                 <label class="filter-option">
-                                    <input type="checkbox" name="price" value="30-50">
-                                    <span>£30 - £50</span>
+                                    <input type="checkbox" name="price" value="35-50">
+                                    <span>£35 - £50</span>
                                 </label>
                                 <label class="filter-option">
                                     <input type="checkbox" name="price" value="50+">
@@ -476,8 +476,8 @@
                 if (currentFilters.priceRanges.length > 0) {
                     const price = p.price;
                     const inRange = currentFilters.priceRanges.some(range => {
-                        if (range === '0-30') return price < 30;
-                        if (range === '30-50') return price >= 30 && price <= 50;
+                        if (range === '0-35') return price < 35;
+                        if (range === '35-50') return price >= 35 && price <= 50;
                         if (range === '50+') return price > 50;
                         return true;
                     });
