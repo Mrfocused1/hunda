@@ -86,12 +86,17 @@ function initHeader() {
 
     // Cart drawer
     const cartTrigger = document.getElementById('cart-trigger');
+    const cartTriggerMobile = document.getElementById('cart-trigger-mobile');
     const cartDrawer = document.getElementById('cart-drawer');
     const cartOverlay = document.getElementById('cart-overlay');
     const closeCart = document.getElementById('close-cart');
 
     if (cartTrigger && cartDrawer) {
         cartTrigger.addEventListener('click', () => toggleCart(true));
+    }
+
+    if (cartTriggerMobile && cartDrawer) {
+        cartTriggerMobile.addEventListener('click', () => toggleCart(true));
     }
 
     if (closeCart) {
