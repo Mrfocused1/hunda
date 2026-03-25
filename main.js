@@ -14,22 +14,18 @@ const state = {
 
 // --- PRODUCT DATA ---
 const products = [
-    { id: 1, title: "Product 1", price: 45, category: "Tops", image: "product-1.png", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
-    { id: 2, title: "Product 2", price: 45, category: "Tops", image: "product-2.png", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
-    { id: 3, title: "Product 3", price: 45, category: "Tops", image: "product-3.png", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
-    { id: 4, title: "Product 4", price: 45, category: "Tops", image: "product-4.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
-    { id: 5, title: "Product 5", price: 45, category: "Tops", image: "product-5.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
-    { id: 6, title: "Product 6", price: 45, category: "Tops", image: "product-6.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["White"] },
+    { id: 1, title: "Racer Trophy Tee", price: 45, category: "Tops", image: "product-1.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"] },
+    { id: 2, title: "Champions Engineered Tee", price: 45, category: "Tops", image: "product-2.png", sizes: ["S", "M", "L", "XL"], colors: ["Grey"] },
+    { id: 3, title: "1H Vintage Trucker Hat", price: 35, category: "Hats", image: "product-3.png", sizes: ["One Size"], colors: ["White/Black"] },
+    { id: 4, title: "Silence Expression Hoodie", price: 65, category: "Hoodies", image: "product-4.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Black"] },
+    { id: 5, title: "Endless Possibilities Hoodie", price: 65, category: "Hoodies", image: "product-5.jpeg", sizes: ["S", "M", "L", "XL"], colors: ["Blue"] },
+    { id: 6, title: "1H Colorway Trucker Hat", price: 35, category: "Hats", image: "product-6.jpeg", sizes: ["One Size"], colors: ["White/Black"] },
 ];
 
 const categories = [
-    { name: "Tops", slug: "tops", count: 142 },
-    { name: "Hoodies", slug: "hoodies", count: 48 },
-    { name: "Jackets", slug: "jackets", count: 32 },
-    { name: "Trousers", slug: "trousers", count: 56 },
-    { name: "Jumpers", slug: "jumpers", count: 24 },
-    { name: "Hats", slug: "hats", count: 89 },
-    { name: "Shoes", slug: "shoes", count: 42 },
+    { name: "Tops", slug: "tops", count: 2 },
+    { name: "Hoodies", slug: "hoodies", count: 2 },
+    { name: "Hats", slug: "hats", count: 2 },
 ];
 
 // ========================================
