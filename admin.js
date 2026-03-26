@@ -21,15 +21,6 @@ const HARDCODED_PRODUCTS = [
         description: 'Premium cotton tee with racing-inspired graphics.'
     },
     {
-        id: 2,
-        title: 'Champions Engineered Tee',
-        price: 45,
-        images: ['product-2.png'],
-        category: 'Tops',
-        stock: 18,
-        description: 'Championship-inspired design on premium fabric.'
-    },
-    {
         id: 3,
         title: '1H Vintage Trucker Hat',
         price: 35,

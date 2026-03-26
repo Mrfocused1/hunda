@@ -25,15 +25,6 @@ const products = [
         colors: ['Grey']
     },
     {
-        id: 2,
-        title: 'Champions Engineered Tee',
-        price: 45,
-        category: 'Tops',
-        images: ['product-2.png'],
-        sizes: ['S', 'M', 'L', 'XL'],
-        colors: ['Grey']
-    },
-    {
         id: 3,
         title: '1H Vintage Trucker Hat',
         price: 35,
@@ -81,7 +72,7 @@ const products = [
 ];
 
 const categories = [
-    { name: 'Tops', slug: 'tops', count: 3 },
+    { name: 'Tops', slug: 'tops', count: 2 },
     { name: 'Hoodies', slug: 'hoodies', count: 2 },
     { name: 'Hats', slug: 'hats', count: 2 }
 ];
