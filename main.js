@@ -45,7 +45,7 @@ const products = [
     {
         id: 6,
         title: '1H Multi Colour Cap',
-        price: 35,
+        price: 30,
         category: 'Hats',
         images: ['product-6.jpeg'],
         sizes: ['One Size'],

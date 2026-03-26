@@ -51,7 +51,7 @@ All in. Always.`
     {
         id: 6,
         title: '1H Multi Colour Cap',
-        price: 35,
+        price: 30,
         images: ['product-6.jpeg'],
         category: 'Hats',
         stock: 20,
