@@ -578,22 +578,16 @@
 
                 if (category) {
                     currentFilters.categories = [category];
-                    document.getElementById('category-title').textContent =
-                        category.charAt(0).toUpperCase() + category.slice(1);
-                    document.getElementById('page-title').textContent =
-                        category.charAt(0).toUpperCase() + category.slice(1);
                     updateFilterCheckboxes();
                 }
 
                 if (isNew) {
-                    document.getElementById('category-title').textContent = 'New Arrivals';
-                    document.getElementById('page-title').textContent = 'New In';
+                    // New filter applied, title remains "Shop All"
                 }
 
                 if (search) {
                     currentFilters.search = search;
                     document.getElementById('search-input').value = search;
-                    document.getElementById('category-title').textContent = `Search: "${search}"`;
                 }
             }
 
