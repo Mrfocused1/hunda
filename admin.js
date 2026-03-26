@@ -13,8 +13,8 @@
 const HARDCODED_PRODUCTS = [
     {
         id: 3,
-        title: '1H Vintage Trucker Hat',
-        price: 35,
+        title: '1H Star Cap',
+        price: 30,
         images: ['product-3.png'],
         category: 'Hats',
         stock: 12,

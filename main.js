@@ -17,8 +17,8 @@ const state = {
 const products = [
     {
         id: 3,
-        title: '1H Vintage Trucker Hat',
-        price: 35,
+        title: '1H Star Cap',
+        price: 30,
         category: 'Hats',
         images: ['product-3.png'],
         sizes: ['One Size'],
