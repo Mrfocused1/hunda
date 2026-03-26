@@ -55,9 +55,6 @@ const AdminData = {
     // Get products from localStorage or use defaults
     getProducts: function () {
         const stored = localStorage.getItem('1hundred_products');
-        if (stored) {
-            return JSON.parse(stored);
-        }
         // Default products
         const defaults = [
             {
@@ -125,6 +122,20 @@ const AdminData = {
                     'The Relentless Trophy Tee distills discipline into design. A monochrome composition of a faceless, armored figure holding its reward—symbolizing victory earned through persistence, not chance.\n\nRefined, understated, and intentional, this piece speaks to those who pursue excellence without compromise.\n\nEarned. Never given.'
             }
         ];
+
+        if (stored) {
+            // Merge stored products with any new defaults
+            const storedProducts = JSON.parse(stored);
+            const storedIds = new Set(storedProducts.map((p) => p.id));
+            const newDefaults = defaults.filter((p) => !storedIds.has(p.id));
+            if (newDefaults.length > 0) {
+                const merged = [...storedProducts, ...newDefaults];
+                this.saveProducts(merged);
+                return merged;
+            }
+            return storedProducts;
+        }
+
         this.saveProducts(defaults);
         return defaults;
     },
