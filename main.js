@@ -44,7 +44,7 @@ const products = [
     },
     {
         id: 6,
-        title: '1H Colorway Trucker Hat',
+        title: '1H Multi Colour Cap',
         price: 35,
         category: 'Hats',
         images: ['product-6.jpeg'],
