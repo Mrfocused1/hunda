@@ -364,10 +364,16 @@ function filterProducts() {
     renderProducts();
 }
 
+let currentProductImage = null;
+
 function openProductModal(productId = null) {
     const modal = document.getElementById('product-modal');
     const title = document.getElementById('product-modal-title');
     const form = document.getElementById('product-form');
+
+    // Reset image upload state
+    currentProductImage = null;
+    resetImageUpload();
 
     if (productId) {
         const products = AdminData.getProducts();
@@ -378,9 +384,14 @@ function openProductModal(productId = null) {
         document.getElementById('product-title').value = product.title;
         document.getElementById('product-price').value = product.price;
         document.getElementById('product-category').value = product.category;
-        document.getElementById('product-image').value = product.image;
         document.getElementById('product-stock').value = product.stock;
         document.getElementById('product-description').value = product.description || '';
+
+        // Set current image
+        if (product.image) {
+            currentProductImage = product.image;
+            showImagePreview(product.image);
+        }
     } else {
         title.textContent = 'Add Product';
         form.reset();
@@ -392,6 +403,100 @@ function openProductModal(productId = null) {
 
 function closeProductModal() {
     document.getElementById('product-modal').classList.remove('active');
+    currentProductImage = null;
+    resetImageUpload();
+}
+
+// Image Upload Functions
+function handleDragOver(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    document.getElementById('image-upload-area').classList.add('drag-over');
+}
+
+function handleDragLeave(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    document.getElementById('image-upload-area').classList.remove('drag-over');
+}
+
+function handleDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    document.getElementById('image-upload-area').classList.remove('drag-over');
+
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        processImageFile(files[0]);
+    }
+}
+
+function handleImageSelect(event) {
+    const files = event.target.files;
+    if (files.length > 0) {
+        processImageFile(files[0]);
+    }
+}
+
+function processImageFile(file) {
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        showToast('Please upload a valid image file (PNG, JPG, or WEBP)');
+        return;
+    }
+
+    // Validate file size (5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+        showToast('Image file is too large. Maximum size is 5MB.');
+        return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        currentProductImage = e.target.result;
+        showImagePreview(currentProductImage);
+    };
+    reader.readAsDataURL(file);
+}
+
+function showImagePreview(imageSrc) {
+    const previewContainer = document.getElementById('image-preview-container');
+    const preview = document.getElementById('image-preview');
+    const uploadArea = document.getElementById('image-upload-area');
+    const removeBtn = document.getElementById('remove-image-btn');
+
+    preview.src = imageSrc;
+    previewContainer.style.display = 'block';
+    uploadArea.style.display = 'none';
+    removeBtn.style.display = 'inline-block';
+
+    // Store in hidden input
+    document.getElementById('product-image').value = imageSrc;
+}
+
+function removeProductImage() {
+    currentProductImage = null;
+    resetImageUpload();
+}
+
+function resetImageUpload() {
+    const previewContainer = document.getElementById('image-preview-container');
+    const preview = document.getElementById('image-preview');
+    const uploadArea = document.getElementById('image-upload-area');
+    const removeBtn = document.getElementById('remove-image-btn');
+    const fileInput = document.getElementById('product-image-file');
+    const hiddenInput = document.getElementById('product-image');
+
+    preview.src = '';
+    previewContainer.style.display = 'none';
+    uploadArea.style.display = 'block';
+    uploadArea.classList.remove('has-image');
+    removeBtn.style.display = 'none';
+    fileInput.value = '';
+    hiddenInput.value = '';
 }
 
 function saveProduct(event) {
@@ -405,7 +510,7 @@ function saveProduct(event) {
         title: document.getElementById('product-title').value,
         price: parseFloat(document.getElementById('product-price').value),
         category: document.getElementById('product-category').value,
-        image: document.getElementById('product-image').value || 'product-1.png',
+        image: currentProductImage || 'product-1.png',
         stock: parseInt(document.getElementById('product-stock').value) || 0,
         description: document.getElementById('product-description').value
     };
