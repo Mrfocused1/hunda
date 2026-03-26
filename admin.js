@@ -409,31 +409,419 @@ function viewOrder(orderId) {
 }
 
 // Customers Management
-function loadCustomers() {
-    const customers = AdminData.getCustomers();
-    const tbody = document.getElementById('customers-table-body');
+let customerCurrentPage = 1;
+let customerPageSize = 12;
+let customerSearchTerm = '';
+let customerFilterStatus = 'all';
+let allCustomers = [];
 
-    if (customers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No customers yet</td></tr>';
+function loadCustomers() {
+    allCustomers = AdminData.getCustomers();
+
+    // Generate sample customers if none exist
+    if (allCustomers.length === 0) {
+        allCustomers = generateSampleCustomers();
+        AdminData.saveCustomers(allCustomers);
+    }
+
+    updateCustomerStats();
+    renderCustomers();
+}
+
+function generateSampleCustomers() {
+    const sampleNames = [
+        ['James', 'Wilson'],
+        ['Sarah', 'Anderson'],
+        ['Michael', 'Brown'],
+        ['Emma', 'Davis'],
+        ['William', 'Taylor'],
+        ['Olivia', 'Thomas'],
+        ['Alexander', 'Jackson'],
+        ['Sophie', 'White'],
+        ['Daniel', 'Harris'],
+        ['Chloe', 'Martin'],
+        ['Matthew', 'Thompson'],
+        ['Lucy', 'Garcia'],
+        ['Ryan', 'Martinez'],
+        ['Grace', 'Robinson'],
+        ['Benjamin', 'Clark'],
+        ['Zoe', 'Rodriguez']
+    ];
+
+    return sampleNames.map((name, index) => {
+        const orderCount = Math.floor(Math.random() * 8) + 1;
+        const totalSpent = orderCount * (25 + Math.floor(Math.random() * 100));
+        const daysAgo = Math.floor(Math.random() * 365);
+        const joinedDate = new Date();
+        joinedDate.setDate(joinedDate.getDate() - daysAgo);
+
+        // Determine customer status
+        let status = 'active';
+        if (totalSpent > 300) status = 'vip';
+        else if (daysAgo < 30) status = 'new';
+        else if (daysAgo > 180) status = 'inactive';
+
+        return {
+            id: `cust_${Date.now()}_${index}`,
+            firstName: name[0],
+            lastName: name[1],
+            email: `${name[0].toLowerCase()}.${name[1].toLowerCase()}@email.com`,
+            phone: `+44 7${Math.floor(Math.random() * 900000000 + 100000000)}`,
+            orders: orderCount,
+            totalSpent: totalSpent,
+            joined: joinedDate.toISOString(),
+            status: status,
+            lastOrder: new Date(
+                joinedDate.getTime() + Math.random() * (Date.now() - joinedDate.getTime())
+            ).toISOString(),
+            notes: ''
+        };
+    });
+}
+
+function updateCustomerStats() {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const totalCustomers = allCustomers.length;
+    const newThisMonth = allCustomers.filter((c) => new Date(c.joined) > thirtyDaysAgo).length;
+    const vipCustomers = allCustomers.filter((c) => c.status === 'vip').length;
+    const avgOrderValue =
+        allCustomers.length > 0
+            ? allCustomers.reduce((sum, c) => sum + c.totalSpent / c.orders, 0) / allCustomers.length
+            : 0;
+
+    document.getElementById('customer-total-count').textContent = totalCustomers;
+    document.getElementById('customer-new-count').textContent = newThisMonth;
+    document.getElementById('customer-vip-count').textContent = vipCustomers;
+    document.getElementById('customer-aov').textContent = `£${avgOrderValue.toFixed(0)}`;
+}
+
+function getFilteredCustomers() {
+    let filtered = [...allCustomers];
+
+    // Apply search filter
+    if (customerSearchTerm) {
+        const term = customerSearchTerm.toLowerCase();
+        filtered = filtered.filter(
+            (c) =>
+                c.firstName.toLowerCase().includes(term) ||
+                c.lastName.toLowerCase().includes(term) ||
+                c.email.toLowerCase().includes(term)
+        );
+    }
+
+    // Apply status filter
+    if (customerFilterStatus !== 'all') {
+        filtered = filtered.filter((c) => c.status === customerFilterStatus);
+    }
+
+    // Sort by joined date (newest first)
+    filtered.sort((a, b) => new Date(b.joined) - new Date(a.joined));
+
+    return filtered;
+}
+
+function renderCustomers() {
+    const filtered = getFilteredCustomers();
+    const grid = document.getElementById('customers-grid');
+    const emptyState = document.getElementById('customers-empty');
+    const pagination = document.getElementById('customers-pagination');
+
+    if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.style.display = 'block';
+        pagination.style.display = 'none';
         return;
     }
 
-    tbody.innerHTML = customers
-        .map(
-            (customer) => `
-        <tr>
-            <td>
-                <p class="font-medium">${customer.firstName} ${customer.lastName}</p>
-                <p class="text-xs text-gray-500 sm:hidden">${customer.email}</p>
-            </td>
-            <td class="hidden sm:table-cell">${customer.email}</td>
-            <td>${customer.orders || 0}</td>
-            <td class="font-medium">£${(customer.totalSpent || 0).toFixed(2)}</td>
-            <td>${new Date(customer.joined).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}</td>
-        </tr>
-    `
-        )
+    emptyState.style.display = 'none';
+    pagination.style.display = 'flex';
+
+    // Pagination
+    const totalPages = Math.ceil(filtered.length / customerPageSize);
+    const start = (customerCurrentPage - 1) * customerPageSize;
+    const paginated = filtered.slice(start, start + customerPageSize);
+
+    // Update pagination info
+    document.getElementById('pagination-info').textContent =
+        `Page ${customerCurrentPage} of ${totalPages} (${filtered.length} customers)`;
+
+    // Render customer cards
+    grid.innerHTML = paginated
+        .map((customer) => {
+            const initials = `${customer.firstName[0]}${customer.lastName[0]}`.toUpperCase();
+            const joinedDate = new Date(customer.joined).toLocaleDateString('en-GB', {
+                month: 'short',
+                year: 'numeric'
+            });
+            const lastOrderDate = new Date(customer.lastOrder).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short'
+            });
+
+            const statusBadges = [];
+            if (customer.status === 'vip') statusBadges.push('<span class="customer-badge vip">VIP</span>');
+            if (customer.status === 'new') statusBadges.push('<span class="customer-badge new">New</span>');
+            if (customer.status === 'active') statusBadges.push('<span class="customer-badge active">Active</span>');
+
+            return `
+            <div class="customer-card" onclick="viewCustomerDetails('${customer.id}')">
+                <div class="customer-card-header">
+                    <div class="customer-avatar ${customer.status}">${initials}</div>
+                    <div class="customer-info">
+                        <div class="customer-name">${customer.firstName} ${customer.lastName}</div>
+                        <div class="customer-email">${customer.email}</div>
+                    </div>
+                </div>
+                
+                <div class="customer-badges">
+                    ${statusBadges.join('')}
+                </div>
+                
+                <div class="customer-stats">
+                    <div class="customer-stat">
+                        <div class="customer-stat-value">${customer.orders}</div>
+                        <div class="customer-stat-label">Orders</div>
+                    </div>
+                    <div class="customer-stat">
+                        <div class="customer-stat-value">£${customer.totalSpent.toFixed(0)}</div>
+                        <div class="customer-stat-label">Spent</div>
+                    </div>
+                    <div class="customer-stat">
+                        <div class="customer-stat-value">£${(customer.totalSpent / customer.orders).toFixed(0)}</div>
+                        <div class="customer-stat-label">AOV</div>
+                    </div>
+                </div>
+                
+                <div class="customer-footer">
+                    <div class="customer-last-order">Last order: ${lastOrderDate}</div>
+                    <div class="customer-actions" onclick="event.stopPropagation()">
+                        <button class="customer-action-btn view" onclick="viewCustomerDetails('${customer.id}')" title="View Details">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                        <button class="customer-action-btn email" onclick="emailCustomer('${customer.id}')" title="Send Email">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </button>
+                        <button class="customer-action-btn delete" onclick="deleteCustomer('${customer.id}')" title="Delete">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        })
         .join('');
+
+    lucide.createIcons();
+}
+
+// Search functionality
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('customer-search');
+    if (searchInput) {
+        let debounceTimer;
+        searchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                customerSearchTerm = this.value.trim();
+                customerCurrentPage = 1;
+                renderCustomers();
+            }, 300);
+        });
+    }
+});
+
+function filterCustomers() {
+    customerFilterStatus = document.getElementById('customer-filter-status').value;
+    customerCurrentPage = 1;
+    renderCustomers();
+}
+
+function changePage(direction) {
+    const filtered = getFilteredCustomers();
+    const totalPages = Math.ceil(filtered.length / customerPageSize);
+
+    customerCurrentPage += direction;
+    if (customerCurrentPage < 1) customerCurrentPage = 1;
+    if (customerCurrentPage > totalPages) customerCurrentPage = totalPages;
+
+    renderCustomers();
+}
+
+function viewCustomerDetails(customerId) {
+    const customer = allCustomers.find((c) => c.id === customerId);
+    if (!customer) return;
+
+    const initials = `${customer.firstName[0]}${customer.lastName[0]}`.toUpperCase();
+    const joinedDate = new Date(customer.joined).toLocaleDateString('en-GB', {
+        month: 'long',
+        year: 'numeric'
+    });
+    const aov = (customer.totalSpent / customer.orders).toFixed(2);
+
+    document.getElementById('customer-modal-avatar').textContent = initials;
+    document.getElementById('customer-modal-avatar').className = `customer-detail-avatar ${customer.status}`;
+    document.getElementById('customer-modal-name').textContent = `${customer.firstName} ${customer.lastName}`;
+    document.getElementById('customer-modal-email').textContent = customer.email;
+    document.getElementById('customer-modal-status').textContent =
+        customer.status.charAt(0).toUpperCase() + customer.status.slice(1);
+    document.getElementById('customer-modal-joined').textContent = joinedDate;
+    document.getElementById('customer-modal-orders').textContent = customer.orders;
+    document.getElementById('customer-modal-spent').textContent = `£${customer.totalSpent.toFixed(2)}`;
+    document.getElementById('customer-modal-aov').textContent = `£${aov}`;
+    document.getElementById('customer-modal-notes').value = customer.notes || '';
+
+    // Store current customer ID for save
+    document.getElementById('customer-modal').dataset.customerId = customerId;
+
+    // Generate mock orders for this customer
+    const ordersList = document.getElementById('customer-modal-orders-list');
+    const mockOrders = generateMockOrdersForCustomer(customer);
+
+    if (mockOrders.length === 0) {
+        ordersList.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 2rem;">No orders yet</p>';
+    } else {
+        ordersList.innerHTML = mockOrders
+            .map(
+                (order) => `
+            <div class="customer-order-item">
+                <div class="customer-order-info">
+                    <span class="customer-order-number">${order.id}</span>
+                    <span class="customer-order-date">${new Date(order.date).toLocaleDateString('en-GB')}</span>
+                </div>
+                <span class="customer-order-total">£${order.total.toFixed(2)}</span>
+            </div>
+        `
+            )
+            .join('');
+    }
+
+    document.getElementById('customer-modal').classList.add('active');
+    lucide.createIcons();
+}
+
+function generateMockOrdersForCustomer(customer) {
+    const orders = [];
+    const statuses = ['delivered', 'delivered', 'delivered', 'shipped', 'processing'];
+
+    for (let i = 0; i < Math.min(customer.orders, 5); i++) {
+        const date = new Date(customer.lastOrder);
+        date.setDate(date.getDate() - i * 15 - Math.floor(Math.random() * 10));
+
+        orders.push({
+            id: `#ORD${String(10000 + Math.floor(Math.random() * 90000)).slice(-5)}`,
+            date: date.toISOString(),
+            total: 25 + Math.floor(Math.random() * 150),
+            status: statuses[Math.floor(Math.random() * statuses.length)]
+        });
+    }
+
+    return orders;
+}
+
+function closeCustomerModal() {
+    document.getElementById('customer-modal').classList.remove('active');
+}
+
+function saveCustomerNotes() {
+    const customerId = document.getElementById('customer-modal').dataset.customerId;
+    const notes = document.getElementById('customer-modal-notes').value;
+
+    const customer = allCustomers.find((c) => c.id === customerId);
+    if (customer) {
+        customer.notes = notes;
+        AdminData.saveCustomers(allCustomers);
+        showToast('Notes saved successfully');
+    }
+}
+
+function openAddCustomerModal() {
+    document.getElementById('add-customer-modal').classList.add('active');
+}
+
+function closeAddCustomerModal() {
+    document.getElementById('add-customer-modal').classList.remove('active');
+    document.getElementById('add-customer-form').reset();
+}
+
+function saveNewCustomer(event) {
+    event.preventDefault();
+
+    const firstName = document.getElementById('new-customer-firstname').value;
+    const lastName = document.getElementById('new-customer-lastname').value;
+    const email = document.getElementById('new-customer-email').value;
+    const phone = document.getElementById('new-customer-phone').value;
+
+    const newCustomer = {
+        id: `cust_${Date.now()}`,
+        firstName,
+        lastName,
+        email,
+        phone,
+        orders: 0,
+        totalSpent: 0,
+        joined: new Date().toISOString(),
+        status: 'new',
+        lastOrder: null,
+        notes: ''
+    };
+
+    allCustomers.push(newCustomer);
+    AdminData.saveCustomers(allCustomers);
+
+    closeAddCustomerModal();
+    updateCustomerStats();
+    renderCustomers();
+    showToast('Customer added successfully');
+}
+
+function emailCustomer(customerId) {
+    const customer = allCustomers.find((c) => c.id === customerId);
+    if (customer) {
+        window.location.href = `mailto:${customer.email}`;
+    }
+}
+
+function deleteCustomer(customerId) {
+    if (!confirm('Are you sure you want to delete this customer? This action cannot be undone.')) return;
+
+    allCustomers = allCustomers.filter((c) => c.id !== customerId);
+    AdminData.saveCustomers(allCustomers);
+
+    updateCustomerStats();
+    renderCustomers();
+    showToast('Customer deleted');
+}
+
+function exportCustomers() {
+    const csv = [
+        ['First Name', 'Last Name', 'Email', 'Phone', 'Orders', 'Total Spent', 'Status', 'Joined'].join(','),
+        ...allCustomers.map((c) =>
+            [
+                c.firstName,
+                c.lastName,
+                c.email,
+                c.phone || '',
+                c.orders,
+                c.totalSpent.toFixed(2),
+                c.status,
+                new Date(c.joined).toISOString().split('T')[0]
+            ].join(',')
+        )
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `customers-export-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('Customers exported to CSV');
 }
 
 // Email Automation
@@ -560,6 +948,22 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('product-modal').addEventListener('click', function (e) {
         if (e.target === this) closeProductModal();
     });
+
+    // Close customer modal on overlay click
+    const customerModal = document.getElementById('customer-modal');
+    if (customerModal) {
+        customerModal.addEventListener('click', function (e) {
+            if (e.target === this) closeCustomerModal();
+        });
+    }
+
+    // Close add customer modal on overlay click
+    const addCustomerModal = document.getElementById('add-customer-modal');
+    if (addCustomerModal) {
+        addCustomerModal.addEventListener('click', function (e) {
+            if (e.target === this) closeAddCustomerModal();
+        });
+    }
 
     // Close mobile menu when clicking nav items
     document.querySelectorAll('.admin-nav-item[data-section]').forEach((item) => {
