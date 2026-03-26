@@ -734,20 +734,274 @@
                 font-family: 'Oswald', sans-serif;
             }
 
-            /* Mobile Responsive for Customer Cards */
+            /* Product Cards */
+            .products-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+            .product-card {
+                background: white;
+                border: 1px solid #e5e7eb;
+                overflow: hidden;
+                transition: all 0.2s;
+            }
+            .product-card:hover {
+                border-color: #111;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+            .product-card-image {
+                aspect-ratio: 1;
+                background: #f9fafb;
+                position: relative;
+                overflow: hidden;
+            }
+            .product-card-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s;
+            }
+            .product-card:hover .product-card-image img {
+                transform: scale(1.05);
+            }
+            .product-card-stock-badge {
+                position: absolute;
+                top: 0.75rem;
+                left: 0.75rem;
+                padding: 0.25rem 0.625rem;
+                font-size: 0.6875rem;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+            .product-card-stock-badge.in-stock {
+                background: #111;
+                color: white;
+            }
+            .product-card-stock-badge.low-stock {
+                background: #fef3c7;
+                color: #92400e;
+            }
+            .product-card-stock-badge.out-stock {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+            .product-card-actions {
+                position: absolute;
+                top: 0.75rem;
+                right: 0.75rem;
+                display: flex;
+                gap: 0.375rem;
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+            .product-card:hover .product-card-actions {
+                opacity: 1;
+            }
+            .product-card-action-btn {
+                width: 36px;
+                height: 36px;
+                background: white;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                transition: all 0.15s;
+            }
+            .product-card-action-btn:hover {
+                background: #111;
+                color: white;
+            }
+            .product-card-content {
+                padding: 1.25rem;
+            }
+            .product-card-category {
+                font-size: 0.6875rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #6b7280;
+                margin-bottom: 0.375rem;
+            }
+            .product-card-title {
+                font-weight: 600;
+                font-size: 1rem;
+                color: #111;
+                margin-bottom: 0.5rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .product-card-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 0.875rem;
+                border-top: 1px solid #f3f4f6;
+            }
+            .product-card-price {
+                font-weight: 700;
+                font-size: 1.125rem;
+                font-family: 'Oswald', sans-serif;
+            }
+            .product-card-stock {
+                font-size: 0.8125rem;
+                color: #6b7280;
+            }
+            .product-card-stock.low {
+                color: #92400e;
+            }
+
+            /* Order Cards */
+            .orders-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+                gap: 1rem;
+            }
+            .order-card {
+                background: white;
+                border: 1px solid #e5e7eb;
+                padding: 1.25rem;
+                transition: all 0.2s;
+                cursor: pointer;
+            }
+            .order-card:hover {
+                border-color: #111;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+            .order-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 1rem;
+                padding-bottom: 0.875rem;
+                border-bottom: 1px solid #f3f4f6;
+            }
+            .order-card-id {
+                font-weight: 700;
+                font-family: 'Oswald', sans-serif;
+                font-size: 1rem;
+            }
+            .order-card-date {
+                font-size: 0.8125rem;
+                color: #6b7280;
+                margin-top: 0.125rem;
+            }
+            .order-card-customer {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            .order-card-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #111;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                font-size: 0.875rem;
+            }
+            .order-card-customer-info {
+                flex: 1;
+            }
+            .order-card-customer-name {
+                font-weight: 600;
+                font-size: 0.9375rem;
+            }
+            .order-card-customer-email {
+                font-size: 0.8125rem;
+                color: #6b7280;
+            }
+            .order-card-items {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                flex-wrap: wrap;
+            }
+            .order-card-item-thumb {
+                width: 48px;
+                height: 48px;
+                border: 1px solid #e5e7eb;
+                object-fit: cover;
+            }
+            .order-card-item-more {
+                width: 48px;
+                height: 48px;
+                background: #f3f4f6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #6b7280;
+            }
+            .order-card-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 0.875rem;
+                border-top: 1px solid #f3f4f6;
+            }
+            .order-card-total {
+                font-weight: 700;
+                font-size: 1.125rem;
+                font-family: 'Oswald', sans-serif;
+            }
+            .order-card-status-select {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.8125rem;
+                border: 1px solid #e5e7eb;
+                background: white;
+                cursor: pointer;
+            }
+
+            /* Settings Tabs */
+            .settings-panel {
+                display: none;
+            }
+            .settings-panel.active {
+                display: block;
+            }
+            .settings-tab.active {
+                color: #111;
+                border-bottom-color: #111;
+            }
+
+            /* Mobile Responsive */
             @media (max-width: 640px) {
-                .customers-grid {
+                .customers-grid,
+                .products-grid,
+                .orders-grid,
+                .emails-grid {
                     grid-template-columns: 1fr;
                 }
-                .customers-toolbar {
+                .customers-toolbar,
+                .products-toolbar,
+                .orders-toolbar {
                     flex-direction: column;
                     align-items: stretch;
                 }
-                .customers-toolbar > div:first-child {
+                .customers-toolbar > div:first-child,
+                .products-toolbar > div:first-child,
+                .orders-toolbar > div:first-child {
                     max-width: none;
                 }
-                .customer-stats {
-                    grid-template-columns: repeat(3, 1fr);
+                .customer-stats,
+                .product-stats,
+                .order-stats {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .settings-nav > div {
+                    flex-wrap: nowrap;
+                }
+                .product-card-actions {
+                    opacity: 1;
                 }
             }
 
@@ -918,66 +1172,298 @@
 
                     <!-- Products Section -->
                     <section id="products" class="admin-section">
-                        <div class="section-header">
-                            <button class="btn btn-primary btn-sm" onclick="openProductModal()">
-                                <i data-lucide="plus" class="w-4 h-4 inline mr-1"></i>
-                                Add Product
+                        <!-- Product Stats -->
+                        <div
+                            class="stats-grid"
+                            style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Products</div>
+                                <div class="stat-value" id="product-total-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">In Stock</div>
+                                <div class="stat-value" id="product-instock-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Low Stock</div>
+                                <div class="stat-value" id="product-lowstock-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Out of Stock</div>
+                                <div class="stat-value" id="product-outstock-count">0</div>
+                            </div>
+                        </div>
+
+                        <!-- Search & Filters Bar -->
+                        <div
+                            class="products-toolbar"
+                            style="
+                                background: white;
+                                border: 1px solid #e5e7eb;
+                                padding: 1rem 1.5rem;
+                                margin-bottom: 1.5rem;
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 1rem;
+                                align-items: center;
+                                justify-content: space-between;
+                            ">
+                            <div style="display: flex; gap: 0.75rem; flex: 1; min-width: 280px">
+                                <div style="position: relative; flex: 1; max-width: 320px">
+                                    <i
+                                        data-lucide="search"
+                                        style="
+                                            position: absolute;
+                                            left: 0.75rem;
+                                            top: 50%;
+                                            transform: translateY(-50%);
+                                            width: 1rem;
+                                            height: 1rem;
+                                            color: #9ca3af;
+                                        "></i>
+                                    <input
+                                        type="text"
+                                        id="product-search"
+                                        placeholder="Search products..."
+                                        style="
+                                            width: 100%;
+                                            padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+                                            border: 1px solid #e5e7eb;
+                                            font-size: 0.875rem;
+                                            outline: none;
+                                            transition: border-color 0.2s;
+                                        "
+                                        onfocus="this.style.borderColor = '#111'"
+                                        onblur="this.style.borderColor = '#e5e7eb'" />
+                                </div>
+                                <select
+                                    id="product-filter-category"
+                                    style="
+                                        padding: 0.5rem 2rem 0.5rem 0.75rem;
+                                        border: 1px solid #e5e7eb;
+                                        font-size: 0.875rem;
+                                        background: white;
+                                        cursor: pointer;
+                                    "
+                                    onchange="filterProducts()">
+                                    <option value="all">All Categories</option>
+                                    <option value="Tops">Tops</option>
+                                    <option value="Hoodies">Hoodies</option>
+                                    <option value="Hats">Hats</option>
+                                </select>
+                                <select
+                                    id="product-filter-stock"
+                                    style="
+                                        padding: 0.5rem 2rem 0.5rem 0.75rem;
+                                        border: 1px solid #e5e7eb;
+                                        font-size: 0.875rem;
+                                        background: white;
+                                        cursor: pointer;
+                                    "
+                                    onchange="filterProducts()">
+                                    <option value="all">All Stock</option>
+                                    <option value="instock">In Stock</option>
+                                    <option value="low">Low Stock</option>
+                                    <option value="out">Out of Stock</option>
+                                </select>
+                            </div>
+                            <button
+                                class="btn btn-primary btn-sm"
+                                onclick="openProductModal()"
+                                style="display: flex; align-items: center; gap: 0.5rem">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span class="hidden sm:inline">Add Product</span>
                             </button>
                         </div>
-                        <div class="table-wrapper">
-                            <table class="data-table" id="products-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 150px; min-width: 150px">Product</th>
-                                        <th style="width: 60px; min-width: 60px">Img</th>
-                                        <th style="width: 90px; min-width: 90px">Category</th>
-                                        <th style="width: 80px; min-width: 80px">Price</th>
-                                        <th style="width: 70px; min-width: 70px">Stock</th>
-                                        <th style="width: 90px; min-width: 90px">Status</th>
-                                        <th style="width: 100px; min-width: 100px">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="products-table-body">
-                                    <!-- Products rendered here -->
-                                </tbody>
-                            </table>
+
+                        <!-- Products Grid -->
+                        <div
+                            id="products-grid"
+                            class="products-grid"
+                            style="
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                                gap: 1.5rem;
+                            ">
+                            <!-- Product cards rendered here -->
+                        </div>
+
+                        <!-- Empty State -->
+                        <div
+                            id="products-empty"
+                            style="
+                                display: none;
+                                text-align: center;
+                                padding: 4rem 2rem;
+                                background: white;
+                                border: 1px solid #e5e7eb;
+                            ">
+                            <div
+                                style="
+                                    width: 64px;
+                                    height: 64px;
+                                    background: #f3f4f6;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    margin: 0 auto 1rem;
+                                ">
+                                <i data-lucide="package" style="width: 28px; height: 28px; color: #9ca3af"></i>
+                            </div>
+                            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem">
+                                No products found
+                            </h3>
+                            <p style="color: #6b7280; font-size: 0.875rem">Try adjusting your search or filters</p>
                         </div>
                     </section>
 
                     <!-- Orders Section -->
                     <section id="orders" class="admin-section">
-                        <div class="section-header">
-                            <div class="flex gap-2">
+                        <!-- Order Stats -->
+                        <div
+                            class="stats-grid"
+                            style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Orders</div>
+                                <div class="stat-value" id="order-total-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Pending</div>
+                                <div class="stat-value" id="order-pending-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Processing</div>
+                                <div class="stat-value" id="order-processing-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Completed</div>
+                                <div class="stat-value" id="order-completed-count">0</div>
+                            </div>
+                        </div>
+
+                        <!-- Search & Filters Bar -->
+                        <div
+                            class="orders-toolbar"
+                            style="
+                                background: white;
+                                border: 1px solid #e5e7eb;
+                                padding: 1rem 1.5rem;
+                                margin-bottom: 1.5rem;
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 1rem;
+                                align-items: center;
+                                justify-content: space-between;
+                            ">
+                            <div style="display: flex; gap: 0.75rem; flex: 1; min-width: 280px">
+                                <div style="position: relative; flex: 1; max-width: 320px">
+                                    <i
+                                        data-lucide="search"
+                                        style="
+                                            position: absolute;
+                                            left: 0.75rem;
+                                            top: 50%;
+                                            transform: translateY(-50%);
+                                            width: 1rem;
+                                            height: 1rem;
+                                            color: #9ca3af;
+                                        "></i>
+                                    <input
+                                        type="text"
+                                        id="order-search"
+                                        placeholder="Search orders..."
+                                        style="
+                                            width: 100%;
+                                            padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+                                            border: 1px solid #e5e7eb;
+                                            font-size: 0.875rem;
+                                            outline: none;
+                                            transition: border-color 0.2s;
+                                        "
+                                        onfocus="this.style.borderColor = '#111'"
+                                        onblur="this.style.borderColor = '#e5e7eb'" />
+                                </div>
                                 <select
-                                    class="form-input"
-                                    style="width: auto"
-                                    id="order-filter"
+                                    id="order-filter-status"
+                                    style="
+                                        padding: 0.5rem 2rem 0.5rem 0.75rem;
+                                        border: 1px solid #e5e7eb;
+                                        font-size: 0.875rem;
+                                        background: white;
+                                        cursor: pointer;
+                                    "
                                     onchange="filterOrders()">
-                                    <option value="all">All Orders</option>
+                                    <option value="all">All Statuses</option>
                                     <option value="pending">Pending</option>
                                     <option value="processing">Processing</option>
                                     <option value="shipped">Shipped</option>
                                     <option value="delivered">Delivered</option>
                                 </select>
+                                <select
+                                    id="order-sort"
+                                    style="
+                                        padding: 0.5rem 2rem 0.5rem 0.75rem;
+                                        border: 1px solid #e5e7eb;
+                                        font-size: 0.875rem;
+                                        background: white;
+                                        cursor: pointer;
+                                    "
+                                    onchange="sortOrders()">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="highest">Highest Total</option>
+                                    <option value="lowest">Lowest Total</option>
+                                </select>
                             </div>
+                            <button
+                                class="btn btn-secondary btn-sm"
+                                onclick="exportOrders()"
+                                style="display: flex; align-items: center; gap: 0.5rem">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                                <span class="hidden sm:inline">Export</span>
+                            </button>
                         </div>
-                        <div class="table-wrapper">
-                            <table class="data-table" id="orders-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 120px; min-width: 120px">Order #</th>
-                                        <th style="width: 90px; min-width: 90px">Date</th>
-                                        <th style="width: 140px; min-width: 140px">Customer</th>
-                                        <th style="width: 70px; min-width: 70px" class="hidden sm:table-cell">Items</th>
-                                        <th style="width: 80px; min-width: 80px" class="hidden sm:table-cell">Total</th>
-                                        <th style="width: 110px; min-width: 110px">Status</th>
-                                        <th style="width: 80px; min-width: 80px">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="orders-table-body">
-                                    <!-- Orders rendered here -->
-                                </tbody>
-                            </table>
+
+                        <!-- Orders Grid -->
+                        <div
+                            id="orders-grid"
+                            class="orders-grid"
+                            style="
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+                                gap: 1rem;
+                            ">
+                            <!-- Order cards rendered here -->
+                        </div>
+
+                        <!-- Empty State -->
+                        <div
+                            id="orders-empty"
+                            style="
+                                display: none;
+                                text-align: center;
+                                padding: 4rem 2rem;
+                                background: white;
+                                border: 1px solid #e5e7eb;
+                            ">
+                            <div
+                                style="
+                                    width: 64px;
+                                    height: 64px;
+                                    background: #f3f4f6;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    margin: 0 auto 1rem;
+                                ">
+                                <i data-lucide="shopping-bag" style="width: 28px; height: 28px; color: #9ca3af"></i>
+                            </div>
+                            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem">
+                                No orders found
+                            </h3>
+                            <p style="color: #6b7280; font-size: 0.875rem">Try adjusting your search or filters</p>
                         </div>
                     </section>
 
@@ -1156,107 +1642,779 @@
 
                     <!-- Email Automation Section -->
                     <section id="emails" class="admin-section">
-                        <p class="text-gray-600 mb-6">
-                            Configure automated emails sent to customers based on their actions.
-                        </p>
-
-                        <div class="email-card">
-                            <div class="email-card-header">
-                                <div>
-                                    <div class="email-card-title">Order Confirmation</div>
-                                    <p class="text-sm text-gray-500">Sent immediately after purchase</p>
-                                </div>
-                                <div class="toggle-switch active" data-email="order-confirmation"></div>
+                        <!-- Email Stats -->
+                        <div
+                            class="stats-grid"
+                            style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem">
+                            <div class="stat-card">
+                                <div class="stat-label">Active Automations</div>
+                                <div class="stat-value" id="email-active-count">0</div>
                             </div>
-                            <div class="bg-gray-50 p-4 font-mono text-sm">
-                                <p>Subject: Thank you for your order! 🎉</p>
-                                <p class="mt-2 text-gray-600">Hi {{firstName}},</p>
-                                <p class="mt-2 text-gray-600">
-                                    We've received your order and are preparing it for shipment...
-                                </p>
+                            <div class="stat-card">
+                                <div class="stat-label">Emails Sent (30d)</div>
+                                <div class="stat-value" id="email-sent-count">0</div>
                             </div>
-                        </div>
-
-                        <div class="email-card">
-                            <div class="email-card-header">
-                                <div>
-                                    <div class="email-card-title">Shipping Confirmation</div>
-                                    <p class="text-sm text-gray-500">Sent when order ships</p>
-                                </div>
-                                <div class="toggle-switch active" data-email="shipping-confirmation"></div>
+                            <div class="stat-card">
+                                <div class="stat-label">Open Rate</div>
+                                <div class="stat-value" id="email-open-rate">0%</div>
                             </div>
-                            <div class="bg-gray-50 p-4 font-mono text-sm">
-                                <p>Subject: Your order is on its way! 🚚</p>
-                                <p class="mt-2 text-gray-600">Hi {{firstName}},</p>
-                                <p class="mt-2 text-gray-600">
-                                    Great news! Your order has been shipped and is on its way...
-                                </p>
+                            <div class="stat-card">
+                                <div class="stat-label">Click Rate</div>
+                                <div class="stat-value" id="email-click-rate">0%</div>
                             </div>
                         </div>
 
-                        <div class="email-card">
-                            <div class="email-card-header">
-                                <div>
-                                    <div class="email-card-title">Abandoned Cart Recovery</div>
-                                    <p class="text-sm text-gray-500">Sent 1 hour after cart abandonment</p>
+                        <!-- Email Automation Cards -->
+                        <div
+                            class="emails-grid"
+                            style="
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+                                gap: 1.5rem;
+                            ">
+                            <!-- Order Confirmation -->
+                            <div
+                                class="email-automation-card"
+                                style="background: white; border: 1px solid #e5e7eb; overflow: hidden">
+                                <div
+                                    style="
+                                        padding: 1.25rem 1.5rem;
+                                        border-bottom: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                    ">
+                                    <div style="display: flex; align-items: center; gap: 0.875rem">
+                                        <div
+                                            style="
+                                                width: 44px;
+                                                height: 44px;
+                                                background: #dbeafe;
+                                                border-radius: 10px;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                            ">
+                                            <i
+                                                data-lucide="package-check"
+                                                style="width: 22px; height: 22px; color: #1e40af"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.9375rem">Order Confirmation</div>
+                                            <div style="font-size: 0.8125rem; color: #6b7280">
+                                                Sent immediately after purchase
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="toggle-switch active"
+                                        data-email="order-confirmation"
+                                        onclick="toggleEmail('order-confirmation', this)"></div>
                                 </div>
-                                <div class="toggle-switch" data-email="abandoned-cart"></div>
+                                <div style="padding: 1.25rem 1.5rem">
+                                    <div
+                                        style="
+                                            background: #f9fafb;
+                                            border: 1px solid #e5e7eb;
+                                            border-radius: 0;
+                                            padding: 1rem;
+                                            font-family: ui-monospace, monospace;
+                                            font-size: 0.8125rem;
+                                            line-height: 1.5;
+                                        ">
+                                        <div style="color: #374151; font-weight: 500; margin-bottom: 0.5rem">
+                                            Subject: Thank you for your order! 🎉
+                                        </div>
+                                        <div style="color: #6b7280">
+                                            Hi {{firstName}},<br /><br />We've received your order and are preparing it
+                                            for shipment...
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+                                        <button
+                                            class="btn btn-secondary btn-sm"
+                                            onclick="editEmailTemplate('order-confirmation')"
+                                            style="display: flex; align-items: center; gap: 0.375rem">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                            Edit Template
+                                        </button>
+                                        <button
+                                            class="btn btn-secondary btn-sm"
+                                            onclick="previewEmail('order-confirmation')"
+                                            style="display: flex; align-items: center; gap: 0.375rem">
+                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                            Preview
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    style="
+                                        padding: 0.75rem 1.5rem;
+                                        background: #f9fafb;
+                                        border-top: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        font-size: 0.75rem;
+                                        color: #6b7280;
+                                    ">
+                                    <span
+                                        >Last sent:
+                                        <span id="email-last-sent-order-confirmation">2 hours ago</span></span
+                                    >
+                                    <span style="color: #10b981; font-weight: 500">● Active</span>
+                                </div>
                             </div>
-                            <div class="bg-gray-50 p-4 font-mono text-sm">
-                                <p>Subject: You left something behind...</p>
-                                <p class="mt-2 text-gray-600">Hi {{firstName}},</p>
-                                <p class="mt-2 text-gray-600">
-                                    Looks like you left some items in your cart. Complete your order now...
-                                </p>
-                            </div>
-                        </div>
 
-                        <div class="email-card">
-                            <div class="email-card-header">
-                                <div>
-                                    <div class="email-card-title">Welcome Email</div>
-                                    <p class="text-sm text-gray-500">Sent after account creation</p>
+                            <!-- Shipping Confirmation -->
+                            <div
+                                class="email-automation-card"
+                                style="background: white; border: 1px solid #e5e7eb; overflow: hidden">
+                                <div
+                                    style="
+                                        padding: 1.25rem 1.5rem;
+                                        border-bottom: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                    ">
+                                    <div style="display: flex; align-items: center; gap: 0.875rem">
+                                        <div
+                                            style="
+                                                width: 44px;
+                                                height: 44px;
+                                                background: #d1fae5;
+                                                border-radius: 10px;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                            ">
+                                            <i
+                                                data-lucide="truck"
+                                                style="width: 22px; height: 22px; color: #065f46"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.9375rem">
+                                                Shipping Confirmation
+                                            </div>
+                                            <div style="font-size: 0.8125rem; color: #6b7280">
+                                                Sent when order ships
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="toggle-switch active"
+                                        data-email="shipping-confirmation"
+                                        onclick="toggleEmail('shipping-confirmation', this)"></div>
                                 </div>
-                                <div class="toggle-switch active" data-email="welcome"></div>
+                                <div style="padding: 1.25rem 1.5rem">
+                                    <div
+                                        style="
+                                            background: #f9fafb;
+                                            border: 1px solid #e5e7eb;
+                                            border-radius: 0;
+                                            padding: 1rem;
+                                            font-family: ui-monospace, monospace;
+                                            font-size: 0.8125rem;
+                                            line-height: 1.5;
+                                        ">
+                                        <div style="color: #374151; font-weight: 500; margin-bottom: 0.5rem">
+                                            Subject: Your order is on its way! 🚚
+                                        </div>
+                                        <div style="color: #6b7280">
+                                            Hi {{firstName}},<br /><br />Great news! Your order has been shipped and is
+                                            on its way...
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+                                        <button
+                                            class="btn btn-secondary btn-sm"
+                                            onclick="editEmailTemplate('shipping-confirmation')"
+                                            style="display: flex; align-items: center; gap: 0.375rem">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                            Edit Template
+                                        </button>
+                                        <button
+                                            class="btn btn-secondary btn-sm"
+                                            onclick="previewEmail('shipping-confirmation')"
+                                            style="display: flex; align-items: center; gap: 0.375rem">
+                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                            Preview
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    style="
+                                        padding: 0.75rem 1.5rem;
+                                        background: #f9fafb;
+                                        border-top: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        font-size: 0.75rem;
+                                        color: #6b7280;
+                                    ">
+                                    <span
+                                        >Last sent:
+                                        <span id="email-last-sent-shipping-confirmation">5 hours ago</span></span
+                                    >
+                                    <span style="color: #10b981; font-weight: 500">● Active</span>
+                                </div>
                             </div>
-                            <div class="bg-gray-50 p-4 font-mono text-sm">
-                                <p>Subject: Welcome to 1 HUNDRED! 👋</p>
-                                <p class="mt-2 text-gray-600">Hi {{firstName}},</p>
-                                <p class="mt-2 text-gray-600">
-                                    Welcome to the 1 HUNDRED family! We're excited to have you...
-                                </p>
+
+                            <!-- Abandoned Cart Recovery -->
+                            <div
+                                class="email-automation-card"
+                                style="background: white; border: 1px solid #e5e7eb; overflow: hidden">
+                                <div
+                                    style="
+                                        padding: 1.25rem 1.5rem;
+                                        border-bottom: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                    ">
+                                    <div style="display: flex; align-items: center; gap: 0.875rem">
+                                        <div
+                                            style="
+                                                width: 44px;
+                                                height: 44px;
+                                                background: #fef3c7;
+                                                border-radius: 10px;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                            ">
+                                            <i
+                                                data-lucide="shopping-cart"
+                                                style="width: 22px; height: 22px; color: #92400e"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.9375rem">
+                                                Abandoned Cart Recovery
+                                            </div>
+                                            <div style="font-size: 0.8125rem; color: #6b7280">
+                                                Sent 1 hour after cart abandonment
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="toggle-switch"
+                                        data-email="abandoned-cart"
+                                        onclick="toggleEmail('abandoned-cart', this)"></div>
+                                </div>
+                                <div style="padding: 1.25rem 1.5rem">
+                                    <div
+                                        style="
+                                            background: #f9fafb;
+                                            border: 1px solid #e5e7eb;
+                                            border-radius: 0;
+                                            padding: 1rem;
+                                            font-family: ui-monospace, monospace;
+                                            font-size: 0.8125rem;
+                                            line-height: 1.5;
+                                        ">
+                                        <div style="color: #374151; font-weight: 500; margin-bottom: 0.5rem">
+                                            Subject: You left something behind...
+                                        </div>
+                                        <div style="color: #6b7280">
+                                            Hi {{firstName}},<br /><br />Looks like you left some items in your cart.
+                                            Complete your order now...
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+                                        <button
+                                            class="btn btn-secondary btn-sm"
+                                            onclick="editEmailTemplate('abandoned-cart')"
+                                            style="display: flex; align-items: center; gap: 0.375rem">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                            Edit Template
+                                        </button>
+                                        <button
+                                            class="btn btn-secondary btn-sm"
+                                            onclick="previewEmail('abandoned-cart')"
+                                            style="display: flex; align-items: center; gap: 0.375rem">
+                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                            Preview
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    style="
+                                        padding: 0.75rem 1.5rem;
+                                        background: #f9fafb;
+                                        border-top: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        font-size: 0.75rem;
+                                        color: #6b7280;
+                                    ">
+                                    <span>Recovery rate: <span style="color: #111; font-weight: 500">12%</span></span>
+                                    <span style="color: #9ca3af; font-weight: 500">● Disabled</span>
+                                </div>
+                            </div>
+
+                            <!-- Welcome Email -->
+                            <div
+                                class="email-automation-card"
+                                style="background: white; border: 1px solid #e5e7eb; overflow: hidden">
+                                <div
+                                    style="
+                                        padding: 1.25rem 1.5rem;
+                                        border-bottom: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                    ">
+                                    <div style="display: flex; align-items: center; gap: 0.875rem">
+                                        <div
+                                            style="
+                                                width: 44px;
+                                                height: 44px;
+                                                background: #fce7f3;
+                                                border-radius: 10px;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                            ">
+                                            <i data-lucide="hand" style="width: 22px; height: 22px; color: #be185d"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.9375rem">Welcome Email</div>
+                                            <div style="font-size: 0.8125rem; color: #6b7280">
+                                                Sent after account creation
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="toggle-switch active"
+                                        data-email="welcome"
+                                        onclick="toggleEmail('welcome', this)"></div>
+                                </div>
+                                <div style="padding: 1.25rem 1.5rem">
+                                    <div
+                                        style="
+                                            background: #f9fafb;
+                                            border: 1px solid #e5e7eb;
+                                            border-radius: 0;
+                                            padding: 1rem;
+                                            font-family: ui-monospace, monospace;
+                                            font-size: 0.8125rem;
+                                            line-height: 1.5;
+                                        ">
+                                        <div style="color: #374151; font-weight: 500; margin-bottom: 0.5rem">
+                                            Subject: Welcome to 1 HUNDRED! 👋
+                                        </div>
+                                        <div style="color: #6b7280">
+                                            Hi {{firstName}},<br /><br />Welcome to the 1 HUNDRED family! We're excited
+                                            to have you...
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+                                        <button
+                                            class="btn btn-secondary btn-sm"
+                                            onclick="editEmailTemplate('welcome')"
+                                            style="display: flex; align-items: center; gap: 0.375rem">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                            Edit Template
+                                        </button>
+                                        <button
+                                            class="btn btn-secondary btn-sm"
+                                            onclick="previewEmail('welcome')"
+                                            style="display: flex; align-items: center; gap: 0.375rem">
+                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                            Preview
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    style="
+                                        padding: 0.75rem 1.5rem;
+                                        background: #f9fafb;
+                                        border-top: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        font-size: 0.75rem;
+                                        color: #6b7280;
+                                    ">
+                                    <span>Last sent: <span id="email-last-sent-welcome">1 day ago</span></span>
+                                    <span style="color: #10b981; font-weight: 500">● Active</span>
+                                </div>
                             </div>
                         </div>
                     </section>
 
-                    <!-- Content Section -->
+                    <!-- Content/Store Settings Section -->
                     <section id="content" class="admin-section">
-                        <div class="section-header" style="justify-content: flex-end">
-                            <button class="btn btn-primary btn-sm" onclick="saveContent()">Save Changes</button>
+                        <!-- Settings Navigation -->
+                        <div
+                            class="settings-nav"
+                            style="background: white; border: 1px solid #e5e7eb; margin-bottom: 1.5rem">
+                            <div style="display: flex; border-bottom: 1px solid #e5e7eb; overflow-x: auto">
+                                <button
+                                    class="settings-tab active"
+                                    data-tab="general"
+                                    onclick="switchSettingsTab('general')"
+                                    style="
+                                        padding: 1rem 1.5rem;
+                                        font-size: 0.875rem;
+                                        font-weight: 500;
+                                        color: #111;
+                                        border-bottom: 2px solid #111;
+                                        background: transparent;
+                                        border-top: none;
+                                        border-left: none;
+                                        border-right: none;
+                                        cursor: pointer;
+                                        white-space: nowrap;
+                                    ">
+                                    General
+                                </button>
+                                <button
+                                    class="settings-tab"
+                                    data-tab="homepage"
+                                    onclick="switchSettingsTab('homepage')"
+                                    style="
+                                        padding: 1rem 1.5rem;
+                                        font-size: 0.875rem;
+                                        font-weight: 500;
+                                        color: #6b7280;
+                                        border-bottom: 2px solid transparent;
+                                        background: transparent;
+                                        border-top: none;
+                                        border-left: none;
+                                        border-right: none;
+                                        cursor: pointer;
+                                        white-space: nowrap;
+                                    ">
+                                    Homepage
+                                </button>
+                                <button
+                                    class="settings-tab"
+                                    data-tab="branding"
+                                    onclick="switchSettingsTab('branding')"
+                                    style="
+                                        padding: 1rem 1.5rem;
+                                        font-size: 0.875rem;
+                                        font-weight: 500;
+                                        color: #6b7280;
+                                        border-bottom: 2px solid transparent;
+                                        background: transparent;
+                                        border-top: none;
+                                        border-left: none;
+                                        border-right: none;
+                                        cursor: pointer;
+                                        white-space: nowrap;
+                                    ">
+                                    Branding
+                                </button>
+                                <button
+                                    class="settings-tab"
+                                    data-tab="social"
+                                    onclick="switchSettingsTab('social')"
+                                    style="
+                                        padding: 1rem 1.5rem;
+                                        font-size: 0.875rem;
+                                        font-weight: 500;
+                                        color: #6b7280;
+                                        border-bottom: 2px solid transparent;
+                                        background: transparent;
+                                        border-top: none;
+                                        border-left: none;
+                                        border-right: none;
+                                        cursor: pointer;
+                                        white-space: nowrap;
+                                    ">
+                                    Social & SEO
+                                </button>
+                            </div>
                         </div>
-                        <div class="bg-white border border-gray-200 p-6 max-w-2xl">
-                            <div class="form-group">
-                                <label class="form-label">Store Name</label>
-                                <input type="text" class="form-input" id="store-name" value="1 HUNDRED" />
+
+                        <!-- General Settings -->
+                        <div id="settings-general" class="settings-panel active">
+                            <div style="background: white; border: 1px solid #e5e7eb">
+                                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6">
+                                    <h3 style="font-weight: 600; font-size: 1rem">Store Details</h3>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem">
+                                        Basic information about your store
+                                    </p>
+                                </div>
+                                <div style="padding: 1.5rem">
+                                    <div
+                                        style="
+                                            display: grid;
+                                            grid-template-columns: 1fr 1fr;
+                                            gap: 1.5rem;
+                                            margin-bottom: 1.5rem;
+                                        ">
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label class="form-label">Store Name</label>
+                                            <input type="text" class="form-input" id="store-name" value="1 HUNDRED" />
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label class="form-label">Currency Symbol</label>
+                                            <select class="form-input" id="currency-symbol">
+                                                <option value="£">GBP (£)</option>
+                                                <option value="$">USD ($)</option>
+                                                <option value="€">EUR (€)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem">
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label class="form-label">Contact Email</label>
+                                            <input
+                                                type="email"
+                                                class="form-input"
+                                                id="store-email"
+                                                value="hello@1hundred.com" />
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label class="form-label">Phone Number</label>
+                                            <input
+                                                type="tel"
+                                                class="form-input"
+                                                id="store-phone"
+                                                value="+44 20 1234 5678" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    style="
+                                        padding: 1rem 1.5rem;
+                                        background: #f9fafb;
+                                        border-top: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: flex-end;
+                                    ">
+                                    <button
+                                        class="btn btn-primary btn-sm"
+                                        onclick="saveContent()"
+                                        style="display: flex; align-items: center; gap: 0.5rem">
+                                        <i data-lucide="save" class="w-4 h-4"></i>
+                                        Save Changes
+                                    </button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Homepage Hero Title</label>
-                                <input type="text" class="form-input" id="hero-title" value="THE NEW WAVE" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Hero Description</label>
-                                <textarea class="form-input" rows="3" id="hero-description">
+                        </div>
+
+                        <!-- Homepage Settings -->
+                        <div id="settings-homepage" class="settings-panel" style="display: none">
+                            <div style="background: white; border: 1px solid #e5e7eb">
+                                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6">
+                                    <h3 style="font-weight: 600; font-size: 1rem">Hero Section</h3>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem">
+                                        Customize your homepage hero
+                                    </p>
+                                </div>
+                                <div style="padding: 1.5rem">
+                                    <div class="form-group" style="margin-bottom: 1.25rem">
+                                        <label class="form-label">Hero Title</label>
+                                        <input type="text" class="form-input" id="hero-title" value="THE NEW WAVE" />
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 1.25rem">
+                                        <label class="form-label">Hero Description</label>
+                                        <textarea class="form-input" rows="3" id="hero-description">
 Discover the latest collection of premium streetwear essentials designed for the modern individual.</textarea
-                                >
+                                        >
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        <label class="form-label">Hero Button Text</label>
+                                        <input type="text" class="form-input" id="hero-button-text" value="Shop Now" />
+                                    </div>
+                                </div>
+                                <div
+                                    style="
+                                        padding: 1rem 1.5rem;
+                                        background: #f9fafb;
+                                        border-top: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: flex-end;
+                                    ">
+                                    <button
+                                        class="btn btn-primary btn-sm"
+                                        onclick="saveContent()"
+                                        style="display: flex; align-items: center; gap: 0.5rem">
+                                        <i data-lucide="save" class="w-4 h-4"></i>
+                                        Save Changes
+                                    </button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Currency Symbol</label>
-                                <input
-                                    type="text"
-                                    class="form-input"
-                                    id="currency-symbol"
-                                    value="£"
-                                    style="width: 80px" />
+                        </div>
+
+                        <!-- Branding Settings -->
+                        <div id="settings-branding" class="settings-panel" style="display: none">
+                            <div style="background: white; border: 1px solid #e5e7eb">
+                                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6">
+                                    <h3 style="font-weight: 600; font-size: 1rem">Logo & Branding</h3>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem">
+                                        Upload your store logo and favicon
+                                    </p>
+                                </div>
+                                <div style="padding: 1.5rem">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem">
+                                        <div>
+                                            <label class="form-label">Store Logo</label>
+                                            <div
+                                                style="
+                                                    border: 2px dashed #e5e7eb;
+                                                    padding: 2rem;
+                                                    text-align: center;
+                                                    cursor: pointer;
+                                                    transition: border-color 0.2s;
+                                                "
+                                                onmouseover="this.style.borderColor = '#111'"
+                                                onmouseout="this.style.borderColor = '#e5e7eb'">
+                                                <img
+                                                    src="logo.svg"
+                                                    alt="Current logo"
+                                                    style="max-height: 60px; margin-bottom: 1rem" />
+                                                <p style="font-size: 0.8125rem; color: #6b7280">
+                                                    Click to upload new logo
+                                                </p>
+                                                <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem">
+                                                    SVG, PNG or JPG (max 2MB)
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Favicon</label>
+                                            <div
+                                                style="
+                                                    border: 2px dashed #e5e7eb;
+                                                    padding: 2rem;
+                                                    text-align: center;
+                                                    cursor: pointer;
+                                                    transition: border-color 0.2s;
+                                                "
+                                                onmouseover="this.style.borderColor = '#111'"
+                                                onmouseout="this.style.borderColor = '#e5e7eb'">
+                                                <div
+                                                    style="
+                                                        width: 48px;
+                                                        height: 48px;
+                                                        background: #111;
+                                                        margin: 0 auto 1rem;
+                                                        display: flex;
+                                                        align-items: center;
+                                                        justify-content: center;
+                                                        color: white;
+                                                        font-weight: 700;
+                                                    ">
+                                                    1H
+                                                </div>
+                                                <p style="font-size: 0.8125rem; color: #6b7280">
+                                                    Click to upload favicon
+                                                </p>
+                                                <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem">
+                                                    ICO or PNG (32x32px)
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    style="
+                                        padding: 1rem 1.5rem;
+                                        background: #f9fafb;
+                                        border-top: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: flex-end;
+                                    ">
+                                    <button
+                                        class="btn btn-primary btn-sm"
+                                        onclick="saveContent()"
+                                        style="display: flex; align-items: center; gap: 0.5rem">
+                                        <i data-lucide="save" class="w-4 h-4"></i>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social & SEO Settings -->
+                        <div id="settings-social" class="settings-panel" style="display: none">
+                            <div style="background: white; border: 1px solid #e5e7eb">
+                                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6">
+                                    <h3 style="font-weight: 600; font-size: 1rem">Social Media Links</h3>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem">
+                                        Connect your social media accounts
+                                    </p>
+                                </div>
+                                <div style="padding: 1.5rem">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem">
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label
+                                                class="form-label"
+                                                style="display: flex; align-items: center; gap: 0.5rem">
+                                                <i data-lucide="instagram" class="w-4 h-4"></i>
+                                                Instagram
+                                            </label>
+                                            <input
+                                                type="url"
+                                                class="form-input"
+                                                id="social-instagram"
+                                                placeholder="https://instagram.com/..." />
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label
+                                                class="form-label"
+                                                style="display: flex; align-items: center; gap: 0.5rem">
+                                                <i data-lucide="twitter" class="w-4 h-4"></i>
+                                                Twitter / X
+                                            </label>
+                                            <input
+                                                type="url"
+                                                class="form-input"
+                                                id="social-twitter"
+                                                placeholder="https://twitter.com/..." />
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label
+                                                class="form-label"
+                                                style="display: flex; align-items: center; gap: 0.5rem">
+                                                <i data-lucide="facebook" class="w-4 h-4"></i>
+                                                Facebook
+                                            </label>
+                                            <input
+                                                type="url"
+                                                class="form-input"
+                                                id="social-facebook"
+                                                placeholder="https://facebook.com/..." />
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label
+                                                class="form-label"
+                                                style="display: flex; align-items: center; gap: 0.5rem">
+                                                <i data-lucide="tiktok" class="w-4 h-4"></i>
+                                                TikTok
+                                            </label>
+                                            <input
+                                                type="url"
+                                                class="form-input"
+                                                id="social-tiktok"
+                                                placeholder="https://tiktok.com/@..." />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    style="
+                                        padding: 1rem 1.5rem;
+                                        background: #f9fafb;
+                                        border-top: 1px solid #f3f4f6;
+                                        display: flex;
+                                        justify-content: flex-end;
+                                    ">
+                                    <button
+                                        class="btn btn-primary btn-sm"
+                                        onclick="saveContent()"
+                                        style="display: flex; align-items: center; gap: 0.5rem">
+                                        <i data-lucide="save" class="w-4 h-4"></i>
+                                        Save Changes
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </section>

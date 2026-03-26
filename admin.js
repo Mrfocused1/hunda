@@ -232,41 +232,136 @@ function loadDashboard() {
 }
 
 // Products Management
+let productSearchTerm = '';
+let productFilterCategory = 'all';
+let productFilterStock = 'all';
+
 function loadProducts() {
     const products = AdminData.getProducts();
-    const tbody = document.getElementById('products-table-body');
 
-    tbody.innerHTML = products
-        .map(
-            (product) => `
-        <tr>
-            <td>
-                <p class="font-medium line-clamp-2">${product.title}</p>
-                <p class="text-xs text-gray-500 hidden sm:block">${product.description?.substring(0, 40) || ''}...</p>
-            </td>
-            <td><img src="${product.image}" alt="${product.title}" loading="lazy"></td>
-            <td><span class="capitalize">${product.category}</span></td>
-            <td class="font-medium">£${product.price.toFixed(2)}</td>
-            <td>${product.stock}</td>
-            <td>
-                <span class="status-badge ${product.stock < 10 ? 'low-stock' : 'in-stock'}">
-                    ${product.stock < 10 ? 'Low' : 'In Stock'}
-                </span>
-            </td>
-            <td>
-                <button class="btn btn-secondary btn-sm btn-icon" onclick="editProduct(${product.id})" aria-label="Edit">
-                    <i data-lucide="edit" class="w-4 h-4"></i>
-                </button>
-                <button class="btn btn-secondary btn-sm btn-icon" onclick="deleteProduct(${product.id})" aria-label="Delete">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-            </td>
-        </tr>
-    `
-        )
+    updateProductStats();
+    renderProducts();
+}
+
+function updateProductStats() {
+    const products = AdminData.getProducts();
+    const inStock = products.filter((p) => p.stock > 10).length;
+    const lowStock = products.filter((p) => p.stock > 0 && p.stock <= 10).length;
+    const outStock = products.filter((p) => p.stock === 0).length;
+
+    document.getElementById('product-total-count').textContent = products.length;
+    document.getElementById('product-instock-count').textContent = inStock;
+    document.getElementById('product-lowstock-count').textContent = lowStock;
+    document.getElementById('product-outstock-count').textContent = outStock;
+}
+
+function getFilteredProducts() {
+    let products = AdminData.getProducts();
+
+    // Search filter
+    if (productSearchTerm) {
+        const term = productSearchTerm.toLowerCase();
+        products = products.filter(
+            (p) => p.title.toLowerCase().includes(term) || p.category.toLowerCase().includes(term)
+        );
+    }
+
+    // Category filter
+    if (productFilterCategory !== 'all') {
+        products = products.filter((p) => p.category === productFilterCategory);
+    }
+
+    // Stock filter
+    if (productFilterStock !== 'all') {
+        products = products.filter((p) => {
+            if (productFilterStock === 'instock') return p.stock > 10;
+            if (productFilterStock === 'low') return p.stock > 0 && p.stock <= 10;
+            if (productFilterStock === 'out') return p.stock === 0;
+            return true;
+        });
+    }
+
+    return products;
+}
+
+function renderProducts() {
+    const products = getFilteredProducts();
+    const grid = document.getElementById('products-grid');
+    const emptyState = document.getElementById('products-empty');
+
+    if (products.length === 0) {
+        grid.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+
+    grid.innerHTML = products
+        .map((product) => {
+            let stockStatus = 'in-stock';
+            let stockLabel = 'In Stock';
+            let stockClass = 'in-stock';
+
+            if (product.stock === 0) {
+                stockStatus = 'out-stock';
+                stockLabel = 'Out of Stock';
+                stockClass = 'out';
+            } else if (product.stock <= 10) {
+                stockStatus = 'low-stock';
+                stockLabel = 'Low Stock';
+                stockClass = 'low';
+            }
+
+            return `
+            <div class="product-card">
+                <div class="product-card-image">
+                    <img src="${product.image}" alt="${product.title}" loading="lazy">
+                    <span class="product-card-stock-badge ${stockStatus}">${stockLabel}</span>
+                    <div class="product-card-actions">
+                        <button class="product-card-action-btn" onclick="event.stopPropagation(); editProduct(${product.id})" title="Edit">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </button>
+                        <button class="product-card-action-btn" onclick="event.stopPropagation(); deleteProduct(${product.id})" title="Delete">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card-content">
+                    <div class="product-card-category">${product.category}</div>
+                    <div class="product-card-title">${product.title}</div>
+                    <div class="product-card-footer">
+                        <span class="product-card-price">£${product.price.toFixed(2)}</span>
+                        <span class="product-card-stock ${stockClass}">${product.stock} in stock</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        })
         .join('');
 
     lucide.createIcons();
+}
+
+// Product search and filter
+document.addEventListener('DOMContentLoaded', function () {
+    const productSearchInput = document.getElementById('product-search');
+    if (productSearchInput) {
+        let debounceTimer;
+        productSearchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                productSearchTerm = this.value.trim();
+                renderProducts();
+            }, 300);
+        });
+    }
+});
+
+function filterProducts() {
+    productFilterCategory = document.getElementById('product-filter-category').value;
+    productFilterStock = document.getElementById('product-filter-stock').value;
+    renderProducts();
 }
 
 function openProductModal(productId = null) {
@@ -346,46 +441,184 @@ function deleteProduct(id) {
 }
 
 // Orders Management
-function loadOrders(filter = 'all') {
-    const orders = AdminData.getOrders();
-    const tbody = document.getElementById('orders-table-body');
+let orderSearchTerm = '';
+let orderFilterStatus = 'all';
+let orderSortBy = 'newest';
 
-    const filteredOrders = filter === 'all' ? orders : orders.filter((o) => o.status === filter);
-
-    tbody.innerHTML = filteredOrders
-        .map(
-            (order) => `
-        <tr>
-            <td class="font-medium">${order.id}</td>
-            <td>${new Date(order.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}</td>
-            <td>
-                <p class="font-medium">${order.customer}</p>
-                <p class="text-xs text-gray-500 sm:hidden">${order.items} items · £${order.total.toFixed(2)}</p>
-            </td>
-            <td class="hidden sm:table-cell">${order.items}</td>
-            <td class="hidden sm:table-cell font-medium">£${order.total.toFixed(2)}</td>
-            <td>
-                <select class="form-input status-select" 
-                        onchange="updateOrderStatus('${order.id}', this.value)"
-                        aria-label="Order status">
-                    <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
-                    <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
-                    <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
-                    <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
-                </select>
-            </td>
-            <td>
-                <button class="btn btn-secondary btn-sm" onclick="viewOrder('${order.id}')">View</button>
-            </td>
-        </tr>
-    `
-        )
-        .join('');
+function loadOrders() {
+    updateOrderStats();
+    renderOrders();
 }
 
+function updateOrderStats() {
+    const orders = AdminData.getOrders();
+    const pending = orders.filter((o) => o.status === 'pending').length;
+    const processing = orders.filter((o) => o.status === 'processing').length;
+    const completed = orders.filter((o) => o.status === 'delivered').length;
+
+    document.getElementById('order-total-count').textContent = orders.length;
+    document.getElementById('order-pending-count').textContent = pending;
+    document.getElementById('order-processing-count').textContent = processing;
+    document.getElementById('order-completed-count').textContent = completed;
+}
+
+function getFilteredOrders() {
+    let orders = AdminData.getOrders();
+
+    // Generate sample orders if none exist
+    if (orders.length === 0) {
+        orders = generateSampleOrders();
+        AdminData.saveOrders(orders);
+    }
+
+    // Search filter
+    if (orderSearchTerm) {
+        const term = orderSearchTerm.toLowerCase();
+        orders = orders.filter(
+            (o) =>
+                o.id.toLowerCase().includes(term) ||
+                o.customer.toLowerCase().includes(term) ||
+                (o.email && o.email.toLowerCase().includes(term))
+        );
+    }
+
+    // Status filter
+    if (orderFilterStatus !== 'all') {
+        orders = orders.filter((o) => o.status === orderFilterStatus);
+    }
+
+    // Sort
+    orders.sort((a, b) => {
+        if (orderSortBy === 'newest') return new Date(b.date) - new Date(a.date);
+        if (orderSortBy === 'oldest') return new Date(a.date) - new Date(b.date);
+        if (orderSortBy === 'highest') return b.total - a.total;
+        if (orderSortBy === 'lowest') return a.total - b.total;
+        return 0;
+    });
+
+    return orders;
+}
+
+function generateSampleOrders() {
+    const sampleOrders = [];
+    const statuses = ['pending', 'processing', 'shipped', 'delivered'];
+    const customers = [
+        { name: 'James Wilson', email: 'james@email.com' },
+        { name: 'Sarah Anderson', email: 'sarah@email.com' },
+        { name: 'Michael Brown', email: 'michael@email.com' },
+        { name: 'Emma Davis', email: 'emma@email.com' }
+    ];
+
+    for (let i = 0; i < 12; i++) {
+        const customer = customers[Math.floor(Math.random() * customers.length)];
+        const daysAgo = Math.floor(Math.random() * 30);
+        const date = new Date();
+        date.setDate(date.getDate() - daysAgo);
+
+        sampleOrders.push({
+            id: `#ORD${String(10000 + i).slice(-5)}`,
+            customer: customer.name,
+            email: customer.email,
+            date: date.toISOString(),
+            total: 25 + Math.floor(Math.random() * 200),
+            items: Math.floor(Math.random() * 4) + 1,
+            status: statuses[Math.floor(Math.random() * statuses.length)],
+            itemsList: ['Racer Trophy Tee', 'Champions Engineered Tee', '1H Vintage Trucker Hat']
+        });
+    }
+
+    return sampleOrders;
+}
+
+function renderOrders() {
+    const orders = getFilteredOrders();
+    const grid = document.getElementById('orders-grid');
+    const emptyState = document.getElementById('orders-empty');
+
+    if (orders.length === 0) {
+        grid.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+
+    grid.innerHTML = orders
+        .map((order) => {
+            const initials = order.customer
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+                .toUpperCase();
+            const date = new Date(order.date).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+
+            const statusColors = {
+                pending: { bg: '#fef3c7', text: '#92400e' },
+                processing: { bg: '#dbeafe', text: '#1e40af' },
+                shipped: { bg: '#d1fae5', text: '#065f46' },
+                delivered: { bg: '#111', text: '#fff' }
+            };
+            const statusColor = statusColors[order.status] || statusColors.pending;
+
+            return `
+            <div class="order-card" onclick="viewOrder('${order.id}')">
+                <div class="order-card-header">
+                    <div>
+                        <div class="order-card-id">${order.id}</div>
+                        <div class="order-card-date">${date}</div>
+                    </div>
+                    <span class="status-badge ${order.status}" style="background: ${statusColor.bg}; color: ${statusColor.text};">
+                        ${order.status}
+                    </span>
+                </div>
+                
+                <div class="order-card-customer">
+                    <div class="order-card-avatar">${initials}</div>
+                    <div class="order-card-customer-info">
+                        <div class="order-card-customer-name">${order.customer}</div>
+                        <div class="order-card-customer-email">${order.email || order.customer.toLowerCase().replace(' ', '.') + '@email.com'}</div>
+                    </div>
+                </div>
+                
+                <div class="order-card-footer">
+                    <span class="order-card-total">£${order.total.toFixed(2)}</span>
+                    <span style="font-size: 0.8125rem; color: #6b7280;">${order.items} items</span>
+                </div>
+            </div>
+        `;
+        })
+        .join('');
+
+    lucide.createIcons();
+}
+
+// Order search and filters
+document.addEventListener('DOMContentLoaded', function () {
+    const orderSearchInput = document.getElementById('order-search');
+    if (orderSearchInput) {
+        let debounceTimer;
+        orderSearchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                orderSearchTerm = this.value.trim();
+                renderOrders();
+            }, 300);
+        });
+    }
+});
+
 function filterOrders() {
-    const filter = document.getElementById('order-filter').value;
-    loadOrders(filter);
+    orderFilterStatus = document.getElementById('order-filter-status').value;
+    renderOrders();
+}
+
+function sortOrders() {
+    orderSortBy = document.getElementById('order-sort').value;
+    renderOrders();
 }
 
 function updateOrderStatus(orderId, status) {
@@ -395,6 +628,7 @@ function updateOrderStatus(orderId, status) {
         order.status = status;
         AdminData.saveOrders(orders);
         showToast(`Order ${orderId} updated to ${status}`);
+        updateOrderStats();
     }
 }
 
@@ -403,9 +637,39 @@ function viewOrder(orderId) {
     const order = orders.find((o) => o.id === orderId);
     if (order) {
         alert(
-            `Order Details:\n\nID: ${order.id}\nCustomer: ${order.customer}\nEmail: ${order.email}\nTotal: £${order.total.toFixed(2)}\nStatus: ${order.status}\n\nItems:\n${order.itemsList?.join('\n') || 'N/A'}`
+            `Order Details:\n\nID: ${order.id}\nCustomer: ${order.customer}\nEmail: ${order.email || 'N/A'}\nTotal: £${order.total.toFixed(2)}\nStatus: ${order.status}\n\nItems:\n${order.itemsList?.join('\n') || 'N/A'}`
         );
     }
+}
+
+function exportOrders() {
+    const orders = AdminData.getOrders();
+    const csv = [
+        ['Order ID', 'Customer', 'Email', 'Date', 'Total', 'Items', 'Status'].join(','),
+        ...orders.map((o) =>
+            [
+                o.id,
+                o.customer,
+                o.email || '',
+                new Date(o.date).toISOString().split('T')[0],
+                o.total.toFixed(2),
+                o.items,
+                o.status
+            ].join(',')
+        )
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `orders-export-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('Orders exported to CSV');
 }
 
 // Customers Management
@@ -826,42 +1090,130 @@ function exportCustomers() {
 
 // Email Automation
 function initEmailToggles() {
+    updateEmailStats();
+
     const settings = AdminData.getEmailSettings();
 
+    // Set initial toggle states
     document.querySelectorAll('.toggle-switch[data-email]').forEach((toggle) => {
         const emailType = toggle.dataset.email;
         toggle.classList.toggle('active', settings[emailType]);
-
-        toggle.addEventListener('click', function () {
-            this.classList.toggle('active');
-            settings[emailType] = this.classList.contains('active');
-            AdminData.saveEmailSettings(settings);
-            showToast(`${emailType.replace('-', ' ')} emails ${settings[emailType] ? 'enabled' : 'disabled'}`);
-        });
     });
 }
 
-// Content Management
+function updateEmailStats() {
+    const settings = AdminData.getEmailSettings();
+    const activeCount = Object.values(settings).filter((v) => v).length;
+
+    // Mock stats for demo
+    document.getElementById('email-active-count').textContent = activeCount;
+    document.getElementById('email-sent-count').textContent = '1,247';
+    document.getElementById('email-open-rate').textContent = '42%';
+    document.getElementById('email-click-rate').textContent = '18%';
+}
+
+function toggleEmail(emailType, element) {
+    element.classList.toggle('active');
+    const isActive = element.classList.contains('active');
+
+    const settings = AdminData.getEmailSettings();
+    settings[emailType] = isActive;
+    AdminData.saveEmailSettings(settings);
+
+    // Update the status text in the footer
+    const card = element.closest('.email-automation-card');
+    const statusSpan = card.querySelector('.email-automation-card > div:last-child span:last-child');
+    if (statusSpan) {
+        statusSpan.textContent = isActive ? '● Active' : '● Disabled';
+        statusSpan.style.color = isActive ? '#10b981' : '#9ca3af';
+    }
+
+    updateEmailStats();
+    showToast(`${emailType.replace('-', ' ')} emails ${isActive ? 'enabled' : 'disabled'}`);
+}
+
+function editEmailTemplate(emailType) {
+    showToast(`Edit template for ${emailType.replace('-', ' ')} - Coming soon`);
+}
+
+function previewEmail(emailType) {
+    showToast(`Preview ${emailType.replace('-', ' ')} email - Coming soon`);
+}
+
+// Content Management / Settings
+function switchSettingsTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.settings-tab').forEach((btn) => {
+        btn.classList.remove('active');
+        btn.style.color = '#6b7280';
+        btn.style.borderBottomColor = 'transparent';
+    });
+
+    const activeBtn = document.querySelector(`.settings-tab[data-tab="${tab}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.color = '#111';
+        activeBtn.style.borderBottomColor = '#111';
+    }
+
+    // Update panels
+    document.querySelectorAll('.settings-panel').forEach((panel) => {
+        panel.classList.remove('active');
+        panel.style.display = 'none';
+    });
+
+    const activePanel = document.getElementById(`settings-${tab}`);
+    if (activePanel) {
+        activePanel.classList.add('active');
+        activePanel.style.display = 'block';
+    }
+}
+
 function saveContent() {
     const content = {
         storeName: document.getElementById('store-name').value,
         heroTitle: document.getElementById('hero-title').value,
         heroDescription: document.getElementById('hero-description').value,
-        currencySymbol: document.getElementById('currency-symbol').value
+        heroButtonText: document.getElementById('hero-button-text')?.value || 'Shop Now',
+        currencySymbol: document.getElementById('currency-symbol').value,
+        storeEmail: document.getElementById('store-email')?.value || '',
+        storePhone: document.getElementById('store-phone')?.value || '',
+        socialInstagram: document.getElementById('social-instagram')?.value || '',
+        socialTwitter: document.getElementById('social-twitter')?.value || '',
+        socialFacebook: document.getElementById('social-facebook')?.value || '',
+        socialTiktok: document.getElementById('social-tiktok')?.value || ''
     };
 
     localStorage.setItem('1hundred_store_content', JSON.stringify(content));
-    showToast('Content saved successfully');
+    showToast('Settings saved successfully');
 }
 
 function loadContent() {
     const stored = localStorage.getItem('1hundred_store_content');
     if (stored) {
         const content = JSON.parse(stored);
-        document.getElementById('store-name').value = content.storeName || '1 HUNDRED';
-        document.getElementById('hero-title').value = content.heroTitle || 'THE NEW WAVE';
-        document.getElementById('hero-description').value = content.heroDescription || '';
-        document.getElementById('currency-symbol').value = content.currencySymbol || '£';
+        if (document.getElementById('store-name'))
+            document.getElementById('store-name').value = content.storeName || '1 HUNDRED';
+        if (document.getElementById('hero-title'))
+            document.getElementById('hero-title').value = content.heroTitle || 'THE NEW WAVE';
+        if (document.getElementById('hero-description'))
+            document.getElementById('hero-description').value = content.heroDescription || '';
+        if (document.getElementById('hero-button-text'))
+            document.getElementById('hero-button-text').value = content.heroButtonText || 'Shop Now';
+        if (document.getElementById('currency-symbol'))
+            document.getElementById('currency-symbol').value = content.currencySymbol || '£';
+        if (document.getElementById('store-email'))
+            document.getElementById('store-email').value = content.storeEmail || '';
+        if (document.getElementById('store-phone'))
+            document.getElementById('store-phone').value = content.storePhone || '';
+        if (document.getElementById('social-instagram'))
+            document.getElementById('social-instagram').value = content.socialInstagram || '';
+        if (document.getElementById('social-twitter'))
+            document.getElementById('social-twitter').value = content.socialTwitter || '';
+        if (document.getElementById('social-facebook'))
+            document.getElementById('social-facebook').value = content.socialFacebook || '';
+        if (document.getElementById('social-tiktok'))
+            document.getElementById('social-tiktok').value = content.socialTiktok || '';
     }
 }
 
