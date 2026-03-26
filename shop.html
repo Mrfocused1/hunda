@@ -580,27 +580,16 @@
 
                 if (category) {
                     currentFilters.categories = [category];
-                    // Update checkboxes after a slight delay to ensure DOM is ready
-                    setTimeout(() => {
-                        updateFilterCheckboxes();
-                        renderProducts();
-                    }, 0);
                 }
 
                 if (isNew) {
                     // New filter applied, title remains "Shop All"
-                    // Filter to show only new products
-                    setTimeout(() => {
-                        renderProducts();
-                    }, 0);
+                    // Filter to show only new products - handled in renderProducts
                 }
 
                 if (search) {
                     currentFilters.search = search;
                     document.getElementById('search-input').value = search;
-                    setTimeout(() => {
-                        renderProducts();
-                    }, 0);
                 }
             }
 
@@ -810,6 +799,8 @@
             document.addEventListener('DOMContentLoaded', () => {
                 parseUrlParams();
                 setupFilters();
+                // Ensure checkboxes match current filters before rendering
+                updateFilterCheckboxes();
                 renderProducts();
             });
         </script>
