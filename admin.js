@@ -12,15 +12,6 @@
 // HARDCODED PRODUCTS - To be replaced with Supabase in future
 const HARDCODED_PRODUCTS = [
     {
-        id: 1,
-        title: 'Racer Trophy Tee',
-        price: 45,
-        images: ['product-1.png'],
-        category: 'Tops',
-        stock: 25,
-        description: 'Premium cotton tee with racing-inspired graphics.'
-    },
-    {
         id: 3,
         title: '1H Vintage Trucker Hat',
         price: 35,

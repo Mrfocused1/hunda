@@ -16,15 +16,6 @@ const state = {
 // HARDCODED PRODUCTS - To be replaced with Supabase in future
 const products = [
     {
-        id: 1,
-        title: 'Racer Trophy Tee',
-        price: 45,
-        category: 'Tops',
-        images: ['product-1.png'],
-        sizes: ['S', 'M', 'L', 'XL'],
-        colors: ['Grey']
-    },
-    {
         id: 3,
         title: '1H Vintage Trucker Hat',
         price: 35,
@@ -72,7 +63,7 @@ const products = [
 ];
 
 const categories = [
-    { name: 'Tops', slug: 'tops', count: 2 },
+    { name: 'Tops', slug: 'tops', count: 1 },
     { name: 'Hoodies', slug: 'hoodies', count: 2 },
     { name: 'Hats', slug: 'hats', count: 2 }
 ];
