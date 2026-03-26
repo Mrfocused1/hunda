@@ -22,12 +22,12 @@ const HARDCODED_PRODUCTS = [
     },
     {
         id: 4,
-        title: 'Silence Expression Hoodie',
+        title: 'The No Half Measures Hoodie',
         price: 85,
         images: ['product-4.jpeg'],
         category: 'Hoodies',
         stock: 8,
-        description: 'Premium hoodie with unique graphic design.'
+        description: 'Premium hoodie with bold graphic design. No half measures.'
     },
     {
         id: 5,

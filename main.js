@@ -26,7 +26,7 @@ const products = [
     },
     {
         id: 4,
-        title: 'Silence Expression Hoodie',
+        title: 'The No Half Measures Hoodie',
         price: 85,
         category: 'Hoodies',
         images: ['product-4.jpeg'],
