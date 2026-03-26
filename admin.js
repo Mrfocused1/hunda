@@ -18,7 +18,7 @@ const HARDCODED_PRODUCTS = [
         images: ['product-3.png'],
         category: 'Hats',
         stock: 12,
-        description: 'Vintage style trucker hat with embroidered logo.'
+        description: `1H Star Cap (Black & White)\n\nA refined essential, the 1H Star Cap is defined by contrast, structure, and intent. Rendered in a distressed black and white finish, the design carries a worn-in character that speaks to experience, not excess.\n\nThe front is anchored by the signature 1H star emblem, a symbol of commitment at the highest level. Clean yet commanding, it reflects a mindset built on discipline and consistency.\n\nAt the back, the statement "No Half Measures" is subtly placed—reinforcing the philosophy behind the piece. Every detail is deliberate, from the curved brim to the structured crown, balancing durability with a sharp, elevated silhouette.\n\nUnderstated. Focused. Uncompromising.\n\nAll or nothing.`
     },
     {
         id: 4,
