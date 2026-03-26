@@ -2,3 +2,10 @@
 screenshots/user/
 node_modules/
 .DS_Store
+.env
+.env.local
+.env.*.local
+*.log
+.vercel
+*.sql
+!supabase_schema.sql
