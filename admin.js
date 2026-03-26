@@ -42,7 +42,7 @@ All in. Always.`
     {
         id: 5,
         title: 'Endless Possibilities Hoodie',
-        price: 65,
+        price: 85,
         images: ['product-5.jpeg'],
         category: 'Hoodies',
         stock: 15,

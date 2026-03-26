@@ -36,7 +36,7 @@ const products = [
     {
         id: 5,
         title: 'Endless Possibilities Hoodie',
-        price: 65,
+        price: 85,
         category: 'Hoodies',
         images: ['product-5.jpeg'],
         sizes: ['S', 'M', 'L', 'XL'],
