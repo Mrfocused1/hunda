@@ -17,6 +17,39 @@
     }
 })();
 
+// Check for legacy/mock data and warn user
+(function checkLegacyData() {
+    const products = JSON.parse(localStorage.getItem('1hundred_products') || '[]');
+    const orders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
+    const customers = JSON.parse(localStorage.getItem('1hundred_customers') || '[]');
+
+    // Check for sample/mock data patterns
+    const hasSampleProducts = products.some((p) =>
+        ['Racer Trophy Tee', 'Champions Engineered Tee', '1H Vintage Trucker Hat'].includes(p.title)
+    );
+
+    const hasSampleCustomers = customers.some((c) =>
+        ['James Wilson', 'Sarah Anderson', 'Michael Brown', 'Emma Davis'].includes(`${c.firstName} ${c.lastName}`)
+    );
+
+    const hasSampleOrders = orders.some((o) =>
+        ['James Wilson', 'Sarah Anderson', 'Michael Brown', 'Emma Davis'].includes(o.customer)
+    );
+
+    if (hasSampleProducts || hasSampleCustomers || hasSampleOrders) {
+        console.warn('⚠️ LEGACY MOCK DATA DETECTED');
+        console.warn('Sample/mock data from previous version detected in localStorage.');
+        console.warn('To clear this data, click "Clear All Data" in the left sidebar.');
+
+        // Show toast notification
+        setTimeout(() => {
+            if (typeof showToast === 'function') {
+                showToast('⚠️ Mock data detected. Click "Clear All Data" in sidebar to reset.');
+            }
+        }, 2000);
+    }
+})();
+
 // Admin Data Management
 const AdminData = {
     // Get products from localStorage
