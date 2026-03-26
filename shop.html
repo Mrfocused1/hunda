@@ -703,6 +703,12 @@
                 document.querySelectorAll('input[name="category"]').forEach((cb) => {
                     cb.addEventListener('change', () => {
                         if (isInitializing) return; // Skip during initialization
+                        // Sync all checkboxes with the same value
+                        const value = cb.value;
+                        const isChecked = cb.checked;
+                        document.querySelectorAll(`input[name="category"][value="${value}"]`).forEach((otherCb) => {
+                            otherCb.checked = isChecked;
+                        });
                         currentFilters.categories = Array.from(
                             document.querySelectorAll('input[name="category"]:checked')
                         ).map((cb) => cb.value);
