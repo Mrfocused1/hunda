@@ -46,7 +46,7 @@ All in. Always.`
         images: ['product-5.jpeg'],
         category: 'Hoodies',
         stock: 15,
-        description: 'Comfortable hoodie with motivational graphics.'
+        description: `Endless Possibilities Hoodie\n\nA refined expression of intent, the Endless Possibilities Hoodie is defined by its balance of structure and ease. Crafted in a washed blue finish, the silhouette is relaxed yet precise, offering a quiet sense of presence.\n\nThe signature 1H mark anchors the piece, while subtle text detailing speaks to a mindset of limitless direction. Studded accents introduce a restrained edge, complementing the garment's considered construction and tactile depth.\n\nUnderstated yet deliberate, this piece moves beyond trend—designed for those who operate with clarity and purpose.\n\nWithout limits.`
     },
     {
         id: 6,

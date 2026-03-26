@@ -415,8 +415,7 @@
                     image: 'product-5.jpeg',
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Blue'],
-                    description:
-                        'Denim style hoodie with Endless Possibilities branding and 1H logo. Unique distressed design.'
+                    description:\n\nA refined expression of intent, the Endless Possibilities Hoodie is defined by its balance of structure and ease. Crafted in a washed blue finish, the silhouette is relaxed yet precise, offering a quiet sense of presence.\n\nThe signature 1H mark anchors the piece, while subtle text detailing speaks to a mindset of limitless direction. Studded accents introduce a restrained edge, complementing the garment's considered construction and tactile depth.\n\nUnderstated yet deliberate, this piece moves beyond trend—designed for those who operate with clarity and purpose.\n\nWithout limits.`
                 },
                 {
                     id: 6,
@@ -482,8 +481,8 @@
                 document.getElementById('color-options').innerHTML = currentProduct.colors
                     .map(
                         (color) => `
-                <button class="color-swatch ${color === 'White' ? 'border' : ''}" 
-                        style="background: ${getColorCode(color)};" 
+                <button class="color-swatch ${color === 'White' ? 'border' : ''}"
+                        style="background: ${getColorCode(color)};"
                         data-color="${color}"
                         onclick="selectColor('${color}', this)">
                 </button>
