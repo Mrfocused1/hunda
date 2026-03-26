@@ -561,6 +561,9 @@
                 search: ''
             };
 
+            // Flag to prevent event handlers from overriding URL-based filters during init
+            let isInitializing = true;
+
             // Update checkbox states based on currentFilters
             function updateFilterCheckboxes() {
                 // Category checkboxes - update both mobile and desktop
@@ -699,6 +702,7 @@
                 // Category checkboxes
                 document.querySelectorAll('input[name="category"]').forEach((cb) => {
                     cb.addEventListener('change', () => {
+                        if (isInitializing) return; // Skip during initialization
                         currentFilters.categories = Array.from(
                             document.querySelectorAll('input[name="category"]:checked')
                         ).map((cb) => cb.value);
@@ -799,9 +803,10 @@
             document.addEventListener('DOMContentLoaded', () => {
                 parseUrlParams();
                 setupFilters();
-                // Ensure checkboxes match current filters before rendering
                 updateFilterCheckboxes();
                 renderProducts();
+                // Mark initialization complete
+                isInitializing = false;
             });
         </script>
     </body>
