@@ -113,6 +113,16 @@ const AdminData = {
                 category: 'Hats',
                 stock: 20,
                 description: 'Colorful trucker hat with 1H branding.'
+            },
+            {
+                id: 7,
+                title: 'Relentless Trophy Tee',
+                price: 40,
+                images: ['product-relentless-front.png', 'product-relentless-back.png'],
+                category: 'Tops',
+                stock: 25,
+                description:
+                    'The Relentless Trophy Tee distills discipline into design. A monochrome composition of a faceless, armored figure holding its reward—symbolizing victory earned through persistence, not chance.\n\nRefined, understated, and intentional, this piece speaks to those who pursue excellence without compromise.\n\nEarned. Never given.'
             }
         ];
         this.saveProducts(defaults);

@@ -67,11 +67,20 @@ const products = [
         image: 'product-6.jpeg',
         sizes: ['One Size'],
         colors: ['White/Black']
+    },
+    {
+        id: 7,
+        title: 'Relentless Trophy Tee',
+        price: 40,
+        category: 'Tops',
+        images: ['product-relentless-front.png', 'product-relentless-back.png'],
+        sizes: ['S', 'M', 'L', 'XL'],
+        colors: ['Grey']
     }
 ];
 
 const categories = [
-    { name: 'Tops', slug: 'tops', count: 2 },
+    { name: 'Tops', slug: 'tops', count: 3 },
     { name: 'Hoodies', slug: 'hoodies', count: 2 },
     { name: 'Hats', slug: 'hats', count: 2 }
 ];
