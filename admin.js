@@ -19,71 +19,10 @@
 
 // Admin Data Management
 const AdminData = {
-    // Get products from localStorage or use defaults
+    // Get products from localStorage
     getProducts: function () {
         const stored = localStorage.getItem('1hundred_products');
-        if (stored) {
-            return JSON.parse(stored);
-        }
-        // Default products
-        const defaults = [
-            {
-                id: 1,
-                title: 'Racer Trophy Tee',
-                price: 45,
-                image: 'product-1.png',
-                category: 'Tops',
-                stock: 25,
-                description: 'Premium cotton tee with racing-inspired graphics.'
-            },
-            {
-                id: 2,
-                title: 'Champions Engineered Tee',
-                price: 45,
-                image: 'product-2.png',
-                category: 'Tops',
-                stock: 18,
-                description: 'Championship-inspired design on premium fabric.'
-            },
-            {
-                id: 3,
-                title: '1H Vintage Trucker Hat',
-                price: 35,
-                image: 'product-3.png',
-                category: 'Hats',
-                stock: 12,
-                description: 'Vintage style trucker hat with embroidered logo.'
-            },
-            {
-                id: 4,
-                title: 'Silence Expression Hoodie',
-                price: 65,
-                image: 'product-4.jpeg',
-                category: 'Hoodies',
-                stock: 8,
-                description: 'Premium hoodie with unique graphic design.'
-            },
-            {
-                id: 5,
-                title: 'Endless Possibilities Hoodie',
-                price: 65,
-                image: 'product-5.jpeg',
-                category: 'Hoodies',
-                stock: 15,
-                description: 'Comfortable hoodie with motivational graphics.'
-            },
-            {
-                id: 6,
-                title: '1H Colorway Trucker Hat',
-                price: 35,
-                image: 'product-6.jpeg',
-                category: 'Hats',
-                stock: 20,
-                description: 'Colorful trucker hat with 1H branding.'
-            }
-        ];
-        this.saveProducts(defaults);
-        return defaults;
+        return stored ? JSON.parse(stored) : [];
     },
 
     saveProducts: function (products) {
@@ -113,10 +52,10 @@ const AdminData = {
         return stored
             ? JSON.parse(stored)
             : {
-                  'order-confirmation': true,
-                  'shipping-confirmation': true,
+                  'order-confirmation': false,
+                  'shipping-confirmation': false,
                   'abandoned-cart': false,
-                  welcome: true
+                  welcome: false
               };
     },
 
@@ -1325,11 +1264,11 @@ function switchSettingsTab(tab) {
 
 function saveContent() {
     const content = {
-        storeName: document.getElementById('store-name').value,
-        heroTitle: document.getElementById('hero-title').value,
-        heroDescription: document.getElementById('hero-description').value,
-        heroButtonText: document.getElementById('hero-button-text')?.value || 'Shop Now',
-        currencySymbol: document.getElementById('currency-symbol').value,
+        storeName: document.getElementById('store-name')?.value || '',
+        heroTitle: document.getElementById('hero-title')?.value || '',
+        heroDescription: document.getElementById('hero-description')?.value || '',
+        heroButtonText: document.getElementById('hero-button-text')?.value || '',
+        currencySymbol: document.getElementById('currency-symbol')?.value || '£',
         storeEmail: document.getElementById('store-email')?.value || '',
         storePhone: document.getElementById('store-phone')?.value || '',
         socialInstagram: document.getElementById('social-instagram')?.value || '',
@@ -1347,9 +1286,9 @@ function loadContent() {
     if (stored) {
         const content = JSON.parse(stored);
         if (document.getElementById('store-name'))
-            document.getElementById('store-name').value = content.storeName || '1 HUNDRED';
+            document.getElementById('store-name').value = content.storeName || '';
         if (document.getElementById('hero-title'))
-            document.getElementById('hero-title').value = content.heroTitle || 'THE NEW WAVE';
+            document.getElementById('hero-title').value = content.heroTitle || '';
         if (document.getElementById('hero-description'))
             document.getElementById('hero-description').value = content.heroDescription || '';
         if (document.getElementById('hero-button-text'))
