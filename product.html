@@ -383,7 +383,7 @@
             </div>
         </footer>
 
-        <script src="main.js"></script>
+        <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
             const allProducts = [
@@ -472,14 +472,26 @@
                 document.getElementById('breadcrumb-category').textContent = currentProduct.category;
                 document.getElementById('breadcrumb-category').href = `/shop?category=${currentProduct.category}`;
 
-                document.getElementById('main-image').src = currentProduct.image;
+                // Get primary image (support both old single image and new images array)
+                let primaryImage = 'product-1.png';
+                if (currentProduct.images && Array.isArray(currentProduct.images)) {
+                    primaryImage = currentProduct.images[0];
+                } else if (currentProduct.image) {
+                    primaryImage = currentProduct.image;
+                }
+                document.getElementById('main-image').src = primaryImage;
                 document.getElementById('main-image').alt = currentProduct.title;
                 document.getElementById('product-title').textContent = currentProduct.title;
                 document.getElementById('product-price').textContent = `£${currentProduct.price.toFixed(2)}`;
                 document.getElementById('product-description').textContent = currentProduct.description;
 
-                // Render thumbnails
-                const thumbnails = [currentProduct.image, currentProduct.image, currentProduct.image];
+                // Render thumbnails - use all available images if array exists
+                let thumbnails = [primaryImage, primaryImage, primaryImage];
+                if (currentProduct.images && Array.isArray(currentProduct.images) && currentProduct.images.length > 1) {
+                    thumbnails = currentProduct.images;
+                } else if (currentProduct.image) {
+                    thumbnails = [currentProduct.image, currentProduct.image, currentProduct.image];
+                }
                 document.getElementById('thumbnails').innerHTML = thumbnails
                     .map(
                         (img, i) => `
@@ -589,11 +601,18 @@
             function renderRelatedProducts() {
                 const related = allProducts.filter((p) => p.id !== currentProduct.id).slice(0, 4);
                 document.getElementById('related-products').innerHTML = related
-                    .map(
-                        (p) => `
+                    .map((p) => {
+                        // Get primary image (support both old single image and new images array)
+                        let pImage = 'product-1.png';
+                        if (p.images && Array.isArray(p.images)) {
+                            pImage = p.images[0];
+                        } else if (p.image) {
+                            pImage = p.image;
+                        }
+                        return `
                 <div class="product-card">
                     <a href="/product?id=${p.id}" class="product-image-wrapper">
-                        <img src="${p.image}" alt="${p.title}" class="product-image" loading="lazy">
+                        <img src="${pImage}" alt="${p.title}" class="product-image" loading="lazy">
                     </a>
                     <a href="/product?id=${p.id}">
                         <div class="product-info">
@@ -603,8 +622,8 @@
                         <p class="product-category">${p.category}</p>
                     </a>
                 </div>
-            `
-                    )
+            `;
+                    })
                     .join('');
             }
 

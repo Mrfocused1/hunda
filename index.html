@@ -697,7 +697,7 @@
         </footer>
 
         <!-- Main JavaScript -->
-        <script src="main.js"></script>
+        <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
 
         <script>
@@ -709,11 +709,18 @@
                 const newArrivals = products.slice(0, 4);
 
                 container.innerHTML = newArrivals
-                    .map(
-                        (product) => `
+                    .map((product) => {
+                        // Get primary image (support both old single image and new images array)
+                        let primaryImage = 'product-1.png';
+                        if (product.images && Array.isArray(product.images)) {
+                            primaryImage = product.images[0];
+                        } else if (product.image) {
+                            primaryImage = product.image;
+                        }
+                        return `
                 <div class="product-card" onclick="openQuickView(${product.id})">
                     <div class="product-image-wrapper">
-                        <img src="${product.image}" alt="${product.title}" class="product-image" loading="lazy">
+                        <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy">
                         <button class="wishlist-btn" data-product-id="${product.id}" onclick="event.stopPropagation(); toggleWishlist(${product.id})">
                             <i data-lucide="heart" class="w-4 h-4"></i>
                         </button>
@@ -732,8 +739,8 @@
                     </div>
                     <p class="product-category">${product.category}</p>
                 </div>
-            `
-                    )
+            `;
+                    })
                     .join('');
 
                 lucide.createIcons();

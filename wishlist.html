@@ -300,7 +300,7 @@
             </div>
         </footer>
 
-        <script src="main.js"></script>
+        <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
             const allProducts = [
@@ -346,12 +346,20 @@
 
                 container.innerHTML = wishlistProducts
                     .map(
-                        (p) => `
+                        (p) => {
+                            // Get primary image (support both old single image and new images array)
+                            let pImage = 'product-1.png';
+                            if (p.images && Array.isArray(p.images)) {
+                                pImage = p.images[0];
+                            } else if (p.image) {
+                                pImage = p.image;
+                            }
+                            return `
                 <div class="group">
                     <div class="product-image-wrapper mb-3">
                         <a href="/product?id=${p.id}">
-                            <img src="${p.image}" alt="${p.title}" class="product-image">
-                        </a>
+                            <img src="${pImage}" alt="${p.title}" class="product-image">
+                        </a>`
                         <button class="remove-wishlist-btn" onclick="removeFromWishlist(${p.id})" title="Remove from wishlist">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
@@ -367,7 +375,7 @@
                         Add to Bag
                     </button>
                 </div>
-            `
+            `;}
                     )
                     .join('');
 
@@ -403,10 +411,18 @@
             function renderRecommended() {
                 document.getElementById('recommended-products').innerHTML = recommendedProducts
                     .map(
-                        (p) => `
+                        (p) => {
+                            // Get primary image (support both old single image and new images array)
+                            let pImage = 'product-1.png';
+                            if (p.images && Array.isArray(p.images)) {
+                                pImage = p.images[0];
+                            } else if (p.image) {
+                                pImage = p.image;
+                            }
+                            return `
                 <div class="product-card">
                     <div class="product-image-wrapper" onclick="openQuickView(${p.id})">
-                        <img src="${p.image}" alt="${p.title}" class="product-image">
+                        <img src="${pImage}" alt="${p.title}" class="product-image">
                         <button class="wishlist-btn ${isInWishlist(p.id) ? 'active' : ''}" data-product-id="${p.id}" onclick="event.stopPropagation(); toggleWishlist(${p.id}); renderWishlist();">
                             <i data-lucide="heart" class="w-4 h-4" style="fill: ${isInWishlist(p.id) ? 'currentColor' : 'none'}"></i>
                         </button>
@@ -419,7 +435,7 @@
                         <p class="product-category">${p.category}</p>
                     </a>
                 </div>
-            `
+            `;}
                     )
                     .join('');
 

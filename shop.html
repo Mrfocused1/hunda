@@ -495,7 +495,7 @@
             </div>
         </footer>
 
-        <script src="main.js"></script>
+        <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
             // Extended product data for shop page
@@ -667,11 +667,18 @@
                 `;
                 } else {
                     container.innerHTML = filtered
-                        .map(
-                            (product) => `
+                        .map((product) => {
+                            // Get primary image (support both old single image and new images array)
+                            let primaryImage = 'product-1.png';
+                            if (product.images && Array.isArray(product.images)) {
+                                primaryImage = product.images[0];
+                            } else if (product.image) {
+                                primaryImage = product.image;
+                            }
+                            return `
                     <div class="product-card">
                         <div class="product-image-wrapper" onclick="openQuickView(${product.id})">
-                            <img src="${product.image}" alt="${product.title}" class="product-image" loading="lazy">
+                            <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy">
                             ${product.isNew ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
                             <button class="wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}" data-product-id="${product.id}" onclick="event.stopPropagation(); toggleWishlist(${product.id})">
                                 <i data-lucide="heart" class="w-4 h-4" style="fill: ${isInWishlist(product.id) ? 'currentColor' : 'none'}"></i>
@@ -693,8 +700,8 @@
                             <p class="product-category">${product.category}</p>
                         </a>
                     </div>
-                `
-                        )
+                `;
+                        })
                         .join('');
                 }
 

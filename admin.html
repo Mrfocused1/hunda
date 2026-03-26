@@ -2525,17 +2525,44 @@
                         </div>
                         <!-- Image Upload -->
                         <div class="form-group">
-                            <label class="form-label">Product Image</label>
-                            <input type="hidden" id="product-image" value="" />
+                            <label class="form-label"
+                                >Product Images <span style="font-weight: 400; color: #6b7280">(Max 5)</span></label
+                            >
 
-                            <!-- Image Preview -->
-                            <div id="image-preview-container" style="display: none; margin-bottom: 0.75rem">
-                                <img
-                                    id="image-preview"
-                                    src=""
-                                    alt="Preview"
-                                    style="max-height: 150px; max-width: 100%; border: 1px solid #e5e7eb" />
-                            </div>
+                            <!-- Image Preview Grid -->
+                            <div id="image-preview-container" style="display: none; margin-bottom: 0.75rem"></div>
+
+                            <!-- Add More Images Button (shown when images exist) -->
+                            <button
+                                type="button"
+                                id="add-more-images-btn"
+                                onclick="
+                                    document.getElementById('product-image-file').click();
+                                    event.stopPropagation();
+                                "
+                                style="
+                                    display: none;
+                                    margin-bottom: 0.75rem;
+                                    padding: 0.5rem 1rem;
+                                    font-size: 0.875rem;
+                                    background: #f3f4f6;
+                                    border: 1px solid #e5e7eb;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                "
+                                onmouseover="this.style.background = '#e5e7eb'"
+                                onmouseout="this.style.background = '#f3f4f6'">
+                                <i
+                                    data-lucide="plus"
+                                    style="
+                                        width: 16px;
+                                        height: 16px;
+                                        display: inline-block;
+                                        vertical-align: middle;
+                                        margin-right: 0.25rem;
+                                    "></i>
+                                Add More Images
+                            </button>
 
                             <!-- Upload Area -->
                             <div
@@ -2559,18 +2586,21 @@
                                 <p style="font-size: 0.875rem; color: #374151; margin-bottom: 0.25rem">
                                     <span style="font-weight: 500">Click to upload</span> or drag and drop
                                 </p>
-                                <p style="font-size: 0.75rem; color: #6b7280">PNG, JPG, WEBP up to 5MB</p>
+                                <p style="font-size: 0.75rem; color: #6b7280">
+                                    Upload up to 5 images. First image is primary.
+                                </p>
                             </div>
 
-                            <!-- Hidden File Input -->
+                            <!-- Hidden File Input (multiple) -->
                             <input
                                 type="file"
                                 id="product-image-file"
                                 accept="image/png,image/jpeg,image/jpg,image/webp"
+                                multiple
                                 style="display: none"
                                 onchange="handleImageSelect(event)" />
 
-                            <!-- Remove Image Button -->
+                            <!-- Clear All Images Button -->
                             <button
                                 type="button"
                                 id="remove-image-btn"
@@ -2863,7 +2893,7 @@
         <!-- Hidden file input for import -->
         <input type="file" id="import-file" accept=".json" style="display: none" onchange="handleImport(event)" />
 
-        <script src="main.js"></script>
+        <script src="main.js?v=3"></script>
         <script src="admin.js?v=3"></script>
     </body>
 </html>

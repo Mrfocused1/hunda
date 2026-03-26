@@ -64,7 +64,7 @@ const AdminData = {
                 id: 1,
                 title: 'Racer Trophy Tee',
                 price: 45,
-                image: 'product-1.png',
+                images: ['product-1.png'],
                 category: 'Tops',
                 stock: 25,
                 description: 'Premium cotton tee with racing-inspired graphics.'
@@ -73,7 +73,7 @@ const AdminData = {
                 id: 2,
                 title: 'Champions Engineered Tee',
                 price: 45,
-                image: 'product-2.png',
+                images: ['product-2.png'],
                 category: 'Tops',
                 stock: 18,
                 description: 'Championship-inspired design on premium fabric.'
@@ -82,7 +82,7 @@ const AdminData = {
                 id: 3,
                 title: '1H Vintage Trucker Hat',
                 price: 35,
-                image: 'product-3.png',
+                images: ['product-3.png'],
                 category: 'Hats',
                 stock: 12,
                 description: 'Vintage style trucker hat with embroidered logo.'
@@ -91,7 +91,7 @@ const AdminData = {
                 id: 4,
                 title: 'Silence Expression Hoodie',
                 price: 65,
-                image: 'product-4.jpeg',
+                images: ['product-4.jpeg'],
                 category: 'Hoodies',
                 stock: 8,
                 description: 'Premium hoodie with unique graphic design.'
@@ -100,7 +100,7 @@ const AdminData = {
                 id: 5,
                 title: 'Endless Possibilities Hoodie',
                 price: 65,
-                image: 'product-5.jpeg',
+                images: ['product-5.jpeg'],
                 category: 'Hoodies',
                 stock: 15,
                 description: 'Comfortable hoodie with motivational graphics.'
@@ -109,7 +109,7 @@ const AdminData = {
                 id: 6,
                 title: '1H Colorway Trucker Hat',
                 price: 35,
-                image: 'product-6.jpeg',
+                images: ['product-6.jpeg'],
                 category: 'Hats',
                 stock: 20,
                 description: 'Colorful trucker hat with 1H branding.'
@@ -246,11 +246,18 @@ function loadDashboard() {
         lowStockEl.innerHTML = '<p class="text-gray-500 text-sm">No low stock items</p>';
     } else {
         lowStockEl.innerHTML = lowStock
-            .map(
-                (product) => `
+            .map((product) => {
+                // Get primary image
+                let primaryImage = 'product-1.png';
+                if (product.images && Array.isArray(product.images)) {
+                    primaryImage = product.images[0];
+                } else if (product.image) {
+                    primaryImage = product.image;
+                }
+                return `
             <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
                 <div class="flex items-center gap-3">
-                    <img src="${product.image}" alt="${product.title}" class="w-10 h-10 object-cover">
+                    <img src="${primaryImage}" alt="${product.title}" class="w-10 h-10 object-cover">
                     <div>
                         <p class="font-medium text-sm">${product.title}</p>
                         <p class="text-xs text-gray-500">${product.category}</p>
@@ -258,8 +265,8 @@ function loadDashboard() {
                 </div>
                 <span class="status-badge low-stock">${product.stock} left</span>
             </div>
-        `
-            )
+        `;
+            })
             .join('');
     }
 }
@@ -346,11 +353,22 @@ function renderProducts() {
                 stockClass = 'low';
             }
 
+            // Get primary image (support both old single image and new images array)
+            let primaryImage = 'product-1.png';
+            let imageCount = 1;
+            if (product.images && Array.isArray(product.images)) {
+                primaryImage = product.images[0];
+                imageCount = product.images.length;
+            } else if (product.image) {
+                primaryImage = product.image;
+            }
+
             return `
             <div class="product-card">
                 <div class="product-card-image">
-                    <img src="${product.image}" alt="${product.title}" loading="lazy">
+                    <img src="${primaryImage}" alt="${product.title}" loading="lazy">
                     <span class="product-card-stock-badge ${stockStatus}">${stockLabel}</span>
+                    ${imageCount > 1 ? `<span class="product-card-image-count" style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; padding: 2px 8px; font-size: 0.75rem; border-radius: 4px;">${imageCount} images</span>` : ''}
                     <div class="product-card-actions">
                         <button class="product-card-action-btn" onclick="event.stopPropagation(); editProduct(${product.id})" title="Edit">
                             <i data-lucide="edit" class="w-4 h-4"></i>
@@ -397,7 +415,7 @@ function filterProducts() {
     renderProducts();
 }
 
-let currentProductImage = null;
+let currentProductImages = [];
 
 function openProductModal(productId = null) {
     const modal = document.getElementById('product-modal');
@@ -405,7 +423,7 @@ function openProductModal(productId = null) {
     const form = document.getElementById('product-form');
 
     // Reset image upload state
-    currentProductImage = null;
+    currentProductImages = [];
     resetImageUpload();
 
     if (productId) {
@@ -420,10 +438,16 @@ function openProductModal(productId = null) {
         document.getElementById('product-stock').value = product.stock;
         document.getElementById('product-description').value = product.description || '';
 
-        // Set current image
-        if (product.image) {
-            currentProductImage = product.image;
-            showImagePreview(product.image);
+        // Set current images (support both old single image and new images array)
+        if (product.images && Array.isArray(product.images)) {
+            currentProductImages = [...product.images];
+        } else if (product.image) {
+            // Backward compatibility: convert single image to array
+            currentProductImages = [product.image];
+        }
+
+        if (currentProductImages.length > 0) {
+            showImagePreviews(currentProductImages);
         }
     } else {
         title.textContent = 'Add Product';
@@ -436,7 +460,7 @@ function openProductModal(productId = null) {
 
 function closeProductModal() {
     document.getElementById('product-modal').classList.remove('active');
-    currentProductImage = null;
+    currentProductImages = [];
     resetImageUpload();
 }
 
@@ -458,78 +482,140 @@ function handleDrop(event) {
     event.stopPropagation();
     document.getElementById('image-upload-area').classList.remove('drag-over');
 
-    const files = event.dataTransfer.files;
-    if (files.length > 0) {
-        processImageFile(files[0]);
-    }
+    const files = Array.from(event.dataTransfer.files);
+    processImageFiles(files);
 }
 
 function handleImageSelect(event) {
-    const files = event.target.files;
-    if (files.length > 0) {
-        processImageFile(files[0]);
-    }
+    const files = Array.from(event.target.files);
+    processImageFiles(files);
 }
 
+function processImageFiles(files) {
+    // Validate max 5 images
+    if (currentProductImages.length + files.length > 5) {
+        showToast('Maximum 5 images allowed per product');
+        return;
+    }
+
+    files.forEach((file, index) => {
+        // Validate file type
+        const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            showToast(`Skipping ${file.name}: Invalid file type`);
+            return;
+        }
+
+        // Validate file size (5MB)
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            showToast(`Skipping ${file.name}: File too large (max 5MB)`);
+            return;
+        }
+
+        // Convert to base64
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            currentProductImages.push(e.target.result);
+            showImagePreviews(currentProductImages);
+
+            // Show count toast after last image
+            if (index === files.length - 1) {
+                showToast(`${currentProductImages.length} image${currentProductImages.length > 1 ? 's' : ''} uploaded`);
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Backward compatibility - single file upload
 function processImageFile(file) {
-    // Validate file type
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-        showToast('Please upload a valid image file (PNG, JPG, or WEBP)');
-        return;
-    }
-
-    // Validate file size (5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-        showToast('Image file is too large. Maximum size is 5MB.');
-        return;
-    }
-
-    // Convert to base64
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        currentProductImage = e.target.result;
-        showImagePreview(currentProductImage);
-    };
-    reader.readAsDataURL(file);
+    processImageFiles([file]);
 }
 
-function showImagePreview(imageSrc) {
+function showImagePreviews(imageSrcs) {
     const previewContainer = document.getElementById('image-preview-container');
-    const preview = document.getElementById('image-preview');
     const uploadArea = document.getElementById('image-upload-area');
-    const removeBtn = document.getElementById('remove-image-btn');
+    const addMoreBtn = document.getElementById('add-more-images-btn');
+    const fileInput = document.getElementById('product-image-file');
 
-    preview.src = imageSrc;
+    // Clear existing previews
+    previewContainer.innerHTML = '';
+
+    // Create preview grid
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.75rem;';
+
+    imageSrcs.forEach((src, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'position: relative; aspect-ratio: 1; border: 1px solid #e5e7eb; overflow: hidden;';
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+
+        // Primary badge for first image
+        if (index === 0) {
+            const badge = document.createElement('span');
+            badge.textContent = 'PRIMARY';
+            badge.style.cssText =
+                'position: absolute; top: 4px; left: 4px; background: #111; color: white; font-size: 0.625rem; padding: 2px 6px; font-weight: 600;';
+            wrapper.appendChild(badge);
+        }
+
+        // Remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = '×';
+        removeBtn.style.cssText =
+            'position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; background: #dc2626; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;';
+        removeBtn.onclick = () => removeProductImage(index);
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+        grid.appendChild(wrapper);
+    });
+
+    previewContainer.appendChild(grid);
     previewContainer.style.display = 'block';
-    uploadArea.style.display = 'none';
-    removeBtn.style.display = 'inline-block';
 
-    // Store in hidden input
-    document.getElementById('product-image').value = imageSrc;
+    // Show/hide upload area and add more button
+    if (imageSrcs.length >= 5) {
+        uploadArea.style.display = 'none';
+        addMoreBtn.style.display = 'none';
+    } else {
+        uploadArea.style.display = 'none';
+        addMoreBtn.style.display = 'inline-block';
+    }
+
+    fileInput.value = '';
 }
 
-function removeProductImage() {
-    currentProductImage = null;
-    resetImageUpload();
+// Backward compatibility
+function showImagePreview(imageSrc) {
+    showImagePreviews([imageSrc]);
+}
+
+function removeProductImage(index) {
+    currentProductImages.splice(index, 1);
+    if (currentProductImages.length === 0) {
+        resetImageUpload();
+    } else {
+        showImagePreviews(currentProductImages);
+    }
 }
 
 function resetImageUpload() {
     const previewContainer = document.getElementById('image-preview-container');
-    const preview = document.getElementById('image-preview');
     const uploadArea = document.getElementById('image-upload-area');
-    const removeBtn = document.getElementById('remove-image-btn');
+    const addMoreBtn = document.getElementById('add-more-images-btn');
     const fileInput = document.getElementById('product-image-file');
-    const hiddenInput = document.getElementById('product-image');
 
-    preview.src = '';
+    previewContainer.innerHTML = '';
     previewContainer.style.display = 'none';
     uploadArea.style.display = 'block';
     uploadArea.classList.remove('has-image');
-    removeBtn.style.display = 'none';
+    if (addMoreBtn) addMoreBtn.style.display = 'none';
     fileInput.value = '';
-    hiddenInput.value = '';
 }
 
 function saveProduct(event) {
@@ -538,12 +624,15 @@ function saveProduct(event) {
     const id = document.getElementById('product-id').value;
     const products = AdminData.getProducts();
 
+    // Use current images or default
+    let images = currentProductImages.length > 0 ? currentProductImages : ['product-1.png'];
+
     const productData = {
         id: id ? parseInt(id) : Date.now(),
         title: document.getElementById('product-title').value,
         price: parseFloat(document.getElementById('product-price').value),
         category: document.getElementById('product-category').value,
-        image: currentProductImage || 'product-1.png',
+        images: images,
         stock: parseInt(document.getElementById('product-stock').value) || 0,
         description: document.getElementById('product-description').value
     };

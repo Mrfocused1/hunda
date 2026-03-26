@@ -197,6 +197,14 @@ function addToCart(productId, size, color, quantity = 1) {
 
     const existingItem = state.cart.find((item) => item.id === productId && item.size === size && item.color === color);
 
+    // Get primary image (support both old single image and new images array)
+    let primaryImage = 'product-1.png';
+    if (product.images && Array.isArray(product.images)) {
+        primaryImage = product.images[0];
+    } else if (product.image) {
+        primaryImage = product.image;
+    }
+
     if (existingItem) {
         existingItem.quantity += quantity;
     } else {
@@ -204,7 +212,7 @@ function addToCart(productId, size, color, quantity = 1) {
             id: productId,
             title: product.title,
             price: product.price,
-            image: product.image,
+            image: primaryImage,
             size,
             color,
             quantity
@@ -410,8 +418,16 @@ function openQuickView(productId) {
 
     if (!modal || !overlay) return;
 
+    // Get primary image (support both old single image and new images array)
+    let primaryImage = 'product-1.png';
+    if (product.images && Array.isArray(product.images)) {
+        primaryImage = product.images[0];
+    } else if (product.image) {
+        primaryImage = product.image;
+    }
+
     // Populate modal
-    document.getElementById('qv-image').src = product.image;
+    document.getElementById('qv-image').src = primaryImage;
     document.getElementById('qv-title').textContent = product.title;
     document.getElementById('qv-price').textContent = formatPrice(product.price);
     document.getElementById('qv-category').textContent = product.category;
