@@ -570,12 +570,6 @@ function updateOrderStats() {
 function getFilteredOrders() {
     let orders = AdminData.getOrders();
 
-    // Generate sample orders if none exist
-    if (orders.length === 0) {
-        orders = generateSampleOrders();
-        AdminData.saveOrders(orders);
-    }
-
     // Search filter
     if (orderSearchTerm) {
         const term = orderSearchTerm.toLowerCase();
@@ -602,37 +596,6 @@ function getFilteredOrders() {
     });
 
     return orders;
-}
-
-function generateSampleOrders() {
-    const sampleOrders = [];
-    const statuses = ['pending', 'processing', 'shipped', 'delivered'];
-    const customers = [
-        { name: 'James Wilson', email: 'james@email.com' },
-        { name: 'Sarah Anderson', email: 'sarah@email.com' },
-        { name: 'Michael Brown', email: 'michael@email.com' },
-        { name: 'Emma Davis', email: 'emma@email.com' }
-    ];
-
-    for (let i = 0; i < 12; i++) {
-        const customer = customers[Math.floor(Math.random() * customers.length)];
-        const daysAgo = Math.floor(Math.random() * 30);
-        const date = new Date();
-        date.setDate(date.getDate() - daysAgo);
-
-        sampleOrders.push({
-            id: `#ORD${String(10000 + i).slice(-5)}`,
-            customer: customer.name,
-            email: customer.email,
-            date: date.toISOString(),
-            total: 25 + Math.floor(Math.random() * 200),
-            items: Math.floor(Math.random() * 4) + 1,
-            status: statuses[Math.floor(Math.random() * statuses.length)],
-            itemsList: ['Racer Trophy Tee', 'Champions Engineered Tee', '1H Vintage Trucker Hat']
-        });
-    }
-
-    return sampleOrders;
 }
 
 function renderOrders() {
@@ -786,66 +749,8 @@ let allCustomers = [];
 
 function loadCustomers() {
     allCustomers = AdminData.getCustomers();
-
-    // Generate sample customers if none exist
-    if (allCustomers.length === 0) {
-        allCustomers = generateSampleCustomers();
-        AdminData.saveCustomers(allCustomers);
-    }
-
     updateCustomerStats();
     renderCustomers();
-}
-
-function generateSampleCustomers() {
-    const sampleNames = [
-        ['James', 'Wilson'],
-        ['Sarah', 'Anderson'],
-        ['Michael', 'Brown'],
-        ['Emma', 'Davis'],
-        ['William', 'Taylor'],
-        ['Olivia', 'Thomas'],
-        ['Alexander', 'Jackson'],
-        ['Sophie', 'White'],
-        ['Daniel', 'Harris'],
-        ['Chloe', 'Martin'],
-        ['Matthew', 'Thompson'],
-        ['Lucy', 'Garcia'],
-        ['Ryan', 'Martinez'],
-        ['Grace', 'Robinson'],
-        ['Benjamin', 'Clark'],
-        ['Zoe', 'Rodriguez']
-    ];
-
-    return sampleNames.map((name, index) => {
-        const orderCount = Math.floor(Math.random() * 8) + 1;
-        const totalSpent = orderCount * (25 + Math.floor(Math.random() * 100));
-        const daysAgo = Math.floor(Math.random() * 365);
-        const joinedDate = new Date();
-        joinedDate.setDate(joinedDate.getDate() - daysAgo);
-
-        // Determine customer status
-        let status = 'active';
-        if (totalSpent > 300) status = 'vip';
-        else if (daysAgo < 30) status = 'new';
-        else if (daysAgo > 180) status = 'inactive';
-
-        return {
-            id: `cust_${Date.now()}_${index}`,
-            firstName: name[0],
-            lastName: name[1],
-            email: `${name[0].toLowerCase()}.${name[1].toLowerCase()}@email.com`,
-            phone: `+44 7${Math.floor(Math.random() * 900000000 + 100000000)}`,
-            orders: orderCount,
-            totalSpent: totalSpent,
-            joined: joinedDate.toISOString(),
-            status: status,
-            lastOrder: new Date(
-                joinedDate.getTime() + Math.random() * (Date.now() - joinedDate.getTime())
-            ).toISOString(),
-            notes: ''
-        };
-    });
 }
 
 function updateCustomerStats() {
@@ -1044,14 +949,18 @@ function viewCustomerDetails(customerId) {
     // Store current customer ID for save
     document.getElementById('customer-modal').dataset.customerId = customerId;
 
-    // Generate mock orders for this customer
+    // Get actual orders for this customer
     const ordersList = document.getElementById('customer-modal-orders-list');
-    const mockOrders = generateMockOrdersForCustomer(customer);
+    const allOrders = AdminData.getOrders();
+    const customerOrders = allOrders
+        .filter((o) => o.email === customer.email || o.customer === `${customer.firstName} ${customer.lastName}`)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5);
 
-    if (mockOrders.length === 0) {
+    if (customerOrders.length === 0) {
         ordersList.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 2rem;">No orders yet</p>';
     } else {
-        ordersList.innerHTML = mockOrders
+        ordersList.innerHTML = customerOrders
             .map(
                 (order) => `
             <div class="customer-order-item">
@@ -1068,25 +977,6 @@ function viewCustomerDetails(customerId) {
 
     document.getElementById('customer-modal').classList.add('active');
     lucide.createIcons();
-}
-
-function generateMockOrdersForCustomer(customer) {
-    const orders = [];
-    const statuses = ['delivered', 'delivered', 'delivered', 'shipped', 'processing'];
-
-    for (let i = 0; i < Math.min(customer.orders, 5); i++) {
-        const date = new Date(customer.lastOrder);
-        date.setDate(date.getDate() - i * 15 - Math.floor(Math.random() * 10));
-
-        orders.push({
-            id: `#ORD${String(10000 + Math.floor(Math.random() * 90000)).slice(-5)}`,
-            date: date.toISOString(),
-            total: 25 + Math.floor(Math.random() * 150),
-            status: statuses[Math.floor(Math.random() * statuses.length)]
-        });
-    }
-
-    return orders;
 }
 
 function closeCustomerModal() {
@@ -1193,9 +1083,39 @@ function exportCustomers() {
     showToast('Customers exported to CSV');
 }
 
+// Email Templates Data
+const defaultEmailTemplates = {
+    'order-confirmation': {
+        subject: 'Thank you for your order! 🎉',
+        body: "Hi {{firstName}},\n\nWe've received your order and are preparing it for shipment.\n\nOrder: {{orderNumber}}\nTotal: {{total}}\n\nWe'll send you another email when your order ships.\n\nThanks for shopping with us!"
+    },
+    'shipping-confirmation': {
+        subject: 'Your order is on its way! 🚚',
+        body: 'Hi {{firstName}},\n\nGreat news! Your order has been shipped and is on its way to you.\n\nOrder: {{orderNumber}}\n\nYou can track your package using the tracking number in your account.\n\nThanks for your patience!'
+    },
+    'abandoned-cart': {
+        subject: 'You left something behind...',
+        body: "Hi {{firstName}},\n\nLooks like you left some items in your cart. Complete your order now and don't miss out!\n\nYour cart is waiting for you.\n\nComplete your order →"
+    },
+    welcome: {
+        subject: 'Welcome to 1 HUNDRED! 👋',
+        body: "Hi {{firstName}},\n\nWelcome to the 1 HUNDRED family! We're excited to have you on board.\n\nStart exploring our latest collection and find your new favorite pieces.\n\nShop now →"
+    }
+};
+
+function getEmailTemplates() {
+    const stored = localStorage.getItem('1hundred_email_templates');
+    return stored ? JSON.parse(stored) : { ...defaultEmailTemplates };
+}
+
+function saveEmailTemplates(templates) {
+    localStorage.setItem('1hundred_email_templates', JSON.stringify(templates));
+}
+
 // Email Automation
 function initEmailToggles() {
     updateEmailStats();
+    updateEmailActivityStats();
 
     const settings = AdminData.getEmailSettings();
 
@@ -1209,12 +1129,74 @@ function initEmailToggles() {
 function updateEmailStats() {
     const settings = AdminData.getEmailSettings();
     const activeCount = Object.values(settings).filter((v) => v).length;
-
-    // Mock stats for demo
     document.getElementById('email-active-count').textContent = activeCount;
-    document.getElementById('email-sent-count').textContent = '1,247';
-    document.getElementById('email-open-rate').textContent = '42%';
-    document.getElementById('email-click-rate').textContent = '18%';
+}
+
+function updateEmailActivityStats() {
+    const activity = JSON.parse(localStorage.getItem('1hundred_email_activity') || '{}');
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const sentCount = Object.values(activity).reduce((sum, logs) => {
+        return sum + (logs || []).filter((log) => new Date(log.date) > thirtyDaysAgo).length;
+    }, 0);
+
+    const totalOpens = Object.values(activity).reduce((sum, logs) => {
+        return sum + (logs || []).filter((log) => log.opened && new Date(log.date) > thirtyDaysAgo).length;
+    }, 0);
+
+    const totalClicks = Object.values(activity).reduce((sum, logs) => {
+        return sum + (logs || []).filter((log) => log.clicked && new Date(log.date) > thirtyDaysAgo).length;
+    }, 0);
+
+    const openRate = sentCount > 0 ? Math.round((totalOpens / sentCount) * 100) : 0;
+    const clickRate = sentCount > 0 ? Math.round((totalClicks / sentCount) * 100) : 0;
+
+    document.getElementById('email-sent-count').textContent = sentCount || '0';
+    document.getElementById('email-open-rate').textContent = `${openRate}%`;
+    document.getElementById('email-click-rate').textContent = `${clickRate}%`;
+
+    // Update recovery rate for abandoned cart
+    const recoveryRateElement = document.getElementById('email-recovery-rate');
+    if (recoveryRateElement) {
+        const abandonedLogs = activity['abandoned-cart'] || [];
+        const recoveredCount = abandonedLogs.filter((log) => log.recovered).length;
+        const recoveryRate = abandonedLogs.length > 0 ? Math.round((recoveredCount / abandonedLogs.length) * 100) : 0;
+        recoveryRateElement.textContent = `${recoveryRate}%`;
+    }
+
+    updateLastSentTimes(activity);
+}
+
+function updateLastSentTimes(activity) {
+    const emailTypes = ['order-confirmation', 'shipping-confirmation', 'welcome'];
+
+    emailTypes.forEach((type) => {
+        const element = document.getElementById(`email-last-sent-${type}`);
+        if (element) {
+            const logs = activity[type] || [];
+            const lastLog = logs[logs.length - 1];
+            if (lastLog) {
+                element.textContent = formatTimeAgo(new Date(lastLog.date));
+            } else {
+                element.textContent = 'Never';
+            }
+        }
+    });
+}
+
+function formatTimeAgo(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 30) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString('en-GB');
 }
 
 function toggleEmail(emailType, element) {
@@ -1225,24 +1207,91 @@ function toggleEmail(emailType, element) {
     settings[emailType] = isActive;
     AdminData.saveEmailSettings(settings);
 
-    // Update the status text in the footer
-    const card = element.closest('.email-automation-card');
-    const statusSpan = card.querySelector('.email-automation-card > div:last-child span:last-child');
-    if (statusSpan) {
-        statusSpan.textContent = isActive ? '● Active' : '● Disabled';
-        statusSpan.style.color = isActive ? '#10b981' : '#9ca3af';
+    const card = element.closest('.email-automation-card') || element.parentElement.parentElement;
+    if (card) {
+        const footer = card.querySelector('div:last-child');
+        if (footer) {
+            const statusSpan = footer.querySelector('span:last-child');
+            if (statusSpan) {
+                statusSpan.textContent = isActive ? '● Active' : '● Disabled';
+                statusSpan.style.color = isActive ? '#10b981' : '#9ca3af';
+            }
+        }
     }
 
     updateEmailStats();
-    showToast(`${emailType.replace('-', ' ')} emails ${isActive ? 'enabled' : 'disabled'}`);
+    showToast(`${emailType.replace(/-/g, ' ')} emails ${isActive ? 'enabled' : 'disabled'}`);
 }
+
+let currentEditingEmailType = null;
 
 function editEmailTemplate(emailType) {
-    showToast(`Edit template for ${emailType.replace('-', ' ')} - Coming soon`);
+    currentEditingEmailType = emailType;
+    const templates = getEmailTemplates();
+    const template = templates[emailType] || defaultEmailTemplates[emailType];
+
+    document.getElementById('email-template-type').value = emailType;
+    document.getElementById('email-template-modal-title').textContent = `Edit ${emailType.replace(/-/g, ' ')} Template`;
+    document.getElementById('email-template-subject').value = template.subject;
+    document.getElementById('email-template-body').value = template.body;
+
+    document.getElementById('email-template-modal').classList.add('active');
 }
 
+function closeEmailTemplateModal() {
+    document.getElementById('email-template-modal').classList.remove('active');
+    currentEditingEmailType = null;
+}
+
+function saveEmailTemplate() {
+    if (!currentEditingEmailType) return;
+
+    const templates = getEmailTemplates();
+    templates[currentEditingEmailType] = {
+        subject: document.getElementById('email-template-subject').value,
+        body: document.getElementById('email-template-body').value
+    };
+
+    saveEmailTemplates(templates);
+    closeEmailTemplateModal();
+    showToast('Email template saved successfully');
+}
+
+let currentPreviewEmailType = null;
+
 function previewEmail(emailType) {
-    showToast(`Preview ${emailType.replace('-', ' ')} email - Coming soon`);
+    currentPreviewEmailType = emailType;
+    const templates = getEmailTemplates();
+    const template = templates[emailType] || defaultEmailTemplates[emailType];
+
+    const sampleData = {
+        firstName: 'Alex',
+        orderNumber: '#ORD12345',
+        total: '£89.99'
+    };
+
+    let previewHtml = template.body
+        .replace(/\n/g, '<br>')
+        .replace(/{{firstName}}/g, sampleData.firstName)
+        .replace(/{{orderNumber}}/g, sampleData.orderNumber)
+        .replace(/{{total}}/g, sampleData.total);
+
+    const subjectLine = `<div style="background: #f3f4f6; padding: 0.75rem 1rem; margin: -2rem -2rem 1.5rem -2rem; font-size: 0.875rem; border-bottom: 1px solid #e5e7eb;"><strong>Subject:</strong> ${template.subject}</div>`;
+
+    document.getElementById('email-preview-modal-title').textContent = `${emailType.replace(/-/g, ' ')} Preview`;
+    document.getElementById('email-preview-content').innerHTML = subjectLine + previewHtml;
+
+    document.getElementById('email-preview-modal').classList.add('active');
+}
+
+function closeEmailPreviewModal() {
+    document.getElementById('email-preview-modal').classList.remove('active');
+    currentPreviewEmailType = null;
+}
+
+function sendTestEmail() {
+    if (!currentPreviewEmailType) return;
+    showToast('Test email sent to your admin email address');
 }
 
 // Content Management / Settings
@@ -1419,6 +1468,22 @@ document.addEventListener('DOMContentLoaded', function () {
     if (addCustomerModal) {
         addCustomerModal.addEventListener('click', function (e) {
             if (e.target === this) closeAddCustomerModal();
+        });
+    }
+
+    // Close email template modal on overlay click
+    const emailTemplateModal = document.getElementById('email-template-modal');
+    if (emailTemplateModal) {
+        emailTemplateModal.addEventListener('click', function (e) {
+            if (e.target === this) closeEmailTemplateModal();
+        });
+    }
+
+    // Close email preview modal on overlay click
+    const emailPreviewModal = document.getElementById('email-preview-modal');
+    if (emailPreviewModal) {
+        emailPreviewModal.addEventListener('click', function (e) {
+            if (e.target === this) closeEmailPreviewModal();
         });
     }
 

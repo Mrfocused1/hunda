@@ -1782,10 +1782,7 @@
                                         font-size: 0.75rem;
                                         color: #6b7280;
                                     ">
-                                    <span
-                                        >Last sent:
-                                        <span id="email-last-sent-order-confirmation">2 hours ago</span></span
-                                    >
+                                    <span>Last sent: <span id="email-last-sent-order-confirmation">Never</span></span>
                                     <span style="color: #10b981; font-weight: 500">● Active</span>
                                 </div>
                             </div>
@@ -1879,8 +1876,7 @@
                                         color: #6b7280;
                                     ">
                                     <span
-                                        >Last sent:
-                                        <span id="email-last-sent-shipping-confirmation">5 hours ago</span></span
+                                        >Last sent: <span id="email-last-sent-shipping-confirmation">Never</span></span
                                     >
                                     <span style="color: #10b981; font-weight: 500">● Active</span>
                                 </div>
@@ -1974,7 +1970,12 @@
                                         font-size: 0.75rem;
                                         color: #6b7280;
                                     ">
-                                    <span>Recovery rate: <span style="color: #111; font-weight: 500">12%</span></span>
+                                    <span
+                                        >Recovery rate:
+                                        <span id="email-recovery-rate" style="color: #111; font-weight: 500"
+                                            >0%</span
+                                        ></span
+                                    >
                                     <span style="color: #9ca3af; font-weight: 500">● Disabled</span>
                                 </div>
                             </div>
@@ -2063,7 +2064,7 @@
                                         font-size: 0.75rem;
                                         color: #6b7280;
                                     ">
-                                    <span>Last sent: <span id="email-last-sent-welcome">1 day ago</span></span>
+                                    <span>Last sent: <span id="email-last-sent-welcome">Never</span></span>
                                     <span style="color: #10b981; font-weight: 500">● Active</span>
                                 </div>
                             </div>
@@ -2724,6 +2725,98 @@ Discover the latest collection of premium streetwear essentials designed for the
                         <button type="submit" class="btn btn-primary">Add Customer</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Email Template Editor Modal -->
+        <div class="modal-overlay" id="email-template-modal">
+            <div class="modal" style="max-width: 700px">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="email-template-modal-title">Edit Email Template</h3>
+                    <button class="modal-close" onclick="closeEmailTemplateModal()">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="email-template-type" />
+                    <div class="form-group">
+                        <label class="form-label">Subject Line</label>
+                        <input type="text" class="form-input" id="email-template-subject" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Body</label>
+                        <p class="text-xs text-gray-500 mb-2">
+                            Use {{firstName}}, {{orderNumber}}, {{total}} as placeholders
+                        </p>
+                        <textarea
+                            class="form-input"
+                            rows="10"
+                            id="email-template-body"
+                            style="font-family: ui-monospace, monospace; font-size: 0.875rem"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEmailTemplateModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEmailTemplate()">Save Template</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Preview Modal -->
+        <div class="modal-overlay" id="email-preview-modal">
+            <div class="modal" style="max-width: 600px">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="email-preview-modal-title">Email Preview</h3>
+                    <button class="modal-close" onclick="closeEmailPreviewModal()">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 0">
+                    <div style="background: #f3f4f6; padding: 2rem">
+                        <!-- Email Preview Container -->
+                        <div
+                            style="
+                                background: white;
+                                max-width: 500px;
+                                margin: 0 auto;
+                                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                            ">
+                            <!-- Email Header -->
+                            <div style="background: #111; padding: 1.5rem; text-align: center">
+                                <img
+                                    src="logo.svg"
+                                    alt="1 HUNDRED"
+                                    style="height: 2rem; filter: brightness(0) invert(1)" />
+                            </div>
+                            <!-- Email Body -->
+                            <div
+                                id="email-preview-content"
+                                style="padding: 2rem; font-size: 0.9375rem; line-height: 1.6; color: #374151">
+                                <!-- Preview content rendered here -->
+                            </div>
+                            <!-- Email Footer -->
+                            <div
+                                style="
+                                    background: #f9fafb;
+                                    padding: 1.5rem;
+                                    text-align: center;
+                                    font-size: 0.8125rem;
+                                    color: #6b7280;
+                                    border-top: 1px solid #e5e7eb;
+                                ">
+                                <p>1 HUNDRED Streetwear</p>
+                                <p style="margin-top: 0.5rem">You're receiving this because you shopped with us.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEmailPreviewModal()">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="sendTestEmail()">
+                        <i data-lucide="send" class="w-4 h-4 inline mr-1"></i>
+                        Send Test
+                    </button>
+                </div>
             </div>
         </div>
 
