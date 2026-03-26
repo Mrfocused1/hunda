@@ -27,7 +27,17 @@ const HARDCODED_PRODUCTS = [
         images: ['product-4.jpeg'],
         category: 'Hoodies',
         stock: 8,
-        description: 'Premium hoodie with bold graphic design. No half measures.'
+        description: `The No Half Measures Hoodie
+
+The No Half Measures Hoodie is a study in precision and intent. Rendered in deep black with a subtle tonal pattern, the piece is defined by its layered composition—balancing restraint with quiet complexity.
+
+A collage of monochrome portrait graphics introduces a raw, expressive edge, contrasted by the structured 1H insignia, a symbol of total commitment. Minimal text detailing reinforces the philosophy: nothing partial, nothing diluted.
+
+Refined embellishments are placed with purpose, adding texture without excess. The silhouette remains clean and controlled, offering a relaxed fit that moves effortlessly between statement and staple.
+
+Every element is considered. Nothing is accidental.
+
+All in. Always.`
     },
     {
         id: 5,
