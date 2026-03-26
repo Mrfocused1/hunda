@@ -52,10 +52,71 @@
 
 // Admin Data Management
 const AdminData = {
-    // Get products from localStorage
+    // Get products from localStorage or use defaults
     getProducts: function () {
         const stored = localStorage.getItem('1hundred_products');
-        return stored ? JSON.parse(stored) : [];
+        if (stored) {
+            return JSON.parse(stored);
+        }
+        // Default products
+        const defaults = [
+            {
+                id: 1,
+                title: 'Racer Trophy Tee',
+                price: 45,
+                image: 'product-1.png',
+                category: 'Tops',
+                stock: 25,
+                description: 'Premium cotton tee with racing-inspired graphics.'
+            },
+            {
+                id: 2,
+                title: 'Champions Engineered Tee',
+                price: 45,
+                image: 'product-2.png',
+                category: 'Tops',
+                stock: 18,
+                description: 'Championship-inspired design on premium fabric.'
+            },
+            {
+                id: 3,
+                title: '1H Vintage Trucker Hat',
+                price: 35,
+                image: 'product-3.png',
+                category: 'Hats',
+                stock: 12,
+                description: 'Vintage style trucker hat with embroidered logo.'
+            },
+            {
+                id: 4,
+                title: 'Silence Expression Hoodie',
+                price: 65,
+                image: 'product-4.jpeg',
+                category: 'Hoodies',
+                stock: 8,
+                description: 'Premium hoodie with unique graphic design.'
+            },
+            {
+                id: 5,
+                title: 'Endless Possibilities Hoodie',
+                price: 65,
+                image: 'product-5.jpeg',
+                category: 'Hoodies',
+                stock: 15,
+                description: 'Comfortable hoodie with motivational graphics.'
+            },
+            {
+                id: 6,
+                title: '1H Colorway Trucker Hat',
+                price: 35,
+                image: 'product-6.jpeg',
+                category: 'Hats',
+                stock: 20,
+                description: 'Colorful trucker hat with 1H branding.'
+            }
+        ];
+        this.saveProducts(defaults);
+        return defaults;
     },
 
     saveProducts: function (products) {
