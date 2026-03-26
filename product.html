@@ -3,8 +3,24 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Product | 1 HUNDRED</title>
-        <meta name="description" content="Shop premium streetwear at 1 HUNDRED." />
+        <title id="page-title">Product | 1 HUNDRED</title>
+        <meta
+            id="page-description"
+            name="description"
+            content="Shop premium streetwear at 1 HUNDRED. No half measures." />
+        <meta name="keywords" content="streetwear, product, fashion, premium clothing" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://1hundred.com/product" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+
+        <!-- Open Graph - Updated dynamically via JS -->
+        <meta property="og:type" content="product" />
+        <meta id="og-url" property="og:url" content="https://1hundred.com/product" />
+        <meta id="og-title" property="og:title" content="Product | 1 HUNDRED" />
+        <meta id="og-description" property="og:description" content="Shop premium streetwear at 1 HUNDRED." />
+        <meta id="og-image" property="og:image" content="https://1hundred.com/hero-image.png" />
+
+        <meta name="theme-color" content="#111111" />
 
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -383,6 +399,9 @@
             </div>
         </footer>
 
+        <!-- Supabase -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+        <script src="supabase.js"></script>
         <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
@@ -454,6 +473,18 @@
 
                 // Update page
                 document.title = `${currentProduct.title} | 1 HUNDRED`;
+
+                // Update meta tags for SEO
+                document.getElementById('page-title').textContent = `${currentProduct.title} | 1 HUNDRED`;
+                document.getElementById('page-description').setAttribute('content',
+                    `${currentProduct.title} - ${currentProduct.description?.substring(0, 150) || 'Premium streetwear from 1 HUNDRED'}`);
+                document.getElementById('og-url').setAttribute('content', window.location.href);
+                document.getElementById('og-title').setAttribute('content', `${currentProduct.title} | 1 HUNDRED`);
+                document.getElementById('og-description').setAttribute('content',
+                    currentProduct.description?.substring(0, 200) || 'Premium streetwear from 1 HUNDRED');
+                document.getElementById('og-image').setAttribute('content',
+                    `${window.location.origin}/${primaryImage}`);
+
                 document.getElementById('breadcrumb-product').textContent = currentProduct.title;
                 document.getElementById('breadcrumb-category').textContent = currentProduct.category;
                 document.getElementById('breadcrumb-category').href = `/shop?category=${currentProduct.category}`;
@@ -590,15 +621,19 @@
                     .map((p) => {
                         // Get primary image (support both old single image and new images array)
                         let pImage = 'product-1.png';
-                        if (p.images && Array.isArray(p.images)) {
-                            pImage = p.images[0];
+                        if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+                            pImage = typeof getProductImageUrl !== 'undefined'
+                                ? getProductImageUrl(p.images[0])
+                                : p.images[0];
                         } else if (p.image) {
-                            pImage = p.image;
+                            pImage = typeof getProductImageUrl !== 'undefined'
+                                ? getProductImageUrl(p.image)
+                                : p.image;
                         }
                         return `
                 <div class="product-card">
                     <a href="/product?id=${p.id}" class="product-image-wrapper">
-                        <img src="${pImage}" alt="${p.title}" class="product-image" loading="lazy">
+                        <img src="${pImage}" alt="${p.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
                     </a>
                     <a href="/product?id=${p.id}">
                         <div class="product-info">

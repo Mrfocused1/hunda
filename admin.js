@@ -2,15 +2,15 @@
  * Admin Dashboard JavaScript
  *
  * Features:
- * - Product CRUD (hardcoded for now, Supabase coming soon)
+ * - Product CRUD via Supabase
  * - Order management (localStorage)
  * - Customer management (localStorage)
  * - Email automation settings
  * - Data export/import
  */
 
-// HARDCODED PRODUCTS - To be replaced with Supabase in future
-const HARDCODED_PRODUCTS = [
+// Fallback products (used when Supabase is not available)
+let adminProducts = [
     {
         id: 3,
         title: '1H Star Cap',
@@ -69,6 +69,41 @@ All in. Always.`
     }
 ];
 
+// Supabase integration flag
+let useSupabase = false;
+
+// Initialize Supabase connection
+async function initAdminSupabase() {
+    if (typeof initSupabase === 'function') {
+        initSupabase();
+    }
+
+    // Try to load from Supabase
+    if (typeof ProductAPI !== 'undefined') {
+        try {
+            const { data, error } = await ProductAPI.getAll();
+            if (!error) {
+                useSupabase = true;
+                if (data && data.length > 0) {
+                    adminProducts = data;
+                    console.log('✅ Admin: Products loaded from Supabase:', adminProducts.length);
+                } else {
+                    console.log('ℹ️ Admin: No products in Supabase yet, using fallback');
+                }
+            } else {
+                console.log('⚠️ Admin: Supabase error, using fallback:', error.message);
+            }
+        } catch (err) {
+            console.log('⚠️ Admin: Could not connect to Supabase, using fallback:', err.message);
+        }
+    }
+
+    // Refresh the UI
+    if (typeof loadProducts === 'function') {
+        loadProducts();
+    }
+}
+
 // Check admin authentication
 (function checkAuth() {
     const adminSession = sessionStorage.getItem('1hundred_admin_session');
@@ -79,15 +114,30 @@ All in. Always.`
 
 // Admin Data Management
 const AdminData = {
-    // Get products - returns hardcoded array (Supabase coming soon)
+    // Get products - returns from Supabase or fallback
     getProducts: function () {
-        return HARDCODED_PRODUCTS;
+        return adminProducts;
     },
 
-    // Save products - shows warning since products are hardcoded
-    saveProducts: function (products) {
-        console.warn('Products are currently hardcoded. Changes will not persist until Supabase is connected.');
-        // In future: save to Supabase
+    // Save products - saves to Supabase if available
+    saveProducts: async function (products) {
+        if (useSupabase && typeof ProductAPI !== 'undefined') {
+            // Sync each product to Supabase
+            for (const product of products) {
+                if (product.id) {
+                    const { error } = await ProductAPI.update(product.id, product);
+                    if (error) {
+                        console.error('Failed to save product:', product.id, error);
+                    }
+                }
+            }
+            // Update local cache
+            adminProducts = [...products];
+        } else {
+            // Fallback: just update local cache
+            adminProducts = [...products];
+            console.log('Products saved locally (Supabase not available)');
+        }
     },
 
     getOrders: function () {
@@ -214,17 +264,21 @@ function loadDashboard() {
     } else {
         lowStockEl.innerHTML = lowStock
             .map((product) => {
-                // Get primary image
+                // Get primary image URL (handles both local and Supabase Storage)
                 let primaryImage = 'product-1.png';
-                if (product.images && Array.isArray(product.images)) {
-                    primaryImage = product.images[0];
+                if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+                    primaryImage =
+                        typeof getProductImageUrl !== 'undefined'
+                            ? getProductImageUrl(product.images[0])
+                            : product.images[0];
                 } else if (product.image) {
-                    primaryImage = product.image;
+                    primaryImage =
+                        typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(product.image) : product.image;
                 }
                 return `
             <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
                 <div class="flex items-center gap-3">
-                    <img src="${primaryImage}" alt="${product.title}" class="w-10 h-10 object-cover">
+                    <img src="${primaryImage}" alt="${product.title}" class="w-10 h-10 object-cover" onerror="this.src='product-1.png'">
                     <div>
                         <p class="font-medium text-sm">${product.title}</p>
                         <p class="text-xs text-gray-500">${product.category}</p>
@@ -320,20 +374,24 @@ function renderProducts() {
                 stockClass = 'low';
             }
 
-            // Get primary image (support both old single image and new images array)
+            // Get primary image (support both local files and Supabase Storage)
             let primaryImage = 'product-1.png';
             let imageCount = 1;
-            if (product.images && Array.isArray(product.images)) {
-                primaryImage = product.images[0];
+            if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+                primaryImage =
+                    typeof getProductImageUrl !== 'undefined'
+                        ? getProductImageUrl(product.images[0])
+                        : product.images[0];
                 imageCount = product.images.length;
             } else if (product.image) {
-                primaryImage = product.image;
+                primaryImage =
+                    typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(product.image) : product.image;
             }
 
             return `
             <div class="product-card">
                 <div class="product-card-image">
-                    <img src="${primaryImage}" alt="${product.title}" loading="lazy">
+                    <img src="${primaryImage}" alt="${product.title}" loading="lazy" onerror="this.src='product-1.png'">
                     <span class="product-card-stock-badge ${stockStatus}">${stockLabel}</span>
                     ${imageCount > 1 ? `<span class="product-card-image-count" style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; padding: 2px 8px; font-size: 0.75rem; border-radius: 4px;">${imageCount} images</span>` : ''}
                     <div class="product-card-actions">
@@ -585,26 +643,119 @@ function resetImageUpload() {
     fileInput.value = '';
 }
 
-function saveProduct(event) {
+// Helper function to upload images to Supabase Storage
+async function uploadProductImages(images, productId) {
+    if (!useSupabase || typeof StorageAPI === 'undefined') {
+        return images; // Return as-is if Supabase not available
+    }
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+
+        // If it's already a filename (not base64), keep it
+        if (!image.startsWith('data:')) {
+            uploadedImages.push(image);
+            continue;
+        }
+
+        // It's a base64 image, upload to Storage
+        showToast(`📤 Uploading image ${i + 1} of ${images.length}...`);
+
+        const fileName = `product-${productId || 'new'}-${Date.now()}-${i}.png`;
+        const { data, error } = await StorageAPI.uploadBase64('product-images', fileName, image, 'image/png');
+
+        if (error) {
+            console.error('Failed to upload image:', error);
+            showToast(`❌ Failed to upload image ${i + 1}`);
+            // Keep the original filename as fallback
+            uploadedImages.push(`product-${i + 1}.png`);
+        } else {
+            // Store just the filename/path
+            uploadedImages.push(data.path);
+            console.log('✅ Image uploaded:', data.publicUrl);
+        }
+    }
+
+    return uploadedImages;
+}
+
+async function saveProduct(event) {
     event.preventDefault();
 
     const id = document.getElementById('product-id').value;
 
-    // Use current images or default
+    // Show loading state
+    const saveBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = saveBtn ? saveBtn.textContent : 'Save';
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+    }
+
+    // Upload images to Supabase Storage if needed
     let images = currentProductImages.length > 0 ? currentProductImages : ['product-1.png'];
 
+    if (useSupabase && images.some((img) => img.startsWith('data:'))) {
+        images = await uploadProductImages(images, id);
+    }
+
     const productData = {
-        id: id ? parseInt(id) : Date.now(),
         title: document.getElementById('product-title').value,
         price: parseFloat(document.getElementById('product-price').value),
         category: document.getElementById('product-category').value,
         images: images,
+        image: images[0], // For backward compatibility
         stock: parseInt(document.getElementById('product-stock').value) || 0,
-        description: document.getElementById('product-description').value
+        description: document.getElementById('product-description').value,
+        sizes: ['S', 'M', 'L', 'XL'],
+        colors: ['Default']
     };
 
-    // For now, products are hardcoded - show demo message
-    showToast('⚠️ Products are hardcoded. Edit admin.js to add new products. Supabase coming soon!');
+    if (useSupabase && typeof ProductAPI !== 'undefined') {
+        let result;
+        if (id) {
+            // Update existing
+            result = await ProductAPI.update(parseInt(id), productData);
+        } else {
+            // Create new
+            result = await ProductAPI.create(productData);
+        }
+
+        if (result.error) {
+            showToast('❌ Error saving product: ' + result.error.message);
+            console.error('Supabase error:', result.error);
+        } else {
+            showToast('✅ Product saved to Supabase!');
+            // Refresh products list
+            const { data } = await ProductAPI.getAll();
+            if (data) adminProducts = data;
+            loadProducts();
+        }
+    } else {
+        // Local fallback
+        if (id) {
+            // Update existing
+            const index = adminProducts.findIndex((p) => p.id === parseInt(id));
+            if (index !== -1) {
+                adminProducts[index] = { ...adminProducts[index], ...productData, id: parseInt(id) };
+            }
+        } else {
+            // Create new
+            const newId = Math.max(...adminProducts.map((p) => p.id), 0) + 1;
+            adminProducts.push({ ...productData, id: newId });
+        }
+        showToast('✅ Product saved locally');
+        loadProducts();
+    }
+
+    // Restore button state
+    if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalText;
+    }
+
     closeProductModal();
 }
 
@@ -612,11 +763,46 @@ function editProduct(id) {
     openProductModal(id);
 }
 
-function deleteProduct(id) {
+async function deleteProduct(id) {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
-    // For now, products are hardcoded
-    showToast('⚠️ Products are hardcoded and cannot be deleted. Supabase coming soon!');
+    if (useSupabase && typeof ProductAPI !== 'undefined') {
+        // First, get the product to find its images
+        const { data: product } = await ProductAPI.getById(id);
+
+        // Delete the product from database
+        const { error } = await ProductAPI.delete(id);
+
+        if (error) {
+            showToast('❌ Error deleting product: ' + error.message);
+            console.error('Supabase error:', error);
+            return;
+        }
+
+        // Delete images from storage
+        if (product && product.images && typeof StorageAPI !== 'undefined') {
+            for (const imagePath of product.images) {
+                // Only delete if it's a storage path (not a local filename)
+                if (imagePath && imagePath.includes('product-') && imagePath.endsWith('.png')) {
+                    await StorageAPI.deleteFile('product-images', imagePath);
+                }
+            }
+        }
+
+        showToast('✅ Product deleted from Supabase!');
+        // Refresh products list
+        const { data } = await ProductAPI.getAll();
+        if (data) adminProducts = data;
+        loadProducts();
+    } else {
+        // Local fallback
+        const index = adminProducts.findIndex((p) => p.id === id);
+        if (index !== -1) {
+            adminProducts.splice(index, 1);
+            showToast('✅ Product deleted locally');
+            loadProducts();
+        }
+    }
 }
 
 // Orders Management
@@ -1548,6 +1734,7 @@ function closeMobileMenu() {
 // Initialize
 document.addEventListener('DOMContentLoaded', function () {
     initNavigation();
+    initAdminSupabase();
     loadDashboard();
     loadContent();
 

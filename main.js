@@ -13,8 +13,8 @@ const state = {
 };
 
 // --- PRODUCT DATA ---
-// HARDCODED PRODUCTS - To be replaced with Supabase in future
-const products = [
+// Fallback products (used when Supabase is not available)
+const FALLBACK_PRODUCTS = [
     {
         id: 3,
         title: '1H Star Cap',
@@ -62,7 +62,65 @@ const products = [
     }
 ];
 
-const categories = [
+// Active products (will be populated from Supabase or fallback)
+let products = [...FALLBACK_PRODUCTS];
+
+// Initialize Supabase and load products
+async function initProducts() {
+    // Initialize Supabase client
+    if (typeof initSupabase === 'function') {
+        initSupabase();
+    }
+
+    // Try to load from Supabase
+    if (typeof ProductAPI !== 'undefined') {
+        try {
+            const { data, error } = await ProductAPI.getAll();
+            if (data && data.length > 0) {
+                products = data.map((p) => ({
+                    id: p.id,
+                    title: p.title,
+                    price: p.price,
+                    category: p.category,
+                    images: p.images || [p.image],
+                    sizes: p.sizes || ['S', 'M', 'L', 'XL'],
+                    colors: p.colors || ['Default']
+                }));
+                console.log('✅ Products loaded from Supabase:', products.length);
+            } else {
+                console.log('ℹ️ No products in Supabase, using fallback data');
+            }
+        } catch (err) {
+            console.log('⚠️ Could not load from Supabase, using fallback data:', err.message);
+        }
+    }
+
+    // Update categories based on products
+    updateCategories();
+
+    // Dispatch event to notify that products are ready
+    window.dispatchEvent(new CustomEvent('productsReady', { detail: products }));
+}
+
+// Update categories from products
+function updateCategories() {
+    const categoryCounts = {};
+    products.forEach((p) => {
+        categoryCounts[p.category] = (categoryCounts[p.category] || 0) + 1;
+    });
+
+    // Update categories array
+    categories.length = 0;
+    Object.entries(categoryCounts).forEach(([name, count]) => {
+        categories.push({
+            name,
+            slug: name.toLowerCase(),
+            count
+        });
+    });
+}
+
+let categories = [
     { name: 'Tops', slug: 'tops', count: 1 },
     { name: 'Hoodies', slug: 'hoodies', count: 2 },
     { name: 'Hats', slug: 'hats', count: 2 }
@@ -189,12 +247,13 @@ function addToCart(productId, size, color, quantity = 1) {
 
     const existingItem = state.cart.find((item) => item.id === productId && item.size === size && item.color === color);
 
-    // Get primary image (support both old single image and new images array)
+    // Get primary image (support local files and Supabase Storage)
     let primaryImage = 'product-1.png';
-    if (product.images && Array.isArray(product.images)) {
-        primaryImage = product.images[0];
+    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+        primaryImage =
+            typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(product.images[0]) : product.images[0];
     } else if (product.image) {
-        primaryImage = product.image;
+        primaryImage = typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(product.image) : product.image;
     }
 
     if (existingItem) {
@@ -500,14 +559,81 @@ function initLoader() {
 }
 
 // ========================================
+// LOADING & ERROR STATES
+// ========================================
+
+// Show loading spinner
+function showLoading(elementId, message = 'Loading...') {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+                <p class="mt-4 text-gray-600">${message}</p>
+            </div>
+        `;
+    }
+}
+
+// Show error message
+function showError(elementId, message = 'Something went wrong. Please try again.') {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 text-center">
+                <i data-lucide="alert-circle" class="w-12 h-12 text-red-500 mb-4"></i>
+                <p class="text-gray-600 mb-4">${message}</p>
+                <button onclick="location.reload()" class="btn btn-primary">Retry</button>
+            </div>
+        `;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+}
+
+// Enhanced toast notification
+function showToast(message, type = 'success', duration = 3000) {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-msg');
+
+    if (!toast || !toastMsg) return;
+
+    // Set icon based on type
+    const iconMap = {
+        success: 'check-circle',
+        error: 'x-circle',
+        warning: 'alert-triangle',
+        info: 'info'
+    };
+    const iconName = iconMap[type] || 'check-circle';
+
+    toast.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i><span id="toast-msg">${message}</span>`;
+    toast.className = `toast ${type}`;
+    toast.style.display = 'flex';
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, duration);
+}
+
+// ========================================
 // INITIALIZATION
 // ========================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initHeader();
     initLoader();
     updateBadges();
     updateWishlistButtons();
+
+    // Initialize Supabase products with error handling
+    try {
+        await initProducts();
+    } catch (err) {
+        console.error('Failed to initialize products:', err);
+        showToast('Using offline mode', 'warning');
+    }
 
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') {
@@ -524,6 +650,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Global error handling
+window.addEventListener('error', (e) => {
+    console.error('Global error:', e.error);
+    showToast('Something went wrong. Please refresh the page.', 'error', 5000);
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('Unhandled promise rejection:', e.reason);
+    showToast('Network error. Please check your connection.', 'error', 5000);
+});
+
 // Expose functions globally
 window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;
@@ -534,3 +671,15 @@ window.closeQuickView = closeQuickView;
 window.selectQVSize = selectQVSize;
 window.addToCartFromQV = addToCartFromQV;
 window.toggleCart = toggleCart;
+window.showToast = showToast;
+window.showLoading = showLoading;
+window.showError = showError;
+window.sanitizeHTML = function (str) {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};

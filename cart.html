@@ -4,7 +4,11 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Shopping Bag | 1 HUNDRED</title>
-        <meta name="description" content="Your shopping bag at 1 HUNDRED." />
+        <meta name="description" content="Your shopping bag at 1 HUNDRED. Review your items and proceed to checkout." />
+        <meta name="robots" content="noindex, follow" />
+        <link rel="canonical" href="https://1hundred.com/cart" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+        <meta name="theme-color" content="#111111" />
 
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -348,6 +352,9 @@
             </div>
         </footer>
 
+        <!-- Supabase -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+        <script src="supabase.js"></script>
         <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
@@ -361,7 +368,13 @@
                     category: 'Hoodies'
                 },
                 { id: 6, title: '1H Multi Colour Cap', price: 30, image: 'product-6.jpeg', category: 'Hats' },
-                { id: 7, title: 'Relentless Trophy Tee', price: 40, image: 'product-relentless-front.png', category: 'Tops' }
+                {
+                    id: 7,
+                    title: 'Relentless Trophy Tee',
+                    price: 40,
+                    image: 'product-relentless-front.png',
+                    category: 'Tops'
+                }
             ];
 
             let discount = 0;
@@ -386,32 +399,36 @@
                 );
 
                 container.innerHTML = state.cart
-                    .map(
-                        (item, index) => `
+                    .map((item, index) => {
+                        const safeTitle = sanitizeHTML(item.title);
+                        const safeColor = sanitizeHTML(item.color);
+                        const safeSize = sanitizeHTML(item.size);
+                        const safeImage = sanitizeHTML(item.image);
+                        return `
                 <div class="cart-item">
                     <div class="cart-item-image">
-                        <img src="${item.image}" alt="${item.title}">
+                        <img src="${safeImage}" alt="${safeTitle}" onerror="this.src='product-1.png'" loading="lazy">
                     </div>
                     <div class="cart-item-details">
                         <div class="cart-item-header">
                             <div>
-                                <h3 class="cart-item-title">${item.title}</h3>
-                                <p class="cart-item-variant">${item.color} / ${item.size}</p>
+                                <h3 class="cart-item-title">${safeTitle}</h3>
+                                <p class="cart-item-variant">${safeColor} / ${safeSize}</p>
                             </div>
-                            <span class="cart-item-price">£${(item.price * item.quantity).toFixed(2)}</span>
+                            <span class="cart-item-price">${formatPrice(item.price * item.quantity)}</span>
                         </div>
                         <div class="cart-item-actions">
                             <div class="cart-quantity-selector">
-                                <button class="cart-quantity-btn" onclick="updateCartQuantity(${item.id}, '${item.size}', '${item.color}', ${item.quantity - 1})">-</button>
+                                <button class="cart-quantity-btn" onclick="updateCartQuantity(${item.id}, '${safeSize}', '${safeColor}', ${item.quantity - 1})">-</button>
                                 <input type="text" class="cart-quantity-input" value="${item.quantity}" readonly>
-                                <button class="cart-quantity-btn" onclick="updateCartQuantity(${item.id}, '${item.size}', '${item.color}', ${item.quantity + 1})">+</button>
+                                <button class="cart-quantity-btn" onclick="updateCartQuantity(${item.id}, '${safeSize}', '${safeColor}', ${item.quantity + 1})">+</button>
                             </div>
-                            <button class="remove-btn" onclick="removeFromCart(${item.id}, '${item.size}', '${item.color}')">Remove</button>
+                            <button class="remove-btn" onclick="removeFromCart(${item.id}, '${safeSize}', '${safeColor}')">Remove</button>
                         </div>
                     </div>
                 </div>
-            `
-                    )
+            `;
+                    })
                     .join('');
 
                 updateSummary();
@@ -462,34 +479,66 @@
 
             function renderRecommended() {
                 document.getElementById('recommended-products').innerHTML = recommendedProducts
-                    .map(
-                        (p) => {
-                            // Get primary image (support both old single image and new images array)
-                            let pImage = 'product-1.png';
-                            if (p.images && Array.isArray(p.images)) {
-                                pImage = p.images[0];
-                            } else if (p.image) {
-                                pImage = p.image;
-                            }
-                            return `
+                    .map((p) => {
+                        // Get primary image (support both old single image and new images array)
+                        let pImage = 'product-1.png';
+                        if (p.images && Array.isArray(p.images)) {
+                            pImage = p.images[0];
+                        } else if (p.image) {
+                            pImage = p.image;
+                        }
+                        const safeTitle = sanitizeHTML(p.title);
+                        const safeCategory = sanitizeHTML(p.category);
+                        return `
                 <div class="product-card">
                     <a href="/product?id=${p.id}" class="product-image-wrapper">
-                        <img src="${pImage}" alt="${p.title}" class="product-image">
-                    </a>`
+                        <img src="${pImage}" alt="${safeTitle}" class="product-image" onerror="this.src='product-1.png'" loading="lazy">
+                    </a>
                     <a href="/product?id=${p.id}">
                         <div class="product-info">
-                            <h3 class="product-title">${p.title}</h3>
-                            <span class="product-price">£${p.price.toFixed(2)}</span>
+                            <h3 class="product-title">${safeTitle}</h3>
+                            <span class="product-price">${formatPrice(p.price)}</span>
                         </div>
-                        <p class="product-category">${p.category}</p>
+                        <p class="product-category">${safeCategory}</p>
                     </a>
                 </div>
-            `;}
-                    )
+            `;
+                    })
                     .join('');
             }
 
+            // Utility: Sanitize HTML to prevent XSS
+            function sanitizeHTML(str) {
+                if (!str) return '';
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            // Utility: Format price consistently
+            function formatPrice(price) {
+                return `£${parseFloat(price).toFixed(2)}`;
+            }
+
             document.addEventListener('DOMContentLoaded', () => {
+                // Check if state is available (main.js loaded)
+                if (typeof state === 'undefined') {
+                    console.error('State not loaded. Waiting for main.js...');
+                    // Retry after a short delay
+                    setTimeout(() => {
+                        if (typeof state !== 'undefined') {
+                            renderCartPage();
+                            renderRecommended();
+                        } else {
+                            container.innerHTML =
+                                '<div class="p-8 text-center text-red-500">Error loading cart. Please refresh the page.</div>';
+                        }
+                    }, 100);
+                    return;
+                }
                 renderCartPage();
                 renderRecommended();
             });

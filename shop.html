@@ -3,10 +3,29 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Shop | 1 HUNDRED</title>
+        <title>Shop | 1 HUNDRED - Premium Streetwear</title>
         <meta
             name="description"
-            content="Shop the latest collection at 1 HUNDRED. Premium streetwear and fashion essentials." />
+            content="Shop the latest collection at 1 HUNDRED. Premium streetwear, hoodies, hats, and fashion essentials. No half measures." />
+        <meta name="keywords" content="shop, streetwear, hoodies, hats, tops, premium clothing, urban fashion" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://1hundred.com/shop" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://1hundred.com/shop" />
+        <meta property="og:title" content="Shop | 1 HUNDRED" />
+        <meta property="og:description" content="Shop premium streetwear and fashion essentials. No half measures." />
+        <meta property="og:image" content="https://1hundred.com/hero-image.png" />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:title" content="Shop | 1 HUNDRED" />
+        <meta
+            property="twitter:description"
+            content="Shop premium streetwear and fashion essentials. No half measures." />
+        <meta name="theme-color" content="#111111" />
 
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -495,17 +514,25 @@
             </div>
         </footer>
 
+        <!-- Supabase -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+        <script src="supabase.js"></script>
         <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
-            // Extended product data for shop page
-            const allProducts = [
+            // Products will be loaded from Supabase
+            let allProducts = [];
+            let useSupabaseProducts = false;
+
+            // Fallback product data (used if Supabase is not available)
+            const fallbackProducts = [
                 {
                     id: 3,
                     title: '1H Star Cap',
                     price: 30,
                     category: 'hats',
                     image: 'product-3.png',
+                    images: ['product-3.png'],
                     sizes: ['One Size'],
                     colors: ['White/Black'],
                     isNew: true
@@ -516,6 +543,7 @@
                     price: 85,
                     category: 'hoodies',
                     image: 'product-4.jpeg',
+                    images: ['product-4.jpeg'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Black'],
                     isNew: false
@@ -526,6 +554,7 @@
                     price: 85,
                     category: 'hoodies',
                     image: 'product-5.jpeg',
+                    images: ['product-5.jpeg'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Blue'],
                     isNew: true
@@ -536,6 +565,7 @@
                     price: 30,
                     category: 'hats',
                     image: 'product-6.jpeg',
+                    images: ['product-6.jpeg'],
                     sizes: ['One Size'],
                     colors: ['White/Black'],
                     isNew: false
@@ -546,11 +576,49 @@
                     price: 40,
                     category: 'tops',
                     image: 'product-relentless-front.png',
+                    images: ['product-relentless-front.png', 'product-relentless-back.png'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Grey'],
                     isNew: true
                 }
             ];
+
+            // Initialize products from Supabase
+            async function initShopProducts() {
+                if (typeof ProductAPI !== 'undefined') {
+                    try {
+                        const { data, error } = await ProductAPI.getAll();
+                        if (data && data.length > 0) {
+                            allProducts = data.map((p) => ({
+                                id: p.id,
+                                title: p.title,
+                                price: p.price,
+                                category: p.category?.toLowerCase() || 'uncategorized',
+                                image: p.image || (p.images && p.images[0]) || 'product-1.png',
+                                images: p.images || [p.image],
+                                sizes: p.sizes || ['S', 'M', 'L', 'XL'],
+                                colors: p.colors || ['Default'],
+                                isNew: p.id > 5 // Simple heuristic for demo
+                            }));
+                            useSupabaseProducts = true;
+                            console.log('✅ Shop: Products loaded from Supabase:', allProducts.length);
+                            renderProducts();
+                            updateProductCount();
+                        } else {
+                            throw new Error('No products in Supabase');
+                        }
+                    } catch (err) {
+                        console.log('⚠️ Shop: Using fallback products:', err.message);
+                        allProducts = [...fallbackProducts];
+                        renderProducts();
+                        updateProductCount();
+                    }
+                } else {
+                    allProducts = [...fallbackProducts];
+                    renderProducts();
+                    updateProductCount();
+                }
+            }
 
             let currentFilters = {
                 categories: [],
@@ -657,17 +725,23 @@
                 } else {
                     container.innerHTML = filtered
                         .map((product) => {
-                            // Get primary image (support both old single image and new images array)
+                            // Get primary image (support local files and Supabase Storage)
                             let primaryImage = 'product-1.png';
-                            if (product.images && Array.isArray(product.images)) {
-                                primaryImage = product.images[0];
+                            if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+                                primaryImage =
+                                    typeof getProductImageUrl !== 'undefined'
+                                        ? getProductImageUrl(product.images[0])
+                                        : product.images[0];
                             } else if (product.image) {
-                                primaryImage = product.image;
+                                primaryImage =
+                                    typeof getProductImageUrl !== 'undefined'
+                                        ? getProductImageUrl(product.image)
+                                        : product.image;
                             }
                             return `
                     <div class="product-card">
                         <div class="product-image-wrapper" onclick="openQuickView(${product.id})">
-                            <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy">
+                            <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
                             ${product.isNew ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
                             <button class="wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}" data-product-id="${product.id}" onclick="event.stopPropagation(); toggleWishlist(${product.id})">
                                 <i data-lucide="heart" class="w-4 h-4" style="fill: ${isInWishlist(product.id) ? 'currentColor' : 'none'}"></i>
@@ -806,11 +880,11 @@
             });
 
             // Initialize
-            document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('DOMContentLoaded', async () => {
                 parseUrlParams();
                 setupFilters();
                 updateFilterCheckboxes();
-                renderProducts();
+                await initShopProducts();
                 // Mark initialization complete
                 isInitializing = false;
             });

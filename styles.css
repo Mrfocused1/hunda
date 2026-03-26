@@ -1475,6 +1475,33 @@ body {
     opacity: 1;
 }
 
+/* Toast types */
+#toast.error {
+    background: #dc2626;
+    color: white;
+}
+
+#toast.warning {
+    background: #f59e0b;
+    color: white;
+}
+
+#toast.info {
+    background: #3b82f6;
+    color: white;
+}
+
+/* Loading spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
 /* ========================================
    EMPTY STATES
    ======================================== */
