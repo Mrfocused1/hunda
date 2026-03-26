@@ -2,12 +2,80 @@
  * Admin Dashboard JavaScript
  *
  * Features:
- * - Product CRUD with localStorage persistence
- * - Order management
- * - Customer management
+ * - Product CRUD (hardcoded for now, Supabase coming soon)
+ * - Order management (localStorage)
+ * - Customer management (localStorage)
  * - Email automation settings
  * - Data export/import
  */
+
+// HARDCODED PRODUCTS - To be replaced with Supabase in future
+const HARDCODED_PRODUCTS = [
+    {
+        id: 1,
+        title: 'Racer Trophy Tee',
+        price: 45,
+        images: ['product-1.png'],
+        category: 'Tops',
+        stock: 25,
+        description: 'Premium cotton tee with racing-inspired graphics.'
+    },
+    {
+        id: 2,
+        title: 'Champions Engineered Tee',
+        price: 45,
+        images: ['product-2.png'],
+        category: 'Tops',
+        stock: 18,
+        description: 'Championship-inspired design on premium fabric.'
+    },
+    {
+        id: 3,
+        title: '1H Vintage Trucker Hat',
+        price: 35,
+        images: ['product-3.png'],
+        category: 'Hats',
+        stock: 12,
+        description: 'Vintage style trucker hat with embroidered logo.'
+    },
+    {
+        id: 4,
+        title: 'Silence Expression Hoodie',
+        price: 65,
+        images: ['product-4.jpeg'],
+        category: 'Hoodies',
+        stock: 8,
+        description: 'Premium hoodie with unique graphic design.'
+    },
+    {
+        id: 5,
+        title: 'Endless Possibilities Hoodie',
+        price: 65,
+        images: ['product-5.jpeg'],
+        category: 'Hoodies',
+        stock: 15,
+        description: 'Comfortable hoodie with motivational graphics.'
+    },
+    {
+        id: 6,
+        title: '1H Colorway Trucker Hat',
+        price: 35,
+        images: ['product-6.jpeg'],
+        category: 'Hats',
+        stock: 20,
+        description: 'Colorful trucker hat with 1H branding.'
+    },
+    {
+        id: 7,
+        title: 'Relentless Trophy Tee',
+        price: 40,
+        images: ['product-relentless-front.png', 'product-relentless-back.png'],
+        category: 'Tops',
+        stock: 25,
+        description:
+            'The Relentless Trophy Tee distills discipline into design. A monochrome composition of a faceless, armored figure holding its reward—symbolizing victory earned through persistence, not chance.\n\nRefined, understated, and intentional, this piece speaks to those who pursue excellence without compromise.\n\nEarned. Never given.'
+    }
+];
 
 // Check admin authentication
 (function checkAuth() {
@@ -17,131 +85,17 @@
     }
 })();
 
-// Check for legacy/mock data and warn user
-(function checkLegacyData() {
-    const products = JSON.parse(localStorage.getItem('1hundred_products') || '[]');
-    const orders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
-    const customers = JSON.parse(localStorage.getItem('1hundred_customers') || '[]');
-
-    // Check for sample/mock data patterns
-    const hasSampleProducts = products.some((p) =>
-        ['Racer Trophy Tee', 'Champions Engineered Tee', '1H Vintage Trucker Hat'].includes(p.title)
-    );
-
-    const hasSampleCustomers = customers.some((c) =>
-        ['James Wilson', 'Sarah Anderson', 'Michael Brown', 'Emma Davis'].includes(`${c.firstName} ${c.lastName}`)
-    );
-
-    const hasSampleOrders = orders.some((o) =>
-        ['James Wilson', 'Sarah Anderson', 'Michael Brown', 'Emma Davis'].includes(o.customer)
-    );
-
-    if (hasSampleProducts || hasSampleCustomers || hasSampleOrders) {
-        console.warn('⚠️ LEGACY MOCK DATA DETECTED');
-        console.warn('Sample/mock data from previous version detected in localStorage.');
-        console.warn('To clear this data, click "Clear All Data" in the left sidebar.');
-
-        // Show toast notification
-        setTimeout(() => {
-            if (typeof showToast === 'function') {
-                showToast('⚠️ Mock data detected. Click "Clear All Data" in sidebar to reset.');
-            }
-        }, 2000);
-    }
-})();
-
 // Admin Data Management
 const AdminData = {
-    // Get products from localStorage or use defaults
+    // Get products - returns hardcoded array (Supabase coming soon)
     getProducts: function () {
-        const stored = localStorage.getItem('1hundred_products');
-        // Default products
-        const defaults = [
-            {
-                id: 1,
-                title: 'Racer Trophy Tee',
-                price: 45,
-                images: ['product-1.png'],
-                category: 'Tops',
-                stock: 25,
-                description: 'Premium cotton tee with racing-inspired graphics.'
-            },
-            {
-                id: 2,
-                title: 'Champions Engineered Tee',
-                price: 45,
-                images: ['product-2.png'],
-                category: 'Tops',
-                stock: 18,
-                description: 'Championship-inspired design on premium fabric.'
-            },
-            {
-                id: 3,
-                title: '1H Vintage Trucker Hat',
-                price: 35,
-                images: ['product-3.png'],
-                category: 'Hats',
-                stock: 12,
-                description: 'Vintage style trucker hat with embroidered logo.'
-            },
-            {
-                id: 4,
-                title: 'Silence Expression Hoodie',
-                price: 65,
-                images: ['product-4.jpeg'],
-                category: 'Hoodies',
-                stock: 8,
-                description: 'Premium hoodie with unique graphic design.'
-            },
-            {
-                id: 5,
-                title: 'Endless Possibilities Hoodie',
-                price: 65,
-                images: ['product-5.jpeg'],
-                category: 'Hoodies',
-                stock: 15,
-                description: 'Comfortable hoodie with motivational graphics.'
-            },
-            {
-                id: 6,
-                title: '1H Colorway Trucker Hat',
-                price: 35,
-                images: ['product-6.jpeg'],
-                category: 'Hats',
-                stock: 20,
-                description: 'Colorful trucker hat with 1H branding.'
-            },
-            {
-                id: 7,
-                title: 'Relentless Trophy Tee',
-                price: 40,
-                images: ['product-relentless-front.png', 'product-relentless-back.png'],
-                category: 'Tops',
-                stock: 25,
-                description:
-                    'The Relentless Trophy Tee distills discipline into design. A monochrome composition of a faceless, armored figure holding its reward—symbolizing victory earned through persistence, not chance.\n\nRefined, understated, and intentional, this piece speaks to those who pursue excellence without compromise.\n\nEarned. Never given.'
-            }
-        ];
-
-        if (stored) {
-            // Merge stored products with any new defaults
-            const storedProducts = JSON.parse(stored);
-            const storedIds = new Set(storedProducts.map((p) => p.id));
-            const newDefaults = defaults.filter((p) => !storedIds.has(p.id));
-            if (newDefaults.length > 0) {
-                const merged = [...storedProducts, ...newDefaults];
-                this.saveProducts(merged);
-                return merged;
-            }
-            return storedProducts;
-        }
-
-        this.saveProducts(defaults);
-        return defaults;
+        return HARDCODED_PRODUCTS;
     },
 
+    // Save products - shows warning since products are hardcoded
     saveProducts: function (products) {
-        localStorage.setItem('1hundred_products', JSON.stringify(products));
+        console.warn('Products are currently hardcoded. Changes will not persist until Supabase is connected.');
+        // In future: save to Supabase
     },
 
     getOrders: function () {
@@ -643,7 +597,6 @@ function saveProduct(event) {
     event.preventDefault();
 
     const id = document.getElementById('product-id').value;
-    const products = AdminData.getProducts();
 
     // Use current images or default
     let images = currentProductImages.length > 0 ? currentProductImages : ['product-1.png'];
@@ -658,21 +611,9 @@ function saveProduct(event) {
         description: document.getElementById('product-description').value
     };
 
-    if (id) {
-        // Update existing
-        const index = products.findIndex((p) => p.id === parseInt(id));
-        if (index !== -1) {
-            products[index] = productData;
-        }
-    } else {
-        // Add new
-        products.push(productData);
-    }
-
-    AdminData.saveProducts(products);
+    // For now, products are hardcoded - show demo message
+    showToast('⚠️ Products are hardcoded. Edit admin.js to add new products. Supabase coming soon!');
     closeProductModal();
-    loadProducts();
-    showToast('Product saved successfully');
 }
 
 function editProduct(id) {
@@ -682,10 +623,8 @@ function editProduct(id) {
 function deleteProduct(id) {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
-    const products = AdminData.getProducts().filter((p) => p.id !== id);
-    AdminData.saveProducts(products);
-    loadProducts();
-    showToast('Product deleted');
+    // For now, products are hardcoded
+    showToast('⚠️ Products are hardcoded and cannot be deleted. Supabase coming soon!');
 }
 
 // Orders Management

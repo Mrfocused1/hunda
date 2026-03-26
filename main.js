@@ -13,13 +13,14 @@ const state = {
 };
 
 // --- PRODUCT DATA ---
+// HARDCODED PRODUCTS - To be replaced with Supabase in future
 const products = [
     {
         id: 1,
         title: 'Racer Trophy Tee',
         price: 45,
         category: 'Tops',
-        image: 'product-1.png',
+        images: ['product-1.png'],
         sizes: ['S', 'M', 'L', 'XL'],
         colors: ['Grey']
     },
@@ -28,7 +29,7 @@ const products = [
         title: 'Champions Engineered Tee',
         price: 45,
         category: 'Tops',
-        image: 'product-2.png',
+        images: ['product-2.png'],
         sizes: ['S', 'M', 'L', 'XL'],
         colors: ['Grey']
     },
@@ -37,7 +38,7 @@ const products = [
         title: '1H Vintage Trucker Hat',
         price: 35,
         category: 'Hats',
-        image: 'product-3.png',
+        images: ['product-3.png'],
         sizes: ['One Size'],
         colors: ['White/Black']
     },
@@ -46,7 +47,7 @@ const products = [
         title: 'Silence Expression Hoodie',
         price: 65,
         category: 'Hoodies',
-        image: 'product-4.jpeg',
+        images: ['product-4.jpeg'],
         sizes: ['S', 'M', 'L', 'XL'],
         colors: ['Black']
     },
@@ -55,7 +56,7 @@ const products = [
         title: 'Endless Possibilities Hoodie',
         price: 65,
         category: 'Hoodies',
-        image: 'product-5.jpeg',
+        images: ['product-5.jpeg'],
         sizes: ['S', 'M', 'L', 'XL'],
         colors: ['Blue']
     },
@@ -64,7 +65,7 @@ const products = [
         title: '1H Colorway Trucker Hat',
         price: 35,
         category: 'Hats',
-        image: 'product-6.jpeg',
+        images: ['product-6.jpeg'],
         sizes: ['One Size'],
         colors: ['White/Black']
     },
