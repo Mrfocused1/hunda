@@ -1362,6 +1362,33 @@ function handleImport(event) {
     reader.readAsText(file);
 }
 
+// Clear All Data
+function clearAllData() {
+    if (
+        !confirm(
+            'Are you sure you want to clear ALL data?\n\nThis will delete:\n- All products\n- All orders\n- All customers\n- All email settings\n- All store settings\n\nThis action cannot be undone!'
+        )
+    ) {
+        return;
+    }
+
+    // Clear all localStorage items
+    localStorage.removeItem('1hundred_products');
+    localStorage.removeItem('1hundred_orders');
+    localStorage.removeItem('1hundred_customers');
+    localStorage.removeItem('1hundred_email_settings');
+    localStorage.removeItem('1hundred_email_templates');
+    localStorage.removeItem('1hundred_email_activity');
+    localStorage.removeItem('1hundred_store_content');
+
+    showToast('All data cleared successfully');
+
+    // Reload the current section to show empty state
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
 // Logout
 function logoutAdmin() {
     sessionStorage.removeItem('1hundred_admin_session');
