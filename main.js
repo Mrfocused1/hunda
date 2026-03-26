@@ -27,7 +27,7 @@ const products = [
     {
         id: 4,
         title: 'Silence Expression Hoodie',
-        price: 65,
+        price: 85,
         category: 'Hoodies',
         images: ['product-4.jpeg'],
         sizes: ['S', 'M', 'L', 'XL'],

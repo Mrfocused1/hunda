@@ -23,7 +23,7 @@ const HARDCODED_PRODUCTS = [
     {
         id: 4,
         title: 'Silence Expression Hoodie',
-        price: 65,
+        price: 85,
         images: ['product-4.jpeg'],
         category: 'Hoodies',
         stock: 8,
