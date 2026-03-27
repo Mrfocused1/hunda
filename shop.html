@@ -602,10 +602,6 @@
                             }));
                             useSupabaseProducts = true;
                             console.log('✅ Shop: Products loaded from Supabase:', allProducts.length);
-                            console.log(
-                                'Product images:',
-                                allProducts.map((p) => ({ id: p.id, title: p.title, image: p.image, images: p.images }))
-                            );
                             renderProducts();
                             updateProductCount();
                         } else {
@@ -731,7 +727,6 @@
                         .map((product) => {
                             // Get primary image (support local files and Supabase Storage)
                             let primaryImage = 'product-1.png';
-                            console.log('Product:', product.title, 'Image:', product.image, 'Images:', product.images);
                             if (product.images && Array.isArray(product.images) && product.images.length > 0) {
                                 primaryImage =
                                     typeof getProductImageUrl !== 'undefined'
@@ -743,7 +738,6 @@
                                         ? getProductImageUrl(product.image)
                                         : product.image;
                             }
-                            console.log('Selected primaryImage:', primaryImage);
                             return `
                     <div class="product-card">
                         <div class="product-image-wrapper" onclick="openQuickView(${product.id})">
