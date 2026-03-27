@@ -601,6 +601,10 @@
                                 isNew: p.id > 5 // Simple heuristic for demo
                             }));
                             useSupabaseProducts = true;
+                            // Sync with global products array for addToCart
+                            if (typeof products !== 'undefined') {
+                                products = [...allProducts];
+                            }
                             // Shop: Products loaded from Supabase
                             renderProducts();
                             updateProductCount();
@@ -610,11 +614,19 @@
                     } catch (err) {
                         // Shop: Using fallback products
                         allProducts = [...fallbackProducts];
+                        // Sync with global products array for addToCart
+                        if (typeof products !== 'undefined') {
+                            products = [...allProducts];
+                        }
                         renderProducts();
                         updateProductCount();
                     }
                 } else {
                     allProducts = [...fallbackProducts];
+                    // Sync with global products array for addToCart
+                    if (typeof products !== 'undefined') {
+                        products = [...allProducts];
+                    }
                     renderProducts();
                     updateProductCount();
                 }
