@@ -485,25 +485,58 @@ function openQuickView(productId) {
 
     // Render sizes
     const sizeContainer = document.getElementById('qv-sizes');
+    const sizeLabel = document.querySelector('#qv-sizes')?.previousElementSibling;
+
     if (sizeContainer) {
-        sizeContainer.innerHTML = product.sizes
-            .map(
-                (size) => `
-            <button class="size-option" data-size="${size}" onclick="selectQVSize('${size}')">${size}</button>
-        `
-            )
-            .join('');
+        // Check if only one size (auto-select it)
+        if (product.sizes.length === 1) {
+            const size = product.sizes[0];
+            sizeContainer.innerHTML = `
+                <div class="size-option active" data-size="${size}" style="cursor: default; opacity: 0.7;">${size}</div>
+            `;
+            modal.dataset.selectedSize = size;
+            // Hide the "Select Size" label or change it
+            if (sizeLabel) sizeLabel.innerHTML = '<span>Size</span>';
+        } else {
+            // Multiple sizes - render clickable buttons
+            sizeContainer.innerHTML = product.sizes
+                .map(
+                    (size) => `
+                <button class="size-option" data-size="${size}">${size}</button>
+            `
+                )
+                .join('');
+            modal.dataset.selectedSize = '';
+            if (sizeLabel) sizeLabel.innerHTML = '<span>Select Size</span> <span class="text-red-500">*</span>';
+        }
     }
 
     // Store current product
     modal.dataset.productId = productId;
-    modal.dataset.selectedSize = '';
 
     // Show modal
     overlay.classList.remove('invisible', 'opacity-0');
     modal.classList.remove('scale-95', 'opacity-0');
     modal.classList.add('scale-100', 'opacity-100');
     document.body.style.overflow = 'hidden';
+
+    // Attach CSP-compatible event listeners to size buttons (for multiple sizes)
+    if (sizeContainer && product.sizes.length > 1) {
+        sizeContainer.querySelectorAll('.size-option').forEach((btn) => {
+            btn.addEventListener('click', function () {
+                const size = this.dataset.size;
+                modal.dataset.selectedSize = size;
+
+                // Update visual state
+                sizeContainer.querySelectorAll('.size-option').forEach((b) => {
+                    b.classList.toggle('active', b.dataset.size === size);
+                });
+
+                // Clear any error state
+                sizeContainer.classList.remove('size-error');
+            });
+        });
+    }
 }
 
 function closeQuickView() {
@@ -533,10 +566,23 @@ function addToCartFromQV(btn) {
 
     const productId = parseInt(modal.dataset.productId);
     const size = modal.dataset.selectedSize;
+    const sizeContainer = document.getElementById('qv-sizes');
 
     if (!size) {
+        // Show visual red error on size selector
+        if (sizeContainer) {
+            sizeContainer.classList.add('size-error');
+            // Add shake animation
+            sizeContainer.style.animation = 'shake 0.3s ease-in-out';
+            setTimeout(() => {
+                sizeContainer.style.animation = '';
+            }, 300);
+        }
         showToast('Please select a size', 'warning');
         return;
+    } else {
+        // Clear error state
+        if (sizeContainer) sizeContainer.classList.remove('size-error');
     }
 
     // Show loading state

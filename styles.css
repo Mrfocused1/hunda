@@ -1595,3 +1595,34 @@ body {
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
+
+/* ========================================
+   SIZE SELECTOR ERROR STATE
+   ======================================== */
+
+.size-error .size-option {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 2px rgb(239 68 68 / 30%);
+}
+
+.size-error::before {
+    content: 'Please select a size';
+    display: block;
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
