@@ -809,60 +809,64 @@
                 document.getElementById('trending-scroll').scrollBy({ left: 300, behavior: 'smooth' });
             });
 
-            // Add to Bag button handler (CSP-compatible)
-            document.getElementById('qv-add-to-bag-btn')?.addEventListener('click', function () {
-                const modal = document.getElementById('quick-view-modal');
-                if (!modal) return;
-
-                const productId = parseInt(modal.dataset.productId);
-                const size = modal.dataset.selectedSize;
-
-                if (!size) {
-                    if (typeof showToast !== 'undefined') {
-                        showToast('Please select a size', 'warning');
-                    }
-                    return;
-                }
-
-                // Show loading state
-                const btn = this;
-                const originalText = btn.textContent;
-                btn.textContent = 'Adding...';
-                btn.disabled = true;
-
-                // Get product info
-                const product = typeof products !== 'undefined' ? products.find((p) => p.id === productId) : null;
-                const productTitle = product ? product.title : 'Item';
-
-                // Add to cart using global function
-                if (typeof addToCart !== 'undefined') {
-                    addToCart(productId, size, 'Black', 1);
-
-                    // Close quick view
-                    if (typeof closeQuickView !== 'undefined') {
-                        closeQuickView();
-                    }
-
-                    // Show success
-                    setTimeout(() => {
-                        if (typeof showToast !== 'undefined') {
-                            showToast(productTitle + ' added to bag', 'success');
-                        }
-                        if (typeof toggleCart !== 'undefined') {
-                            toggleCart(true);
-                        }
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }, 100);
-                } else {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                }
-            });
-
             // Initialize
             document.addEventListener('DOMContentLoaded', () => {
                 renderNewArrivals();
+
+                // Add to Bag button handler (CSP-compatible)
+                const addToBagBtn = document.getElementById('qv-add-to-bag-btn');
+                if (addToBagBtn) {
+                    addToBagBtn.addEventListener('click', function () {
+                        const modal = document.getElementById('quick-view-modal');
+                        if (!modal) return;
+
+                        const productId = parseInt(modal.dataset.productId);
+                        const size = modal.dataset.selectedSize;
+
+                        if (!size) {
+                            if (typeof showToast !== 'undefined') {
+                                showToast('Please select a size', 'warning');
+                            }
+                            return;
+                        }
+
+                        // Show loading state
+                        const btn = this;
+                        const originalText = btn.textContent;
+                        btn.textContent = 'Adding...';
+                        btn.disabled = true;
+
+                        // Get product info
+                        const product =
+                            typeof products !== 'undefined' ? products.find((p) => p.id === productId) : null;
+                        const productTitle = product ? product.title : 'Item';
+
+                        // Add to cart using global function
+                        if (typeof addToCart !== 'undefined') {
+                            addToCart(productId, size, 'Black', 1);
+
+                            // Close quick view
+                            if (typeof closeQuickView !== 'undefined') {
+                                closeQuickView();
+                            }
+
+                            // Show success
+                            setTimeout(() => {
+                                if (typeof showToast !== 'undefined') {
+                                    showToast(productTitle + ' added to bag', 'success');
+                                }
+                                if (typeof toggleCart !== 'undefined') {
+                                    toggleCart(true);
+                                }
+                                btn.textContent = originalText;
+                                btn.disabled = false;
+                            }, 100);
+                        } else {
+                            btn.textContent = originalText;
+                            btn.disabled = false;
+                        }
+                    });
+                }
             });
         </script>
     </body>
