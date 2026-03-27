@@ -88,7 +88,7 @@ async function testLiveSite() {
 
         // Click Add to Bag button
         console.log('\n5. Clicking Add to Bag button...');
-        const addButton = await page.$('button[onclick="addToCartFromQV()"]');
+        const addButton = await page.$('#qv-add-to-bag-btn');
         if (!addButton) {
             console.log('   ERROR: Add to Bag button not found!');
             await browser.close();
