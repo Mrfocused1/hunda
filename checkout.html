@@ -278,39 +278,39 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Email *</label>
-                                    <input type="email" class="form-input" required />
+                                    <label class="form-label" for="checkout-email">Email *</label>
+                                    <input type="email" class="form-input" id="checkout-email" required />
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Phone *</label>
-                                    <input type="tel" class="form-input" required />
+                                    <label class="form-label" for="checkout-phone">Phone *</label>
+                                    <input type="tel" class="form-input" id="checkout-phone" required />
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Address Line 1 *</label>
-                                    <input type="text" class="form-input" required />
+                                    <label class="form-label" for="checkout-address1">Address Line 1 *</label>
+                                    <input type="text" class="form-input" id="checkout-address1" required />
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Address Line 2</label>
-                                    <input type="text" class="form-input" />
+                                    <label class="form-label" for="checkout-address2">Address Line 2</label>
+                                    <input type="text" class="form-input" id="checkout-address2" />
                                 </div>
 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label class="form-label">City *</label>
-                                        <input type="text" class="form-input" required />
+                                        <label class="form-label" for="checkout-city">City *</label>
+                                        <input type="text" class="form-input" id="checkout-city" required />
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Postcode *</label>
-                                        <input type="text" class="form-input" required />
+                                        <label class="form-label" for="checkout-postcode">Postcode *</label>
+                                        <input type="text" class="form-input" id="checkout-postcode" required />
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Country *</label>
-                                    <select class="form-input">
+                                    <label class="form-label" for="checkout-country">Country *</label>
+                                    <select class="form-input" id="checkout-country">
                                         <option>United Kingdom</option>
                                         <option>United States</option>
                                         <option>Canada</option>
@@ -388,10 +388,11 @@
 
                             <div id="card-form">
                                 <div class="form-group">
-                                    <label class="form-label">Card Number *</label>
+                                    <label class="form-label" for="checkout-cardnumber">Card Number *</label>
                                     <div class="relative">
                                         <input
                                             type="text"
+                                            id="checkout-cardnumber"
                                             class="form-input pl-12"
                                             placeholder="1234 5678 9012 3456"
                                             maxlength="19" />
@@ -403,13 +404,23 @@
 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label class="form-label">Expiry Date *</label>
-                                        <input type="text" class="form-input" placeholder="MM/YY" maxlength="5" />
+                                        <label class="form-label" for="checkout-expiry">Expiry Date *</label>
+                                        <input
+                                            type="text"
+                                            class="form-input"
+                                            id="checkout-expiry"
+                                            placeholder="MM/YY"
+                                            maxlength="5" />
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">CVV *</label>
+                                        <label class="form-label" for="checkout-cvv">CVV *</label>
                                         <div class="relative">
-                                            <input type="text" class="form-input" placeholder="123" maxlength="3" />
+                                            <input
+                                                type="text"
+                                                class="form-input"
+                                                id="checkout-cvv"
+                                                placeholder="123"
+                                                maxlength="3" />
                                             <i
                                                 data-lucide="help-circle"
                                                 class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
@@ -418,8 +429,12 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Name on Card *</label>
-                                    <input type="text" class="form-input" placeholder="JOHN SMITH" />
+                                    <label class="form-label" for="checkout-cardname">Name on Card *</label>
+                                    <input
+                                        type="text"
+                                        class="form-input"
+                                        id="checkout-cardname"
+                                        placeholder="JOHN SMITH" />
                                 </div>
                             </div>
 
@@ -480,8 +495,8 @@
                             <div class="flex items-start gap-2 mb-8">
                                 <input type="checkbox" id="terms" class="w-4 h-4 mt-0.5" required />
                                 <label for="terms" class="text-sm text-gray-600">
-                                    I agree to the <a href="#" class="underline">Terms & Conditions</a> and
-                                    <a href="#" class="underline">Privacy Policy</a>
+                                    I agree to the <a href="/terms" class="underline">Terms & Conditions</a> and
+                                    <a href="/privacy" class="underline">Privacy Policy</a>
                                 </label>
                             </div>
 
@@ -567,21 +582,36 @@
                         <h4 class="font-bold mb-4">Help</h4>
                         <ul class="space-y-2 text-sm text-gray-400">
                             <li><a href="/about" class="hover:text-white transition-colors">About Us</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Shipping</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Returns</a></li>
+                            <li><a href="/help" class="hover:text-white transition-colors">Contact</a></li>
+                            <li><a href="/delivery" class="hover:text-white transition-colors">Shipping</a></li>
+                            <li><a href="/delivery" class="hover:text-white transition-colors">Returns</a></li>
                         </ul>
                     </div>
                     <div>
                         <h4 class="font-bold mb-4">Connect</h4>
                         <div class="flex gap-4">
-                            <a href="#" class="text-gray-400 hover:text-white transition-colors" aria-label="Instagram">
+                            <a
+                                href="https://instagram.com/1hundred.uk"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-gray-400 hover:text-white transition-colors"
+                                aria-label="Instagram">
                                 <i data-lucide="instagram" class="w-5 h-5"></i>
                             </a>
-                            <a href="#" class="text-gray-400 hover:text-white transition-colors" aria-label="Twitter">
+                            <a
+                                href="https://twitter.com/1hundreduk"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-gray-400 hover:text-white transition-colors"
+                                aria-label="Twitter">
                                 <i data-lucide="twitter" class="w-5 h-5"></i>
                             </a>
-                            <a href="#" class="text-gray-400 hover:text-white transition-colors" aria-label="TikTok">
+                            <a
+                                href="https://tiktok.com/@1hundred.uk"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-gray-400 hover:text-white transition-colors"
+                                aria-label="TikTok">
                                 <i data-lucide="music-2" class="w-5 h-5"></i>
                             </a>
                         </div>

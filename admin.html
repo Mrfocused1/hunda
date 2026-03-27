@@ -2500,12 +2500,12 @@
                     <div class="modal-body">
                         <input type="hidden" id="product-id" />
                         <div class="form-group">
-                            <label class="form-label">Product Name *</label>
+                            <label class="form-label" for="product-title">Product Name *</label>
                             <input type="text" class="form-input" id="product-title" required />
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Price *</label>
+                                <label class="form-label" for="product-price">Price *</label>
                                 <input
                                     type="number"
                                     class="form-input"
@@ -2515,7 +2515,7 @@
                                     required />
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Category *</label>
+                                <label class="form-label" for="product-category">Category *</label>
                                 <select class="form-input" id="product-category" required>
                                     <option value="Tops">Tops</option>
                                     <option value="Hoodies">Hoodies</option>
@@ -2724,12 +2724,21 @@
                                         "
                                         >Recent Orders</label
                                     >
-                                    <a
-                                        href="#"
+                                    <button
+                                        type="button"
                                         id="customer-view-all-orders"
-                                        style="font-size: 0.75rem; color: #111; text-decoration: underline"
-                                        >View All</a
-                                    >
+                                        style="
+                                            font-size: 0.75rem;
+                                            color: #111;
+                                            text-decoration: underline;
+                                            background: none;
+                                            border: none;
+                                            cursor: pointer;
+                                            padding: 0;
+                                        "
+                                        onclick="switchTab('orders')">
+                                        View All
+                                    </button>
                                 </div>
                                 <div class="customer-orders-list" id="customer-modal-orders-list">
                                     <!-- Orders rendered here -->
@@ -2758,20 +2767,20 @@
                     <div class="modal-body">
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">First Name</label>
+                                <label class="form-label" for="new-customer-firstname">First Name</label>
                                 <input type="text" class="form-input" id="new-customer-firstname" required />
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Last Name</label>
+                                <label class="form-label" for="new-customer-lastname">Last Name</label>
                                 <input type="text" class="form-input" id="new-customer-lastname" required />
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Email *</label>
+                            <label class="form-label" for="new-customer-email">Email *</label>
                             <input type="email" class="form-input" id="new-customer-email" required />
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Phone</label>
+                            <label class="form-label" for="new-customer-phone">Phone</label>
                             <input type="tel" class="form-input" id="new-customer-phone" />
                         </div>
                         <div class="form-group">
@@ -2810,11 +2819,11 @@
                 <div class="modal-body">
                     <input type="hidden" id="email-template-type" />
                     <div class="form-group">
-                        <label class="form-label">Subject Line</label>
+                        <label class="form-label" for="email-template-subject">Subject Line</label>
                         <input type="text" class="form-input" id="email-template-subject" />
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Email Body</label>
+                        <label class="form-label" for="email-template-body">Email Body</label>
                         <p class="text-xs text-gray-500 mb-2">
                             Use {{firstName}}, {{orderNumber}}, {{total}} as placeholders
                         </p>

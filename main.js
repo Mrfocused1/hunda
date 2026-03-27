@@ -86,12 +86,12 @@ async function initProducts() {
                     sizes: p.sizes || ['S', 'M', 'L', 'XL'],
                     colors: p.colors || ['Default']
                 }));
-                console.log('✅ Products loaded from Supabase:', products.length);
+                // Products loaded from Supabase
             } else {
-                console.log('ℹ️ No products in Supabase, using fallback data');
+                // No products in Supabase, using fallback data
             }
         } catch (err) {
-            console.log('⚠️ Could not load from Supabase, using fallback data:', err.message);
+            // Could not load from Supabase, using fallback data
         }
     }
 

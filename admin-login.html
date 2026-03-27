@@ -103,7 +103,7 @@
                             id="email"
                             name="email"
                             class="form-input"
-                            placeholder="admin@1hundred.com"
+                            placeholder="Enter your admin email"
                             required
                             autocomplete="email" />
                     </div>
@@ -129,10 +129,6 @@
                         Back to Store
                     </a>
                 </div>
-
-                <div class="mt-8 pt-6 border-t border-gray-200 text-center">
-                    <p class="text-xs text-gray-400">Demo: admin@1hundred.com / admin123</p>
-                </div>
             </div>
         </div>
 
@@ -141,7 +137,9 @@
         <script src="supabase.js"></script>
         <script src="main.js?v=3"></script>
         <script>
-            // Admin credentials (in production, this would be backend authenticated)
+            // SECURITY WARNING: This is a demo implementation only.
+            // In production, authentication must be handled by a secure backend server.
+            // Never store credentials in client-side code.
             const ADMIN_CREDENTIALS = {
                 email: 'admin@1hundred.com',
                 password: 'admin123'

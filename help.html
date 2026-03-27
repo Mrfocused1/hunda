@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Help Centre | 1 HUNDRED</title>
+        <meta
+            name="description"
+            content="Get help with your 1 HUNDRED order. Find answers to frequently asked questions about shipping, returns, sizing, and more." />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://1hundred.com/help" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+        <meta name="theme-color" content="#111111" />
+
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body class="antialiased">
+        <!-- Page Loader -->
+        <div id="page-loader" class="page-loader">
+            <img src="logo.svg" alt="1 HUNDRED" />
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span id="toast-msg">Added to bag</span>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="menu-overlay" class="mobile-menu-overlay"></div>
+
+        <!-- Mobile Menu -->
+        <nav id="mobile-menu" class="mobile-menu">
+            <div class="mobile-menu-header">
+                <a href="/">
+                    <img src="logo.svg" alt="1 HUNDRED" class="h-8" />
+                </a>
+                <button id="menu-toggle-close" class="p-2">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="mobile-search">
+                <div class="relative">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        class="w-full bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm" />
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <a href="/shop" class="mobile-nav-link">Shop All</a>
+                <a href="/shop?new=true" class="mobile-nav-link">New In</a>
+                <a href="/about" class="mobile-nav-link">About Us</a>
+                <div class="border-t border-gray-200 mt-4 pt-4">
+                    <a href="/login" class="mobile-nav-link">
+                        <span>Sign In</span>
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </a>
+                    <a href="/wishlist" class="mobile-nav-link">
+                        <span>Wishlist</span>
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                    </a>
+                    <a href="/cart" class="mobile-nav-link">
+                        <span>Shopping Bag</span>
+                        <div class="flex items-center gap-2">
+                            <span id="cart-count-mobile" class="badge hidden">0</span>
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Cart Drawer -->
+        <div id="cart-overlay" class="mobile-menu-overlay"></div>
+        <aside
+            id="cart-drawer"
+            class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="font-display font-bold uppercase text-xl">Bag (<span id="mini-cart-count">0</span>)</h2>
+                <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="mini-cart-items" class="flex-1 overflow-y-auto p-6"></div>
+            <div class="p-6 border-t border-gray-100 bg-gray-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Subtotal</span>
+                    <span id="mini-cart-subtotal">£0.00</span>
+                </div>
+                <a href="/checkout" class="btn btn-primary btn-full mb-3">Checkout</a>
+                <a href="/cart" class="btn btn-secondary btn-full">View Bag</a>
+            </div>
+        </aside>
+
+        <!-- Header -->
+        <header id="main-header" class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+            <div class="container-main">
+                <div class="h-16 hidden lg:flex items-center justify-between">
+                    <a href="/" class="flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+                    <nav class="flex items-center gap-8">
+                        <a href="/shop" class="nav-link">Shop All</a>
+                        <a href="/shop?new=true" class="nav-link">New In</a>
+                        <a href="/about" class="nav-link">About Us</a>
+                    </nav>
+                    <div class="search-container">
+                        <i data-lucide="search" class="search-icon w-4 h-4"></i>
+                        <input type="text" placeholder="Search for items, brands..." class="search-input" />
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <a href="/login" class="header-action" aria-label="Sign In">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </a>
+                        <a href="/wishlist" class="header-action" aria-label="Wishlist">
+                            <i data-lucide="heart" class="w-5 h-5"></i>
+                            <span id="wishlist-count" class="badge hidden">0</span>
+                        </a>
+                        <button id="cart-trigger" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="h-16 lg:hidden flex items-center justify-between relative">
+                    <button id="menu-toggle" class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <a href="/" class="absolute left-1/2 -translate-x-1/2 flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+                    <div class="flex items-center gap-3">
+                        <button class="header-action" aria-label="Search">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                        </button>
+                        <button id="cart-trigger-mobile" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count-mobile-header" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="pt-16">
+            <!-- Hero Section -->
+            <section class="bg-black text-white py-16 md:py-24">
+                <div class="container-main px-4 text-center">
+                    <h1 class="text-4xl md:text-5xl font-display font-bold uppercase mb-4">Help Centre</h1>
+                    <p class="text-white/60 max-w-xl mx-auto">
+                        Find answers to your questions about orders, shipping, returns, and more.
+                    </p>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section class="py-16 md:py-24 px-4">
+                <div class="container-main max-w-4xl">
+                    <!-- Orders -->
+                    <div class="mb-12">
+                        <h2 class="text-2xl font-display font-bold uppercase mb-6 flex items-center gap-3">
+                            <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                            Orders
+                        </h2>
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h3 class="font-bold mb-2">How do I track my order?</h3>
+                                <p class="text-gray-600">
+                                    Once your order ships, you'll receive an email with tracking information. You can
+                                    also view order status in your account dashboard under "My Orders".
+                                </p>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h3 class="font-bold mb-2">Can I modify or cancel my order?</h3>
+                                <p class="text-gray-600">
+                                    We process orders quickly, but if you need to make changes, contact us immediately
+                                    at support@1hundred.com. Once shipped, orders cannot be modified.
+                                </p>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h3 class="font-bold mb-2">What payment methods do you accept?</h3>
+                                <p class="text-gray-600">
+                                    We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and
+                                    Apple Pay.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping -->
+                    <div class="mb-12">
+                        <h2 class="text-2xl font-display font-bold uppercase mb-6 flex items-center gap-3">
+                            <i data-lucide="truck" class="w-6 h-6"></i>
+                            Shipping
+                        </h2>
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h3 class="font-bold mb-2">How long does shipping take?</h3>
+                                <p class="text-gray-600">
+                                    UK orders: 2-4 business days. International orders: 5-10 business days. Express
+                                    shipping options available at checkout.
+                                </p>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h3 class="font-bold mb-2">Do you ship internationally?</h3>
+                                <p class="text-gray-600">
+                                    Yes, we ship worldwide. International orders may be subject to customs fees and
+                                    import duties depending on your country.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Returns -->
+                    <div class="mb-12">
+                        <h2 class="text-2xl font-display font-bold uppercase mb-6 flex items-center gap-3">
+                            <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+                            Returns & Exchanges
+                        </h2>
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h3 class="font-bold mb-2">What is your return policy?</h3>
+                                <p class="text-gray-600">
+                                    We accept returns within 14 days of delivery. Items must be unworn, unwashed, and
+                                    with all original tags attached. Sale items are final sale.
+                                </p>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h3 class="font-bold mb-2">How do I start a return?</h3>
+                                <p class="text-gray-600">
+                                    Contact us at support@1hundred.com with your order number. We'll provide a return
+                                    label and instructions. Refunds are processed within 5-7 business days.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="bg-gray-50 rounded-2xl p-8 md:p-12 text-center">
+                        <h2 class="text-2xl font-display font-bold uppercase mb-4">Still need help?</h2>
+                        <p class="text-gray-600 mb-6">Our customer service team is here to assist you.</p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a
+                                href="mailto:support@1hundred.com"
+                                class="btn btn-primary inline-flex items-center justify-center gap-2">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                                Email Us
+                            </a>
+                            <span class="text-gray-500 flex items-center justify-center">support@1hundred.com</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="container-main">
+                <div class="footer-grid">
+                    <div>
+                        <img src="logo.svg" alt="1 HUNDRED" class="h-10 mb-6" style="filter: brightness(0) invert(1)" />
+                        <p class="text-gray-400 text-sm max-w-xs">
+                            Premium streetwear for the modern individual. Designed in London, worn worldwide.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Shop</h4>
+                        <div class="footer-links">
+                            <a href="/shop" class="footer-link">Shop All</a>
+                            <a href="/shop?new=true" class="footer-link">New Arrivals</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Help</h4>
+                        <div class="footer-links">
+                            <a href="/help" class="footer-link">Help Centre</a>
+                            <a href="/delivery" class="footer-link">Delivery & Returns</a>
+                            <a href="/help" class="footer-link">Track Order</a>
+                            <a href="/about" class="footer-link">Our Story</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Legal</h4>
+                        <div class="footer-links">
+                            <a href="/privacy" class="footer-link">Privacy Policy</a>
+                            <a href="/terms" class="footer-link">Terms & Conditions</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="text-gray-500 text-sm">© 2026 1 HUNDRED Ltd. All rights reserved.</div>
+                    <div class="flex gap-6 text-sm">
+                        <a href="/privacy" class="footer-link">Privacy Policy</a>
+                        <a href="/terms" class="footer-link">Terms & Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+        <script src="supabase.js"></script>
+        <script src="main.js?v=3"></script>
+        <script src="auth.js"></script>
+    </body>
+</html>

@@ -86,15 +86,15 @@ async function initAdminSupabase() {
                 useSupabase = true;
                 if (data && data.length > 0) {
                     adminProducts = data;
-                    console.log('✅ Admin: Products loaded from Supabase:', adminProducts.length);
+                    // Admin: Products loaded from Supabase
                 } else {
-                    console.log('ℹ️ Admin: No products in Supabase yet, using fallback');
+                    // Admin: No products in Supabase yet, using fallback
                 }
             } else {
-                console.log('⚠️ Admin: Supabase error, using fallback:', error.message);
+                // Admin: Supabase error, using fallback
             }
         } catch (err) {
-            console.log('⚠️ Admin: Could not connect to Supabase, using fallback:', err.message);
+            // Admin: Could not connect to Supabase, using fallback
         }
     }
 
@@ -127,7 +127,7 @@ const AdminData = {
                 if (product.id) {
                     const { error } = await ProductAPI.update(product.id, product);
                     if (error) {
-                        console.error('Failed to save product:', product.id, error);
+                        // Failed to save product
                     }
                 }
             }
@@ -136,7 +136,7 @@ const AdminData = {
         } else {
             // Fallback: just update local cache
             adminProducts = [...products];
-            console.log('Products saved locally (Supabase not available)');
+            // Products saved locally (Supabase not available)
         }
     },
 
@@ -667,14 +667,14 @@ async function uploadProductImages(images, productId) {
         const { data, error } = await StorageAPI.uploadBase64('product-images', fileName, image, 'image/png');
 
         if (error) {
-            console.error('Failed to upload image:', error);
+            // Failed to upload image
             showToast(`❌ Failed to upload image ${i + 1}`);
             // Keep the original filename as fallback
             uploadedImages.push(`product-${i + 1}.png`);
         } else {
             // Store just the filename/path
             uploadedImages.push(data.path);
-            console.log('✅ Image uploaded:', data.publicUrl);
+            // Image uploaded successfully
         }
     }
 
@@ -725,7 +725,7 @@ async function saveProduct(event) {
 
         if (result.error) {
             showToast('❌ Error saving product: ' + result.error.message);
-            console.error('Supabase error:', result.error);
+            // Supabase error during save
         } else {
             showToast('✅ Product saved to Supabase!');
             // Refresh products list
@@ -775,7 +775,7 @@ async function deleteProduct(id) {
 
         if (error) {
             showToast('❌ Error deleting product: ' + error.message);
-            console.error('Supabase error:', error);
+            // Supabase error during delete
             return;
         }
 

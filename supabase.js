@@ -13,14 +13,14 @@ let supabaseClient = null;
 function initSupabase() {
     if (typeof supabase !== 'undefined' && supabase.createClient) {
         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('✅ Supabase connected successfully');
+        // Supabase connected successfully
         return supabaseClient;
     } else if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('✅ Supabase connected successfully');
+        // Supabase connected successfully
         return supabaseClient;
     }
-    console.warn('⚠️ Supabase library not loaded yet');
+    // Supabase library not loaded yet
     return null;
 }
 

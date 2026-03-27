@@ -300,7 +300,7 @@
                 class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl transform scale-95 opacity-0 transition-all duration-300">
                 <div class="grid md:grid-cols-2">
                     <div class="aspect-square bg-gray-100">
-                        <img id="qv-image" src="" alt="" class="w-full h-full object-cover" />
+                        <img id="qv-image" src="" alt="Product image" class="w-full h-full object-cover" />
                     </div>
                     <div class="p-8 relative">
                         <button
@@ -486,9 +486,9 @@
                     <div>
                         <h4 class="footer-title">Help</h4>
                         <div class="footer-links">
-                            <a href="#" class="footer-link">Help Centre</a>
-                            <a href="#" class="footer-link">Delivery & Returns</a>
-                            <a href="#" class="footer-link">Track Order</a>
+                            <a href="/help" class="footer-link">Help Centre</a>
+                            <a href="/delivery" class="footer-link">Delivery & Returns</a>
+                            <a href="/help" class="footer-link">Track Order</a>
                         </div>
                     </div>
                     <div>
@@ -507,8 +507,8 @@
                 <div class="footer-bottom">
                     <div class="text-gray-500 text-sm">© 2026 1 HUNDRED Ltd.</div>
                     <div class="flex gap-6 text-sm">
-                        <a href="#" class="footer-link">Privacy Policy</a>
-                        <a href="#" class="footer-link">Terms & Conditions</a>
+                        <a href="/privacy" class="footer-link">Privacy Policy</a>
+                        <a href="/terms" class="footer-link">Terms & Conditions</a>
                     </div>
                 </div>
             </div>
@@ -601,14 +601,14 @@
                                 isNew: p.id > 5 // Simple heuristic for demo
                             }));
                             useSupabaseProducts = true;
-                            console.log('✅ Shop: Products loaded from Supabase:', allProducts.length);
+                            // Shop: Products loaded from Supabase
                             renderProducts();
                             updateProductCount();
                         } else {
                             throw new Error('No products in Supabase');
                         }
                     } catch (err) {
-                        console.log('⚠️ Shop: Using fallback products:', err.message);
+                        // Shop: Using fallback products
                         allProducts = [...fallbackProducts];
                         renderProducts();
                         updateProductCount();
