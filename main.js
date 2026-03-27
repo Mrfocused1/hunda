@@ -507,7 +507,16 @@ function openQuickView(productId) {
                 )
                 .join('');
             modal.dataset.selectedSize = '';
-            if (sizeLabel) sizeLabel.innerHTML = '<span>Select Size</span> <span class="text-red-500">*</span>';
+            if (sizeLabel) {
+                sizeLabel.innerHTML = `
+                    <span style="color: #dc2626; font-weight: 700; font-size: 0.875rem;">
+                        SELECT A SIZE
+                    </span>
+                    <span style="background: #dc2626; color: white; font-size: 0.625rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 8px; text-transform: uppercase;">
+                        Required
+                    </span>
+                `;
+            }
         }
     }
 
