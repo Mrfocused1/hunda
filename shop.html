@@ -731,6 +731,7 @@
                         .map((product) => {
                             // Get primary image (support local files and Supabase Storage)
                             let primaryImage = 'product-1.png';
+                            console.log('Product:', product.title, 'Image:', product.image, 'Images:', product.images);
                             if (product.images && Array.isArray(product.images) && product.images.length > 0) {
                                 primaryImage =
                                     typeof getProductImageUrl !== 'undefined'
@@ -742,6 +743,7 @@
                                         ? getProductImageUrl(product.image)
                                         : product.image;
                             }
+                            console.log('Selected primaryImage:', primaryImage);
                             return `
                     <div class="product-card">
                         <div class="product-image-wrapper" onclick="openQuickView(${product.id})">
