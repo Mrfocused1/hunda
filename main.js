@@ -708,29 +708,42 @@ function initSearch() {
     const searchInput = document.getElementById('search-input');
     const searchDropdown = document.getElementById('search-dropdown');
 
-    if (!searchInput) return;
-
-    // Handle search input
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const query = searchInput.value.trim();
-            if (query) {
-                window.location.href = `/shop?q=${encodeURIComponent(query)}`;
+    // Handle desktop search input
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `/shop?q=${encodeURIComponent(query)}`;
+                }
             }
-        }
-    });
+        });
 
-    // Hide dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.search-container')) {
-            if (searchDropdown) searchDropdown.style.display = 'none';
-        }
-    });
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                if (searchDropdown) searchDropdown.style.display = 'none';
+            }
+        });
 
-    // Show dropdown on focus
-    searchInput.addEventListener('focus', () => {
-        if (searchDropdown) searchDropdown.style.display = 'block';
-    });
+        // Show dropdown on focus
+        searchInput.addEventListener('focus', () => {
+            if (searchDropdown) searchDropdown.style.display = 'block';
+        });
+    }
+
+    // Handle mobile search input
+    const mobileSearchInput = document.getElementById('mobile-search-input');
+    if (mobileSearchInput) {
+        mobileSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = mobileSearchInput.value.trim();
+                if (query) {
+                    window.location.href = `/shop?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
 }
 
 // ========================================
