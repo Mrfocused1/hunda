@@ -975,6 +975,30 @@
                 } else {
                     console.error('DEBUG: Add to Bag button NOT found in DOM!');
                 }
+
+                // Size button handler (CSP-compatible) - delegated event
+                const sizesContainer = document.getElementById('qv-sizes');
+                if (sizesContainer) {
+                    sizesContainer.addEventListener('click', function (e) {
+                        const sizeBtn = e.target.closest('.size-option');
+                        if (!sizeBtn) return;
+
+                        const size = sizeBtn.dataset.size;
+                        console.log('DEBUG: Size clicked:', size);
+
+                        // Update modal dataset
+                        const modal = document.getElementById('quick-view-modal');
+                        if (modal) {
+                            modal.dataset.selectedSize = size;
+                            console.log('DEBUG: Size saved to modal:', modal.dataset.selectedSize);
+                        }
+
+                        // Update visual state
+                        sizesContainer.querySelectorAll('.size-option').forEach((btn) => {
+                            btn.classList.toggle('active', btn.dataset.size === size);
+                        });
+                    });
+                }
             });
         </script>
     </body>
