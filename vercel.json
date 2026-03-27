@@ -11,7 +11,6 @@
         { "source": "/product/:path*", "destination": "/product.html" },
         { "source": "/cart", "destination": "/cart.html" },
         { "source": "/checkout", "destination": "/checkout.html" },
-        { "source": "/wishlist", "destination": "/wishlist.html" },
         { "source": "/account", "destination": "/account.html" },
         { "source": "/about", "destination": "/about.html" },
         { "source": "/login", "destination": "/login.html" },

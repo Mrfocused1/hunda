@@ -115,10 +115,6 @@
                         <span>Sign In</span>
                         <i data-lucide="user" class="w-5 h-5"></i>
                     </a>
-                    <a href="/wishlist" class="mobile-nav-link">
-                        <span>Wishlist</span>
-                        <i data-lucide="heart" class="w-5 h-5"></i>
-                    </a>
                     <a href="/cart" class="mobile-nav-link">
                         <span>Shopping Bag</span>
                         <div class="flex items-center gap-2">
@@ -158,10 +154,6 @@
                     <div class="flex items-center gap-4">
                         <a href="/login" class="header-action" aria-label="Sign In">
                             <i data-lucide="user" class="w-5 h-5"></i>
-                        </a>
-                        <a href="/wishlist" class="header-action" aria-label="Wishlist">
-                            <i data-lucide="heart" class="w-5 h-5"></i>
-                            <span id="wishlist-count" class="badge hidden">0</span>
                         </a>
                         <button id="cart-trigger" class="header-action" aria-label="Cart">
                             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
@@ -774,9 +766,6 @@
                 <div class="product-card" data-product-id="${product.id}">
                     <div class="product-image-wrapper" data-quick-view="${product.id}">
                         <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy">
-                        <button class="wishlist-btn" data-wishlist="${product.id}">
-                            <i data-lucide="heart" class="w-4 h-4"></i>
-                        </button>
                         <div class="product-quick-actions">
                             <button class="quick-action-btn" title="Quick View" data-quick-view="${product.id}">
                                 <i data-lucide="eye" class="w-5 h-5"></i>
@@ -887,18 +876,6 @@
                 const newArrivalsGrid = document.getElementById('new-arrivals-grid');
                 if (newArrivalsGrid) {
                     newArrivalsGrid.addEventListener('click', function (e) {
-                        // Wishlist button
-                        const wishlistBtn = e.target.closest('[data-wishlist]');
-                        if (wishlistBtn) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const productId = parseInt(wishlistBtn.dataset.wishlist);
-                            if (typeof toggleWishlist === 'function') {
-                                toggleWishlist(productId);
-                            }
-                            return;
-                        }
-
                         // Quick view
                         const quickViewBtn = e.target.closest('[data-quick-view]');
                         if (quickViewBtn) {

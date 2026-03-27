@@ -5,7 +5,6 @@
 // --- STATE ---
 const state = {
     cart: JSON.parse(localStorage.getItem('cart')) || [],
-    wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
     user: JSON.parse(localStorage.getItem('user')) || null,
     isMenuOpen: false,
     isCartOpen: false,
@@ -329,14 +328,6 @@ function updateBadges() {
             badge.classList.toggle('hidden', cartCount === 0);
         }
     });
-
-    const wishlistCount = state.wishlist.length;
-    const wishlistBadge = document.getElementById('wishlist-count');
-
-    if (wishlistBadge) {
-        wishlistBadge.textContent = wishlistCount;
-        wishlistBadge.classList.toggle('hidden', wishlistCount === 0);
-    }
 }
 
 function renderMiniCart() {
@@ -395,44 +386,6 @@ function renderMiniCart() {
 // ========================================
 // WISHLIST FUNCTIONS
 // ========================================
-
-function toggleWishlist(productId) {
-    const index = state.wishlist.indexOf(productId);
-
-    if (index > -1) {
-        state.wishlist.splice(index, 1);
-        showToast('Removed from wishlist');
-    } else {
-        state.wishlist.push(productId);
-        showToast('Added to wishlist');
-    }
-
-    localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
-    updateBadges();
-    updateWishlistButtons();
-}
-
-function isInWishlist(productId) {
-    return state.wishlist.includes(productId);
-}
-
-function updateWishlistButtons() {
-    document.querySelectorAll('.wishlist-btn').forEach((btn) => {
-        const productId = parseInt(btn.dataset.productId);
-        const isActive = isInWishlist(productId);
-        btn.classList.toggle('active', isActive);
-
-        const icon = btn.querySelector('i');
-        if (icon) {
-            icon.setAttribute('data-lucide', isActive ? 'heart' : 'heart');
-            icon.style.fill = isActive ? 'currentColor' : 'none';
-        }
-    });
-
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-}
 
 // ========================================
 // UI HELPERS
@@ -766,7 +719,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initHeader();
     initLoader();
     updateBadges();
-    updateWishlistButtons();
 
     // Initialize Supabase products with error handling
     try {
@@ -809,7 +761,6 @@ window.addEventListener('unhandledrejection', (e) => {
 window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;
 window.updateCartQuantity = updateCartQuantity;
-window.toggleWishlist = toggleWishlist;
 window.openQuickView = openQuickView;
 window.closeQuickView = closeQuickView;
 window.selectQVSize = selectQVSize;

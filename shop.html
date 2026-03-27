@@ -91,10 +91,6 @@
                         <span>Sign In</span>
                         <i data-lucide="user" class="w-5 h-5"></i>
                     </a>
-                    <a href="/wishlist" class="mobile-nav-link">
-                        <span>Wishlist</span>
-                        <i data-lucide="heart" class="w-5 h-5"></i>
-                    </a>
                     <a href="/cart" class="mobile-nav-link">
                         <span>Shopping Bag</span>
                         <div class="flex items-center gap-2">
@@ -209,10 +205,6 @@
                     <div class="flex items-center gap-4">
                         <a href="/login" class="header-action" aria-label="Sign In">
                             <i data-lucide="user" class="w-5 h-5"></i>
-                        </a>
-                        <a href="/wishlist" class="header-action" aria-label="Wishlist">
-                            <i data-lucide="heart" class="w-5 h-5"></i>
-                            <span id="wishlist-count" class="badge hidden">0</span>
                         </a>
                         <button id="cart-trigger" class="header-action" aria-label="Cart">
                             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
@@ -753,9 +745,6 @@
                         <div class="product-image-wrapper" data-quick-view="${product.id}">
                             <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
                             ${product.isNew ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
-                            <button class="wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}" data-wishlist="${product.id}">
-                                <i data-lucide="heart" class="w-4 h-4" style="fill: ${isInWishlist(product.id) ? 'currentColor' : 'none'}"></i>
-                            </button>
                             <div class="product-quick-actions">
                                 <button class="quick-action-btn" title="Quick View" data-quick-view="${product.id}">
                                     <i data-lucide="eye" class="w-5 h-5"></i>
