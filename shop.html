@@ -512,7 +512,8 @@
                     images: ['product-3.png'],
                     sizes: ['One Size'],
                     colors: ['White/Black'],
-                    isNew: true
+                    isNew: true,
+                    slug: '1h-star-cap'
                 },
                 {
                     id: 4,
@@ -523,7 +524,8 @@
                     images: ['product-4.jpeg'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Black'],
-                    isNew: false
+                    isNew: false,
+                    slug: 'no-half-measures-hoodie'
                 },
                 {
                     id: 5,
@@ -534,7 +536,8 @@
                     images: ['product-5.jpeg'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Blue'],
-                    isNew: true
+                    isNew: true,
+                    slug: 'endless-possibilities-hoodie'
                 },
                 {
                     id: 6,
@@ -545,7 +548,8 @@
                     images: ['product-6.jpeg'],
                     sizes: ['One Size'],
                     colors: ['White/Black'],
-                    isNew: false
+                    isNew: false,
+                    slug: '1h-multi-colour-cap'
                 },
                 {
                     id: 7,
@@ -556,9 +560,24 @@
                     images: ['product-relentless-front.png', 'product-relentless-back.png'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Grey'],
-                    isNew: true
+                    isNew: true,
+                    slug: 'relentless-trophy-tee'
                 }
             ];
+
+            // Product slug mapping for clean URLs
+            const productSlugs = {
+                3: '1h-star-cap',
+                4: 'no-half-measures-hoodie',
+                5: 'endless-possibilities-hoodie',
+                6: '1h-multi-colour-cap',
+                7: 'relentless-trophy-tee'
+            };
+
+            function getProductUrl(product) {
+                const slug = productSlugs[product.id] || `product-${product.id}`;
+                return `/${slug}`;
+            }
 
             // Initialize products from Supabase
             async function initShopProducts() {
@@ -573,6 +592,7 @@
                                 category: p.category?.toLowerCase() || 'uncategorized',
                                 image: p.image || (p.images && p.images[0]) || 'product-1.png',
                                 images: p.images || [p.image],
+                                slug: productSlugs[p.id] || `product-${p.id}`,
                                 sizes: p.sizes || ['S', 'M', 'L', 'XL'],
                                 colors: p.colors || ['Default'],
                                 isNew: p.id > 5 // Simple heuristic for demo
@@ -727,24 +747,25 @@
                                         ? getProductImageUrl(product.image)
                                         : product.image;
                             }
+                            const productUrl = product.slug ? `/${product.slug}` : `/product?id=${product.id}`;
                             return `
-                    <div class="product-card">
-                        <div class="product-image-wrapper" onclick="openQuickView(${product.id})">
+                    <div class="product-card" data-product-id="${product.id}">
+                        <div class="product-image-wrapper" data-quick-view="${product.id}">
                             <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
                             ${product.isNew ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
-                            <button class="wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}" data-product-id="${product.id}" onclick="event.stopPropagation(); toggleWishlist(${product.id})">
+                            <button class="wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}" data-wishlist="${product.id}">
                                 <i data-lucide="heart" class="w-4 h-4" style="fill: ${isInWishlist(product.id) ? 'currentColor' : 'none'}"></i>
                             </button>
                             <div class="product-quick-actions">
-                                <button class="quick-action-btn" title="Quick View">
+                                <button class="quick-action-btn" title="Quick View" data-quick-view="${product.id}">
                                     <i data-lucide="eye" class="w-5 h-5"></i>
                                 </button>
-                                <button class="quick-action-btn" title="Add to Bag" onclick="event.stopPropagation(); addToCart(${product.id}, 'M', 'Black', 1)">
+                                <button class="quick-action-btn" title="Add to Bag" data-add-cart="${product.id}">
                                     <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                                 </button>
                             </div>
                         </div>
-                        <a href="/product?id=${product.id}" class="block">
+                        <a href="${productUrl}" class="block">
                             <div class="product-info">
                                 <h3 class="product-title">${product.title}</h3>
                                 <span class="product-price">£${product.price.toFixed(2)}</span>
@@ -974,6 +995,66 @@
                         sizesContainer.querySelectorAll('.size-option').forEach((btn) => {
                             btn.classList.toggle('active', btn.dataset.size === size);
                         });
+                    });
+                }
+
+                // Product card event delegation (CSP-compatible)
+                const productGrid = document.getElementById('product-grid');
+                if (productGrid) {
+                    productGrid.addEventListener('click', function (e) {
+                        // Wishlist button
+                        const wishlistBtn = e.target.closest('[data-wishlist]');
+                        if (wishlistBtn) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const productId = parseInt(wishlistBtn.dataset.wishlist);
+                            if (typeof toggleWishlist === 'function') {
+                                toggleWishlist(productId);
+                                // Update visual state
+                                wishlistBtn.classList.toggle('active');
+                                const icon = wishlistBtn.querySelector('i');
+                                if (icon) {
+                                    icon.style.fill = wishlistBtn.classList.contains('active')
+                                        ? 'currentColor'
+                                        : 'none';
+                                }
+                            }
+                            return;
+                        }
+
+                        // Quick view
+                        const quickViewBtn = e.target.closest('[data-quick-view]');
+                        if (quickViewBtn) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const productId = parseInt(quickViewBtn.dataset.quickView);
+                            if (typeof openQuickView === 'function') {
+                                openQuickView(productId);
+                            }
+                            return;
+                        }
+
+                        // Add to cart from grid
+                        const addCartBtn = e.target.closest('[data-add-cart]');
+                        if (addCartBtn) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const productId = parseInt(addCartBtn.dataset.addCart);
+                            const product = allProducts.find((p) => p.id === productId);
+                            if (product && typeof addToCart === 'function') {
+                                // Auto-select size if only one option
+                                const size = product.sizes.length === 1 ? product.sizes[0] : 'M';
+                                const color = product.colors[0];
+                                addToCart(productId, size, color, 1);
+                                if (typeof showToast !== 'undefined') {
+                                    showToast(product.title + ' added to bag', 'success');
+                                }
+                                if (typeof toggleCart === 'function') {
+                                    toggleCart(true);
+                                }
+                            }
+                            return;
+                        }
                     });
                 }
             });

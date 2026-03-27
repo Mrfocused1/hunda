@@ -416,8 +416,8 @@
                     </div>
 
                     <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4" id="trending-scroll">
-                        <div class="flex-shrink-0 w-72 md:w-80">
-                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative group">
+                        <a href="/1h-star-cap" class="flex-shrink-0 w-72 md:w-80 group">
+                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative">
                                 <img
                                     src="product-3.png"
                                     alt="1H Star Cap"
@@ -427,21 +427,23 @@
                                     >New</span
                                 >
                             </div>
-                            <h3 class="font-bold uppercase">1H Star Cap</h3>
+                            <h3 class="font-bold uppercase group-hover:text-gray-300 transition-colors">1H Star Cap</h3>
                             <p class="text-gray-400 text-sm">£30.00</p>
-                        </div>
-                        <div class="flex-shrink-0 w-72 md:w-80">
-                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative group">
+                        </a>
+                        <a href="/no-half-measures-hoodie" class="flex-shrink-0 w-72 md:w-80 group">
+                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative">
                                 <img
                                     src="product-4.jpeg"
                                     alt="The No Half Measures Hoodie"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             </div>
-                            <h3 class="font-bold uppercase">The No Half Measures Hoodie</h3>
+                            <h3 class="font-bold uppercase group-hover:text-gray-300 transition-colors">
+                                The No Half Measures Hoodie
+                            </h3>
                             <p class="text-gray-400 text-sm">£85.00</p>
-                        </div>
-                        <div class="flex-shrink-0 w-72 md:w-80">
-                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative group">
+                        </a>
+                        <a href="/endless-possibilities-hoodie" class="flex-shrink-0 w-72 md:w-80 group">
+                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative">
                                 <img
                                     src="product-5.jpeg"
                                     alt="Endless Possibilities Hoodie"
@@ -451,21 +453,25 @@
                                     >New</span
                                 >
                             </div>
-                            <h3 class="font-bold uppercase">Endless Possibilities Hoodie</h3>
+                            <h3 class="font-bold uppercase group-hover:text-gray-300 transition-colors">
+                                Endless Possibilities Hoodie
+                            </h3>
                             <p class="text-gray-400 text-sm">£85.00</p>
-                        </div>
-                        <div class="flex-shrink-0 w-72 md:w-80">
-                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative group">
+                        </a>
+                        <a href="/1h-multi-colour-cap" class="flex-shrink-0 w-72 md:w-80 group">
+                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative">
                                 <img
                                     src="product-6.jpeg"
                                     alt="1H Multi Colour Cap"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             </div>
-                            <h3 class="font-bold uppercase">1H Multi Colour Cap</h3>
+                            <h3 class="font-bold uppercase group-hover:text-gray-300 transition-colors">
+                                1H Multi Colour Cap
+                            </h3>
                             <p class="text-gray-400 text-sm">£30.00</p>
-                        </div>
-                        <div class="flex-shrink-0 w-72 md:w-80">
-                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative group">
+                        </a>
+                        <a href="/relentless-trophy-tee" class="flex-shrink-0 w-72 md:w-80 group">
+                            <div class="aspect-[3/4] bg-gray-800 overflow-hidden mb-4 relative">
                                 <img
                                     src="product-relentless-front.png"
                                     alt="Relentless Trophy Tee"
@@ -475,9 +481,11 @@
                                     >New</span
                                 >
                             </div>
-                            <h3 class="font-bold uppercase">Relentless Trophy Tee</h3>
+                            <h3 class="font-bold uppercase group-hover:text-gray-300 transition-colors">
+                                Relentless Trophy Tee
+                            </h3>
                             <p class="text-gray-400 text-sm">£40.00</p>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -521,10 +529,8 @@
                                 </div>
 
                                 <div class="flex flex-col sm:flex-row gap-4">
-                                    <a href="/product?id=1" class="btn btn-primary">Shop Now</a>
-                                    <button onclick="addToCart(1, 'M', 'Black', 1)" class="btn btn-secondary">
-                                        Add to Bag
-                                    </button>
+                                    <a href="/no-half-measures-hoodie" class="btn btn-primary">Shop Now</a>
+                                    <button id="featured-add-to-bag" class="btn btn-secondary">Add to Bag</button>
                                 </div>
                             </div>
                         </div>
@@ -735,6 +741,19 @@
 
         <script>
             // Render new arrivals
+            // Product slug mapping
+            const productSlugs = {
+                3: '1h-star-cap',
+                4: 'no-half-measures-hoodie',
+                5: 'endless-possibilities-hoodie',
+                6: '1h-multi-colour-cap',
+                7: 'relentless-trophy-tee'
+            };
+
+            function getProductUrl(product) {
+                return productSlugs[product.id] ? `/${productSlugs[product.id]}` : `/product?id=${product.id}`;
+            }
+
             function renderNewArrivals() {
                 const container = document.getElementById('new-arrivals-grid');
                 if (!container) return;
@@ -750,26 +769,27 @@
                         } else if (product.image) {
                             primaryImage = product.image;
                         }
+                        const productUrl = getProductUrl(product);
                         return `
-                <div class="product-card" onclick="openQuickView(${product.id})">
-                    <div class="product-image-wrapper">
+                <div class="product-card" data-product-id="${product.id}">
+                    <div class="product-image-wrapper" data-quick-view="${product.id}">
                         <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy">
-                        <button class="wishlist-btn" data-product-id="${product.id}" onclick="event.stopPropagation(); toggleWishlist(${product.id})">
+                        <button class="wishlist-btn" data-wishlist="${product.id}">
                             <i data-lucide="heart" class="w-4 h-4"></i>
                         </button>
                         <div class="product-quick-actions">
-                            <button class="quick-action-btn" title="Quick View">
+                            <button class="quick-action-btn" title="Quick View" data-quick-view="${product.id}">
                                 <i data-lucide="eye" class="w-5 h-5"></i>
                             </button>
-                            <button class="quick-action-btn" title="Add to Bag" onclick="event.stopPropagation(); addToCart(${product.id}, 'M', 'Black', 1)">
+                            <button class="quick-action-btn" title="Add to Bag" data-add-cart="${product.id}">
                                 <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="product-info">
+                    <a href="${productUrl}" class="product-info">
                         <h3 class="product-title">${product.title}</h3>
                         <span class="product-price">£${product.price.toFixed(2)}</span>
-                    </div>
+                    </a>
                     <p class="product-category">${product.category}</p>
                 </div>
             `;
@@ -843,6 +863,73 @@
                         } else {
                             btn.textContent = originalText;
                             btn.disabled = false;
+                        }
+                    });
+                }
+
+                // Featured section Add to Bag button (CSP-compatible)
+                const featuredAddBtn = document.getElementById('featured-add-to-bag');
+                if (featuredAddBtn) {
+                    featuredAddBtn.addEventListener('click', function () {
+                        if (typeof addToCart !== 'undefined') {
+                            addToCart(4, 'M', 'Black', 1);
+                            if (typeof showToast !== 'undefined') {
+                                showToast('The No Half Measures Hoodie added to bag', 'success');
+                            }
+                            if (typeof toggleCart !== 'undefined') {
+                                toggleCart(true);
+                            }
+                        }
+                    });
+                }
+
+                // New Arrivals grid event delegation (CSP-compatible)
+                const newArrivalsGrid = document.getElementById('new-arrivals-grid');
+                if (newArrivalsGrid) {
+                    newArrivalsGrid.addEventListener('click', function (e) {
+                        // Wishlist button
+                        const wishlistBtn = e.target.closest('[data-wishlist]');
+                        if (wishlistBtn) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const productId = parseInt(wishlistBtn.dataset.wishlist);
+                            if (typeof toggleWishlist === 'function') {
+                                toggleWishlist(productId);
+                            }
+                            return;
+                        }
+
+                        // Quick view
+                        const quickViewBtn = e.target.closest('[data-quick-view]');
+                        if (quickViewBtn) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const productId = parseInt(quickViewBtn.dataset.quickView);
+                            if (typeof openQuickView === 'function') {
+                                openQuickView(productId);
+                            }
+                            return;
+                        }
+
+                        // Add to cart
+                        const addCartBtn = e.target.closest('[data-add-cart]');
+                        if (addCartBtn) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const productId = parseInt(addCartBtn.dataset.addCart);
+                            const product = products.find((p) => p.id === productId);
+                            if (product && typeof addToCart === 'function') {
+                                const size = product.sizes.length === 1 ? product.sizes[0] : 'M';
+                                const color = product.colors[0];
+                                addToCart(productId, size, color, 1);
+                                if (typeof showToast !== 'undefined') {
+                                    showToast(product.title + ' added to bag', 'success');
+                                }
+                                if (typeof toggleCart === 'function') {
+                                    toggleCart(true);
+                                }
+                            }
+                            return;
                         }
                     });
                 }

@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Endless Possibilities Hoodie | 1 HUNDRED</title>
+        <meta
+            name="description"
+            content="The Endless Possibilities Hoodie represents infinite potential. Premium washed denim-effect fabric with intricate embroidery and a relaxed oversized silhouette." />
+        <meta name="keywords" content="hoodies, endless possibilities hoodie, streetwear, 1 hundred" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://1hundred.com/endless-possibilities-hoodie" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content="https://1hundred.com/endless-possibilities-hoodie" />
+        <meta property="og:title" content="Endless Possibilities Hoodie | 1 HUNDRED" />
+        <meta
+            property="og:description"
+            content="The Endless Possibilities Hoodie represents infinite potential. Premium washed denim-effect fabric with intricate embroidery and a relaxed oversized silhouette." />
+        <meta property="og:image" content="https://1hundred.com/product-5.jpeg" />
+
+        <meta name="theme-color" content="#111111" />
+
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body class="antialiased">
+        <!-- Page Loader -->
+        <div id="page-loader" class="page-loader">
+            <img src="logo.svg" alt="1 HUNDRED" />
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span id="toast-msg">Added to bag</span>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="menu-overlay" class="mobile-menu-overlay"></div>
+
+        <!-- Mobile Menu -->
+        <nav id="mobile-menu" class="mobile-menu">
+            <div class="mobile-menu-header">
+                <a href="/">
+                    <img src="logo.svg" alt="1 HUNDRED" class="h-8" />
+                </a>
+                <button id="menu-toggle-close" class="p-2">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <div class="flex flex-col">
+                <a href="/" class="mobile-nav-link">Home</a>
+                <a href="/shop" class="mobile-nav-link">Shop All</a>
+                <a href="/shop?new=true" class="mobile-nav-link">New In</a>
+                <a href="/about" class="mobile-nav-link">About Us</a>
+
+                <div class="border-t border-gray-200 mt-4 pt-4">
+                    <a href="/login" class="mobile-nav-link">
+                        <span>Sign In</span>
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </a>
+                    <a href="/wishlist" class="mobile-nav-link">
+                        <span>Wishlist</span>
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                    </a>
+                    <a href="/cart" class="mobile-nav-link">
+                        <span>Shopping Bag</span>
+                        <div class="flex items-center gap-2">
+                            <span id="cart-count-mobile" class="badge hidden">0</span>
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header id="main-header" class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+            <div class="container-main">
+                <!-- Desktop Header Layout -->
+                <div class="h-16 hidden lg:flex items-center justify-between">
+                    <!-- Left: Logo -->
+                    <a href="/" class="flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+
+                    <!-- Center: Desktop Navigation -->
+                    <nav class="flex items-center gap-8">
+                        <a href="/" class="nav-link">Home</a>
+                        <a href="/shop" class="nav-link">Shop All</a>
+                        <a href="/shop?new=true" class="nav-link">New In</a>
+                        <a href="/about" class="nav-link">About Us</a>
+                    </nav>
+
+                    <!-- Center: Search -->
+                    <div class="search-container hidden lg:block">
+                        <i data-lucide="search" class="search-icon w-4 h-4"></i>
+                        <input type="text" placeholder="Search products..." class="search-input" id="search-input" />
+                    </div>
+
+                    <!-- Right: Actions -->
+                    <div class="flex items-center gap-4">
+                        <a href="/login" class="header-action" aria-label="Sign In">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </a>
+                        <a href="/wishlist" class="header-action" aria-label="Wishlist">
+                            <i data-lucide="heart" class="w-5 h-5"></i>
+                            <span id="wishlist-count" class="badge hidden">0</span>
+                        </a>
+                        <button id="cart-trigger" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Header Layout -->
+                <div class="h-16 lg:hidden flex items-center justify-between relative">
+                    <!-- Left: Hamburger Menu -->
+                    <button id="menu-toggle" class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+
+                    <!-- Center: Logo (absolutely centered) -->
+                    <a href="/" class="absolute left-1/2 -translate-x-1/2 flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+
+                    <!-- Right: Actions -->
+                    <div class="flex items-center gap-3">
+                        <button id="cart-trigger-mobile" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count-mobile-header" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Cart Drawer -->
+        <div id="cart-overlay" class="mobile-menu-overlay"></div>
+        <aside
+            id="cart-drawer"
+            class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="font-display font-bold uppercase text-xl">Bag (<span id="mini-cart-count">0</span>)</h2>
+                <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="mini-cart-items" class="flex-1 overflow-y-auto p-6"></div>
+            <div class="p-6 border-t border-gray-100 bg-gray-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Subtotal</span>
+                    <span id="mini-cart-subtotal">£0.00</span>
+                </div>
+                <a href="/checkout" class="btn btn-primary btn-full mb-3">Checkout</a>
+                <a href="/cart" class="btn btn-secondary btn-full">View Bag</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="pt-16">
+            <!-- Breadcrumb -->
+            <nav class="container-main py-4">
+                <div class="breadcrumb">
+                    <a href="/">Home</a>
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    <a href="/shop">Shop</a>
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    <a href="/shop?category=hoodies">Hoodies</a>
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    <span>Endless Possibilities Hoodie</span>
+                </div>
+            </nav>
+
+            <!-- Product Detail -->
+            <section class="container-main pb-16">
+                <div class="pdp-container">
+                    <!-- Gallery -->
+                    <div class="pdp-gallery">
+                        <div class="pdp-main-image">
+                            <img
+                                id="main-image"
+                                src="product-5.jpeg"
+                                alt="Endless Possibilities Hoodie"
+                                class="w-full h-full object-cover" />
+                        </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="pdp-info">
+                        <div class="pdp-brand">1 HUNDRED</div>
+                        <h1 class="pdp-title">Endless Possibilities Hoodie</h1>
+                        <div class="pdp-price">£85.00</div>
+
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="flex text-yellow-400">
+                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">4.9 (128 reviews)</span>
+                        </div>
+
+                        <p class="pdp-description">
+                            The Endless Possibilities Hoodie represents infinite potential. Premium washed denim-effect
+                            fabric with intricate embroidery and a relaxed oversized silhouette. Built for those who see
+                            no limits.
+                        </p>
+
+                        <!-- Color Selection -->
+                        <div class="pdp-section">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="font-bold text-sm uppercase"
+                                    >Color:
+                                    <span id="selected-color" class="font-normal text-gray-500">Blue</span></span
+                                >
+                            </div>
+                            <div class="flex gap-3" id="color-options">
+                                <button class="color-option active" data-color="Blue">
+                                    <span class="color-swatch" style="background: #3b82f6"></span>
+                                    <span class="color-label">Blue</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Size Selection -->
+                        <div class="pdp-section">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="font-bold text-sm uppercase">Size</span>
+                                <button class="text-xs underline text-gray-500 hover:text-black" id="size-guide-btn">
+                                    Size Guide
+                                </button>
+                            </div>
+                            <div class="size-grid" id="size-options">
+                                <div class="size-option" data-size="S">S</div>
+                                <div class="size-option" data-size="M">M</div>
+                                <div class="size-option" data-size="L">L</div>
+                                <div class="size-option" data-size="XL">XL</div>
+                            </div>
+                            <p id="size-error" class="text-red-500 text-sm mt-2 hidden">Please select a size</p>
+                        </div>
+
+                        <!-- Quantity & Add to Bag -->
+                        <div class="pdp-section" style="border: none">
+                            <div class="flex gap-4">
+                                <div class="quantity-selector">
+                                    <button class="quantity-btn" id="qty-minus">-</button>
+                                    <input type="text" id="quantity" class="quantity-input" value="1" readonly />
+                                    <button class="quantity-btn" id="qty-plus">+</button>
+                                </div>
+                                <button id="add-to-bag-btn" class="btn btn-primary flex-1">Add to Bag</button>
+                            </div>
+                            <button
+                                id="wishlist-btn"
+                                class="btn btn-secondary btn-full mt-4 flex items-center justify-center gap-2">
+                                <i data-lucide="heart" class="w-5 h-5"></i>
+                                <span>Add to Wishlist</span>
+                            </button>
+                        </div>
+
+                        <!-- Product Details Accordion -->
+                        <div class="border-t border-gray-200 mt-8">
+                            <div class="py-4 border-b border-gray-200">
+                                <button
+                                    class="flex justify-between items-center w-full font-bold uppercase text-sm accordion-toggle"
+                                    data-target="details-content">
+                                    <span>Product Details</span>
+                                    <i
+                                        data-lucide="chevron-down"
+                                        class="w-5 h-5 transition-transform accordion-icon"></i>
+                                </button>
+                                <div id="details-content" class="hidden mt-4 text-sm text-gray-600 space-y-2">
+                                    <p>• Premium heavyweight cotton (240gsm)</p>
+                                    <p>• Oversized fit</p>
+                                    <p>• Drop shoulder design</p>
+                                    <p>• Ribbed collar</p>
+                                    <p>• Made in Portugal</p>
+                                </div>
+                            </div>
+                            <div class="py-4 border-b border-gray-200">
+                                <button
+                                    class="flex justify-between items-center w-full font-bold uppercase text-sm accordion-toggle"
+                                    data-target="shipping-content">
+                                    <span>Shipping & Returns</span>
+                                    <i
+                                        data-lucide="chevron-down"
+                                        class="w-5 h-5 transition-transform accordion-icon"></i>
+                                </button>
+                                <div id="shipping-content" class="hidden mt-4 text-sm text-gray-600 space-y-2">
+                                    <p>• Free standard shipping on orders over £50</p>
+                                    <p>• Next day delivery available</p>
+                                    <p>• Free returns within 28 days</p>
+                                    <p>• See our full returns policy</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Related Products -->
+            <section class="bg-gray-50 py-16">
+                <div class="container-main">
+                    <h2 class="text-2xl md:text-3xl font-display font-bold uppercase mb-8">You May Also Like</h2>
+                    <div class="product-grid">
+                        <div class="product-card" data-product-id="4">
+                            <a href="/no-half-measures-hoodie" class="product-image-container">
+                                <img src="product-4.jpeg" alt="The No Half Measures Hoodie" class="product-image" />
+                            </a>
+                            <div class="product-info">
+                                <h3 class="product-title">The No Half Measures Hoodie</h3>
+                                <div class="product-price">£85.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="container-main">
+                <div class="footer-grid">
+                    <div>
+                        <img src="logo.svg" alt="1 HUNDRED" class="h-10 mb-6" style="filter: brightness(0) invert(1)" />
+                        <p class="text-gray-400 text-sm max-w-xs">Premium streetwear for the modern individual.</p>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Shop</h4>
+                        <div class="footer-links">
+                            <a href="/shop" class="footer-link">Shop All</a>
+                            <a href="/shop?new=true" class="footer-link">New Arrivals</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Help</h4>
+                        <div class="footer-links">
+                            <a href="/delivery" class="footer-link">Delivery</a>
+                            <a href="/help" class="footer-link">Help Centre</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Legal</h4>
+                        <div class="footer-links">
+                            <a href="/terms" class="footer-link">Terms</a>
+                            <a href="/privacy" class="footer-link">Privacy</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 1 HUNDRED. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <script src="main.js"></script>
+        <script>
+            // Product page specific JavaScript - CSP compliant
+            (function () {
+                const productId = 5;
+                const productTitle = 'Endless Possibilities Hoodie';
+                const productPrice = 85;
+                const productImages = ['product-5.jpeg'];
+                let selectedSize = '';
+                let selectedColor = 'Blue';
+                let quantity = 1;
+
+                // Quantity buttons
+                document.getElementById('qty-minus')?.addEventListener('click', function () {
+                    if (quantity > 1) {
+                        quantity--;
+                        document.getElementById('quantity').value = quantity;
+                    }
+                });
+
+                document.getElementById('qty-plus')?.addEventListener('click', function () {
+                    if (quantity < 10) {
+                        quantity++;
+                        document.getElementById('quantity').value = quantity;
+                    }
+                });
+
+                // Size selection
+                document.getElementById('size-options')?.addEventListener('click', function (e) {
+                    const option = e.target.closest('.size-option');
+                    if (!option) return;
+
+                    document.querySelectorAll('.size-option').forEach((el) => el.classList.remove('active'));
+                    option.classList.add('active');
+                    selectedSize = option.dataset.size;
+                    document.getElementById('size-error')?.classList.add('hidden');
+                });
+
+                // Color selection
+                document.getElementById('color-options')?.addEventListener('click', function (e) {
+                    const option = e.target.closest('.color-option');
+                    if (!option) return;
+
+                    document.querySelectorAll('.color-option').forEach((el) => el.classList.remove('active'));
+                    option.classList.add('active');
+                    selectedColor = option.dataset.color;
+                    document.getElementById('selected-color').textContent = selectedColor;
+                });
+
+                // Add to bag
+                document.getElementById('add-to-bag-btn')?.addEventListener('click', function () {
+                    if (!selectedSize) {
+                        document.getElementById('size-error')?.classList.remove('hidden');
+                        return;
+                    }
+
+                    if (typeof addToCart === 'function') {
+                        addToCart(productId, selectedSize, selectedColor, quantity);
+                        toggleCart(true);
+                    }
+                });
+
+                // Wishlist
+                document.getElementById('wishlist-btn')?.addEventListener('click', function () {
+                    if (typeof toggleWishlist === 'function') {
+                        toggleWishlist(productId);
+                    }
+                });
+
+                // Accordion toggles
+                document.querySelectorAll('.accordion-toggle').forEach((btn) => {
+                    btn.addEventListener('click', function () {
+                        const target = document.getElementById(this.dataset.target);
+                        const icon = this.querySelector('.accordion-icon');
+                        if (target) {
+                            target.classList.toggle('hidden');
+                            icon?.classList.toggle('rotate-180');
+                        }
+                    });
+                });
+
+                // Size guide (placeholder)
+                document.getElementById('size-guide-btn')?.addEventListener('click', function () {
+                    alert('Size Guide coming soon!');
+                });
+            })();
+        </script>
+    </body>
+</html>
