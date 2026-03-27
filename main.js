@@ -701,6 +701,39 @@ function showToast(message, type = 'success', duration = 3000) {
 }
 
 // ========================================
+// SEARCH FUNCTIONALITY
+// ========================================
+
+function initSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchDropdown = document.getElementById('search-dropdown');
+
+    if (!searchInput) return;
+
+    // Handle search input
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = searchInput.value.trim();
+            if (query) {
+                window.location.href = `/shop?q=${encodeURIComponent(query)}`;
+            }
+        }
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+            if (searchDropdown) searchDropdown.style.display = 'none';
+        }
+    });
+
+    // Show dropdown on focus
+    searchInput.addEventListener('focus', () => {
+        if (searchDropdown) searchDropdown.style.display = 'block';
+    });
+}
+
+// ========================================
 // INITIALIZATION
 // ========================================
 
@@ -731,6 +764,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             closeMobileMenu();
         }
     });
+
+    // Search functionality
+    initSearch();
 });
 
 // Global error handling
