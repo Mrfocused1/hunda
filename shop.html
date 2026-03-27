@@ -602,6 +602,10 @@
                             }));
                             useSupabaseProducts = true;
                             console.log('✅ Shop: Products loaded from Supabase:', allProducts.length);
+                            console.log(
+                                'Product images:',
+                                allProducts.map((p) => ({ id: p.id, title: p.title, image: p.image, images: p.images }))
+                            );
                             renderProducts();
                             updateProductCount();
                         } else {
@@ -852,6 +856,14 @@
                 document.getElementById('sort-select').value = 'recommended';
 
                 renderProducts();
+            }
+
+            function updateProductCount() {
+                const count = document.querySelectorAll('.product-card').length;
+                const countEl = document.getElementById('product-count');
+                if (countEl) {
+                    countEl.textContent = count;
+                }
             }
 
             function applyFilters() {
