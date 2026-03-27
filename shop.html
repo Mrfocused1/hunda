@@ -322,9 +322,7 @@
                             </div>
                             <div id="qv-sizes" class="size-grid"></div>
                         </div>
-                        <button id="qv-add-to-bag-btn" onclick="addToCartFromQV(this)" class="btn btn-primary btn-full">
-                            Add to Bag
-                        </button>
+                        <button id="qv-add-to-bag-btn" class="btn btn-primary btn-full">Add to Bag</button>
                     </div>
                 </div>
             </div>
@@ -899,6 +897,57 @@
                 document.getElementById('filter-sidebar').classList.remove('active');
                 document.getElementById('filter-overlay').classList.remove('active');
                 document.body.style.overflow = '';
+            });
+
+            // Add to Bag button handler (CSP-compatible)
+            document.getElementById('qv-add-to-bag-btn')?.addEventListener('click', function () {
+                const modal = document.getElementById('quick-view-modal');
+                if (!modal) return;
+
+                const productId = parseInt(modal.dataset.productId);
+                const size = modal.dataset.selectedSize;
+
+                if (!size) {
+                    if (typeof showToast !== 'undefined') {
+                        showToast('Please select a size', 'warning');
+                    }
+                    return;
+                }
+
+                // Show loading state
+                const btn = this;
+                const originalText = btn.textContent;
+                btn.textContent = 'Adding...';
+                btn.disabled = true;
+
+                // Get product info
+                const product = allProducts.find((p) => p.id === productId);
+                const productTitle = product ? product.title : 'Item';
+
+                // Add to cart using global function
+                if (typeof addToCart !== 'undefined') {
+                    addToCart(productId, size, 'Black', 1);
+
+                    // Close quick view
+                    if (typeof closeQuickView !== 'undefined') {
+                        closeQuickView();
+                    }
+
+                    // Show success
+                    setTimeout(() => {
+                        if (typeof showToast !== 'undefined') {
+                            showToast(productTitle + ' added to bag', 'success');
+                        }
+                        if (typeof toggleCart !== 'undefined') {
+                            toggleCart(true);
+                        }
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }, 100);
+                } else {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
             });
 
             // Initialize
