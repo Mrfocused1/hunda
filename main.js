@@ -527,7 +527,7 @@ function selectQVSize(size) {
     });
 }
 
-function addToCartFromQV() {
+function addToCartFromQV(btn) {
     const modal = document.getElementById('quick-view-modal');
     if (!modal) return;
 
@@ -535,12 +535,40 @@ function addToCartFromQV() {
     const size = modal.dataset.selectedSize;
 
     if (!size) {
-        showToast('Please select a size');
+        showToast('Please select a size', 'warning');
         return;
     }
 
+    // Show loading state
+    const originalText = btn ? btn.textContent : 'Add to Bag';
+    if (btn) {
+        btn.textContent = 'Adding...';
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+    }
+
+    // Get product info for toast
+    const product = products.find((p) => p.id === productId);
+    const productTitle = product ? product.title : 'Item';
+
+    // Add to cart
     addToCart(productId, size, 'Black', 1);
+
+    // Close quick view and open cart drawer
     closeQuickView();
+
+    // Show success toast and open cart
+    setTimeout(() => {
+        showToast(`${productTitle} added to bag`, 'success');
+        toggleCart(true); // Open cart drawer
+
+        // Reset button state
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+    }, 100);
 }
 
 // ========================================
