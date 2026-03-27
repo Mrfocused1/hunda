@@ -734,15 +734,27 @@ function initSearch() {
 
     // Handle mobile search input
     const mobileSearchInput = document.getElementById('mobile-search-input');
+    const mobileSearchBtn = document.getElementById('mobile-search-btn');
+
+    function doMobileSearch() {
+        if (mobileSearchInput) {
+            const query = mobileSearchInput.value.trim();
+            if (query) {
+                window.location.href = `/shop?q=${encodeURIComponent(query)}`;
+            }
+        }
+    }
+
     if (mobileSearchInput) {
         mobileSearchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                const query = mobileSearchInput.value.trim();
-                if (query) {
-                    window.location.href = `/shop?q=${encodeURIComponent(query)}`;
-                }
+                doMobileSearch();
             }
         });
+    }
+
+    if (mobileSearchBtn) {
+        mobileSearchBtn.addEventListener('click', doMobileSearch);
     }
 }
 

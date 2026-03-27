@@ -88,13 +88,18 @@
 
             <!-- Mobile Search -->
             <div class="mobile-search">
-                <div class="relative">
+                <div class="relative flex gap-2">
                     <input
                         type="text"
                         id="mobile-search-input"
                         placeholder="Search products..."
-                        class="w-full bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm" />
+                        class="flex-1 bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm" />
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                    <button
+                        id="mobile-search-btn"
+                        class="bg-black text-white px-4 py-2 rounded-full text-sm font-medium">
+                        Search
+                    </button>
                 </div>
             </div>
 
