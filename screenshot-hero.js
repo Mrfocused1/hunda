@@ -14,26 +14,29 @@ const puppeteer = require('puppeteer');
         timeout: 60000
     });
 
-    // Wait for the hero image to load
-    await page.waitForSelector('section.relative.h-screen img', { timeout: 10000 });
+    // Wait for products to load
+    await page.waitForFunction(
+        () => {
+            return document.querySelector('section.relative.h-screen img') !== null;
+        },
+        { timeout: 20000 }
+    );
 
-    // Take screenshot of the hero section
-    const heroElement = await page.$('section.relative.h-screen');
-    if (heroElement) {
-        await heroElement.screenshot({
-            path: 'hero-current.png',
-            type: 'png'
-        });
-        console.log('✅ Hero screenshot saved: hero-current.png');
-    }
+    // Force hide loader
+    await page.evaluate(() => {
+        const loader = document.getElementById('page-loader');
+        if (loader) loader.style.display = 'none';
+    });
 
-    // Also take full page screenshot
+    // Wait a bit more for render
+    await new Promise((r) => setTimeout(r, 2000));
+
+    // Take screenshot
     await page.screenshot({
-        path: 'fullpage-current.png',
-        fullPage: false,
+        path: 'hero-current.png',
         clip: { x: 0, y: 0, width: 1440, height: 800 }
     });
-    console.log('✅ Full page screenshot saved: fullpage-current.png');
+    console.log('✅ Screenshot saved: hero-current.png');
 
     await browser.close();
 })();
