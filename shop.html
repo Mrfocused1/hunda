@@ -910,15 +910,23 @@
 
                 // Add to Bag button handler (CSP-compatible)
                 const addToBagBtn = document.getElementById('qv-add-to-bag-btn');
+                console.log('DEBUG: Add to Bag button found:', !!addToBagBtn);
                 if (addToBagBtn) {
-                    addToBagBtn.addEventListener('click', function () {
+                    addToBagBtn.addEventListener('click', function (e) {
+                        console.log('DEBUG: Add to Bag clicked!');
+                        e.preventDefault();
+                        e.stopPropagation();
+
                         const modal = document.getElementById('quick-view-modal');
+                        console.log('DEBUG: Modal found:', !!modal);
                         if (!modal) return;
 
                         const productId = parseInt(modal.dataset.productId);
                         const size = modal.dataset.selectedSize;
+                        console.log('DEBUG: productId:', productId, 'size:', size);
 
                         if (!size) {
+                            console.log('DEBUG: No size selected!');
                             if (typeof showToast !== 'undefined') {
                                 showToast('Please select a size', 'warning');
                             }
@@ -933,11 +941,14 @@
 
                         // Get product info
                         const product = allProducts.find((p) => p.id === productId);
+                        console.log('DEBUG: Product found:', !!product);
                         const productTitle = product ? product.title : 'Item';
 
                         // Add to cart using global function
+                        console.log('DEBUG: addToCart function exists:', typeof addToCart !== 'undefined');
                         if (typeof addToCart !== 'undefined') {
                             addToCart(productId, size, 'Black', 1);
+                            console.log('DEBUG: addToCart called');
 
                             // Close quick view
                             if (typeof closeQuickView !== 'undefined') {
@@ -956,10 +967,13 @@
                                 btn.disabled = false;
                             }, 100);
                         } else {
+                            console.error('DEBUG: addToCart function not found!');
                             btn.textContent = originalText;
                             btn.disabled = false;
                         }
                     });
+                } else {
+                    console.error('DEBUG: Add to Bag button NOT found in DOM!');
                 }
             });
         </script>
