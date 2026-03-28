@@ -128,7 +128,7 @@
             const SUPABASE_ANON_KEY =
                 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzZ2JuZm9henZka3hwZHF3Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NDY4MTMsImV4cCI6MjA5MDEyMjgxM30.YUl4-O9q39Wn5xqUjp8S1F8VmTQH76PTIcQGpnrHXNE';
 
-            const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             const statusEl = document.getElementById('status');
             const logEl = document.getElementById('log');
             const fixBtn = document.getElementById('fixBtn');
@@ -157,7 +157,7 @@
                 try {
                     // Step 1: Enable RLS on products table
                     log('Step 1: Enabling RLS on products table...');
-                    const { error: rlsError } = await supabase.rpc('exec_sql', {
+                    const { error: rlsError } = await supabaseClient.rpc('exec_sql', {
                         sql: 'ALTER TABLE products ENABLE ROW LEVEL SECURITY;'
                     });
                     if (rlsError) {
@@ -168,7 +168,7 @@
 
                     // Step 2: Create INSERT policy
                     log('Step 2: Creating INSERT policy...');
-                    const { error: insertError } = await supabase.rpc('exec_sql', {
+                    const { error: insertError } = await supabaseClient.rpc('exec_sql', {
                         sql: `
                         DROP POLICY IF EXISTS "Allow anonymous insert" ON products;
                         CREATE POLICY "Allow anonymous insert" ON products 
@@ -180,7 +180,7 @@
 
                     // Step 3: Create UPDATE policy
                     log('Step 3: Creating UPDATE policy...');
-                    const { error: updateError } = await supabase.rpc('exec_sql', {
+                    const { error: updateError } = await supabaseClient.rpc('exec_sql', {
                         sql: `
                         DROP POLICY IF EXISTS "Allow anonymous update" ON products;
                         CREATE POLICY "Allow anonymous update" ON products 
@@ -192,7 +192,7 @@
 
                     // Step 4: Create DELETE policy
                     log('Step 4: Creating DELETE policy...');
-                    const { error: deleteError } = await supabase.rpc('exec_sql', {
+                    const { error: deleteError } = await supabaseClient.rpc('exec_sql', {
                         sql: `
                         DROP POLICY IF EXISTS "Allow anonymous delete" ON products;
                         CREATE POLICY "Allow anonymous delete" ON products 
@@ -204,7 +204,7 @@
 
                     // Step 5: Create SELECT policy
                     log('Step 5: Creating SELECT policy...');
-                    const { error: selectError } = await supabase.rpc('exec_sql', {
+                    const { error: selectError } = await supabaseClient.rpc('exec_sql', {
                         sql: `
                         DROP POLICY IF EXISTS "Allow anonymous read" ON products;
                         CREATE POLICY "Allow anonymous read" ON products 
@@ -216,7 +216,7 @@
 
                     // Step 6: Fix storage policies
                     log('Step 6: Fixing storage RLS policies...');
-                    const { error: storageError } = await supabase.rpc('exec_sql', {
+                    const { error: storageError } = await supabaseClient.rpc('exec_sql', {
                         sql: `
                         -- Enable RLS on storage
                         ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
@@ -246,7 +246,10 @@
 
                     // Step 7: Test the connection
                     log('Step 7: Testing connection...');
-                    const { data: testData, error: testError } = await supabase.from('products').select('id').limit(1);
+                    const { data: testData, error: testError } = await supabaseClient
+                        .from('products')
+                        .select('id')
+                        .limit(1);
 
                     if (testError) {
                         log(`Test warning: ${testError.message}`, 'warn');
