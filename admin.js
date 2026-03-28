@@ -694,14 +694,19 @@ async function saveProduct(event) {
         saveBtn.textContent = 'Saving...';
     }
 
-    // Prepare base product data (without images first for new products)
+    // Prepare base product data
+    const category = document.getElementById('product-category').value;
+
+    // Set appropriate sizes based on category
+    const sizes = category === 'Hats' ? ['One Size'] : ['S', 'M', 'L', 'XL'];
+
     const baseProductData = {
         title: document.getElementById('product-title').value,
         price: parseFloat(document.getElementById('product-price').value),
-        category: document.getElementById('product-category').value,
+        category: category,
         stock: parseInt(document.getElementById('product-stock').value) || 0,
         description: document.getElementById('product-description').value,
-        sizes: ['S', 'M', 'L', 'XL'],
+        sizes: sizes,
         colors: ['Default']
     };
 
