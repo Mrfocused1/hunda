@@ -172,8 +172,8 @@
             </div>
 
             <div class="mt-6 space-y-3">
-                <button onclick="applyFilters()" class="btn btn-primary btn-full">Apply Filters</button>
-                <button onclick="clearFilters()" class="btn btn-secondary btn-full">Clear All</button>
+                <button id="apply-filters-btn" class="btn btn-primary btn-full">Apply Filters</button>
+                <button id="clear-filters-btn" class="btn btn-secondary btn-full">Clear All</button>
             </div>
         </aside>
 
@@ -272,9 +272,7 @@
                         <img id="qv-image" src="" alt="Product image" class="w-full h-full object-cover" />
                     </div>
                     <div class="p-8 relative">
-                        <button
-                            onclick="closeQuickView()"
-                            class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full">
+                        <button id="close-quick-view" class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full">
                             <i data-lucide="x" class="w-5 h-5"></i>
                         </button>
                         <div class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2" id="qv-category">
@@ -421,7 +419,7 @@
                                 </div>
                             </div>
 
-                            <button onclick="clearFilters()" class="text-sm underline hover:no-underline mt-4">
+                            <button id="clear-filters-btn" class="text-sm underline hover:no-underline mt-4">
                                 Clear all filters
                             </button>
                         </div>
@@ -472,12 +470,7 @@
                     </div>
                     <div>
                         <h4 class="footer-title">Join The List</h4>
-                        <form
-                            class="footer-input-group"
-                            onsubmit="
-                                event.preventDefault();
-                                showToast('Thanks for subscribing!');
-                            ">
+                        <form id="newsletter-form" class="footer-input-group">
                             <input type="email" placeholder="Email Address" class="footer-input" required />
                             <button type="submit" class="footer-submit">Join</button>
                         </form>
@@ -747,7 +740,7 @@
                         <i data-lucide="search-x" class="empty-state-icon mx-auto"></i>
                         <h3 class="empty-state-title">No products found</h3>
                         <p class="empty-state-text">Try adjusting your filters</p>
-                        <button onclick="clearFilters()" class="btn btn-primary mt-4">Clear Filters</button>
+                        <button id="clear-filters-btn" class="btn btn-primary mt-4">Clear Filters</button>
                     </div>
                 `;
                 } else {
@@ -1097,6 +1090,27 @@
                     const url = new URL(window.location);
                     url.searchParams.delete('q');
                     window.history.replaceState({}, '', url);
+                });
+
+                // Apply filters button
+                document.getElementById('apply-filters-btn')?.addEventListener('click', applyFilters);
+
+                // Clear filters buttons
+                document.getElementById('clear-filters-btn')?.addEventListener('click', clearFilters);
+                document.getElementById('clear-filters-link')?.addEventListener('click', clearFilters);
+                document.getElementById('clear-filters-empty')?.addEventListener('click', clearFilters);
+
+                // Close quick view button
+                document.getElementById('close-quick-view')?.addEventListener('click', function () {
+                    document.getElementById('quick-view-modal')?.classList.remove('active');
+                    document.getElementById('quick-view-overlay')?.classList.remove('active');
+                });
+
+                // Newsletter form
+                document.getElementById('newsletter-form')?.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    showToast('Thanks for subscribing!', 'success');
+                    this.reset();
                 });
             });
         </script>

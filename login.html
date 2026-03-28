@@ -267,9 +267,7 @@
                                 <input type="checkbox" id="remember-me" name="remember-me" />
                                 <span>Remember me</span>
                             </label>
-                            <button type="button" class="forgot-link" onclick="showForgotPassword()">
-                                Forgot password?
-                            </button>
+                            <button type="button" class="forgot-link" id="forgot-password-btn">Forgot password?</button>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-full mb-4">Sign In</button>
@@ -374,6 +372,9 @@
             function showForgotPassword() {
                 showToast('Password reset coming soon');
             }
+
+            // Forgot password button
+            document.getElementById('forgot-password-btn')?.addEventListener('click', showForgotPassword);
 
             // Check if already logged in
             if (Auth.isLoggedIn()) {

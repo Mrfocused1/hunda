@@ -224,7 +224,7 @@
                     </div>
                     <div class="p-8 relative">
                         <button
-                            onclick="closeQuickView()"
+                            id="close-quick-view"
                             class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors">
                             <i data-lucide="x" class="w-5 h-5"></i>
                         </button>
@@ -675,12 +675,7 @@
                         <p class="text-gray-400 text-sm mb-4">
                             Get 15% off your first order and exclusive access to drops.
                         </p>
-                        <form
-                            class="footer-input-group"
-                            onsubmit="
-                                event.preventDefault();
-                                showToast('Thanks for subscribing!');
-                            ">
+                        <form id="newsletter-form" class="footer-input-group">
                             <input type="email" placeholder="Email Address" class="footer-input" required />
                             <button type="submit" class="footer-submit">Join</button>
                         </form>
@@ -910,6 +905,20 @@
                         }
                     });
                 }
+
+                // Close quick view button
+                document.getElementById('close-quick-view')?.addEventListener('click', function () {
+                    if (typeof closeQuickView === 'function') {
+                        closeQuickView();
+                    }
+                });
+
+                // Newsletter form
+                document.getElementById('newsletter-form')?.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    showToast('Thanks for subscribing!', 'success');
+                    this.reset();
+                });
             });
         </script>
     </body>
