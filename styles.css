@@ -366,7 +366,40 @@ body {
     display: none;
 }
 
-/* Hamburger Button */
+/* ========================================
+   Hamburger Button
+   ======================================== */
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--brand-mid-grey);
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+}
+
+.breadcrumbs > a,
+.breadcrumbs > span {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.breadcrumbs i,
+.breadcrumbs svg {
+    display: inline-flex;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.breadcrumbs a:hover {
+    color: var(--brand-black);
+}
+
 .hamburger {
     display: flex;
     flex-direction: column;
@@ -723,6 +756,9 @@ body {
     padding: 1.25rem 2.5rem;
     font-size: 1rem;
 }
+
+/* ========================================
+   BREADCRUMBS
 
 /* ========================================
    FILTERS & SIDEBAR
@@ -1463,25 +1499,6 @@ body {
 
 .footer-social-link:hover {
     color: var(--white);
-}
-
-/* ========================================
-   BREADCRUMBS
-   ======================================== */
-
-.breadcrumbs {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.75rem;
-    color: var(--brand-mid-grey);
-    margin-bottom: 1.5rem;
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
-.breadcrumbs a:hover {
-    color: var(--brand-black);
 }
 
 /* ========================================
