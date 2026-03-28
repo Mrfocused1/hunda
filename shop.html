@@ -1089,9 +1089,24 @@
                 document.getElementById('clear-filters-empty')?.addEventListener('click', clearFilters);
 
                 // Close quick view button
-                document.getElementById('close-quick-view')?.addEventListener('click', function () {
-                    document.getElementById('quick-view-modal')?.classList.remove('active');
-                    document.getElementById('quick-view-overlay')?.classList.remove('active');
+                const closeQuickViewModal = function () {
+                    const modal = document.getElementById('quick-view-modal');
+                    const overlay = document.getElementById('quick-view-overlay');
+                    if (modal && overlay) {
+                        modal.classList.add('scale-95', 'opacity-0');
+                        modal.classList.remove('scale-100', 'opacity-100');
+                        overlay.classList.add('invisible', 'opacity-0');
+                        document.body.style.overflow = '';
+                    }
+                };
+
+                document.getElementById('close-quick-view')?.addEventListener('click', closeQuickViewModal);
+
+                // Close when clicking overlay (outside modal)
+                document.getElementById('quick-view-overlay')?.addEventListener('click', function (e) {
+                    if (e.target === this) {
+                        closeQuickViewModal();
+                    }
                 });
 
                 // Newsletter form

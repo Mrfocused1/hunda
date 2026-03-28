@@ -913,6 +913,13 @@
                     }
                 });
 
+                // Close when clicking overlay (outside modal)
+                document.getElementById('quick-view-overlay')?.addEventListener('click', function (e) {
+                    if (e.target === this && typeof closeQuickView === 'function') {
+                        closeQuickView();
+                    }
+                });
+
                 // Newsletter form
                 document.getElementById('newsletter-form')?.addEventListener('submit', function (e) {
                     e.preventDefault();
