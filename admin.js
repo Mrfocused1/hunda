@@ -694,19 +694,11 @@ async function saveProduct(event) {
         saveBtn.textContent = 'Saving...';
     }
 
-    // Upload images to Supabase Storage if needed
-    let images = currentProductImages.length > 0 ? currentProductImages : ['product-1.png'];
-
-    if (useSupabase && images.some((img) => img.startsWith('data:'))) {
-        images = await uploadProductImages(images, id);
-    }
-
-    const productData = {
+    // Prepare base product data (without images first for new products)
+    const baseProductData = {
         title: document.getElementById('product-title').value,
         price: parseFloat(document.getElementById('product-price').value),
         category: document.getElementById('product-category').value,
-        images: images,
-        image: images[0], // For backward compatibility
         stock: parseInt(document.getElementById('product-stock').value) || 0,
         description: document.getElementById('product-description').value,
         sizes: ['S', 'M', 'L', 'XL'],
@@ -715,17 +707,58 @@ async function saveProduct(event) {
 
     if (useSupabase && typeof ProductAPI !== 'undefined') {
         let result;
+        let productId = id ? parseInt(id) : null;
+
         if (id) {
-            // Update existing
-            result = await ProductAPI.update(parseInt(id), productData);
+            // Update existing - handle images with known product ID
+            let images = currentProductImages.length > 0 ? currentProductImages : ['product-1.png'];
+
+            if (images.some((img) => img.startsWith('data:'))) {
+                images = await uploadProductImages(images, productId);
+            }
+
+            const productData = {
+                ...baseProductData,
+                images: images,
+                image: images[0]
+            };
+
+            result = await ProductAPI.update(productId, productData);
         } else {
-            // Create new
-            result = await ProductAPI.create(productData);
+            // Create new - first create product without images to get an ID
+            const tempProductData = {
+                ...baseProductData,
+                images: ['product-1.png'],
+                image: 'product-1.png'
+            };
+
+            result = await ProductAPI.create(tempProductData);
+
+            if (!result.error && result.data) {
+                productId = result.data.id;
+
+                // Now upload images with the correct product ID
+                let images = currentProductImages.length > 0 ? currentProductImages : ['product-1.png'];
+
+                if (images.some((img) => img.startsWith('data:'))) {
+                    showToast('📤 Uploading images...');
+                    images = await uploadProductImages(images, productId);
+
+                    // Update product with correct image paths
+                    const updateResult = await ProductAPI.update(productId, {
+                        images: images,
+                        image: images[0]
+                    });
+
+                    if (updateResult.data) {
+                        result.data = updateResult.data;
+                    }
+                }
+            }
         }
 
         if (result.error) {
             showToast('❌ Error saving product: ' + result.error.message);
-            // Supabase error during save
         } else {
             showToast('✅ Product saved to Supabase!');
             // Refresh products list
@@ -735,6 +768,14 @@ async function saveProduct(event) {
         }
     } else {
         // Local fallback
+        let images = currentProductImages.length > 0 ? currentProductImages : ['product-1.png'];
+
+        const productData = {
+            ...baseProductData,
+            images: images,
+            image: images[0]
+        };
+
         if (id) {
             // Update existing
             const index = adminProducts.findIndex((p) => p.id === parseInt(id));
