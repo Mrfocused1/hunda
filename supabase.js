@@ -2,29 +2,42 @@
 // Supabase Configuration
 // ========================================
 
-// Initialize Supabase client
+// SECURITY NOTE: The Supabase anon key is PUBLIC by design.
+// It is safe to expose in client-side code. Row Level Security (RLS)
+// policies protect your data. Never expose the service_role key here.
 const SUPABASE_URL = 'https://wsgbnfoazvdkxpdqwgyo.supabase.co';
 const SUPABASE_ANON_KEY =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzZ2JuZm9henZka3hwZHF3Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NDY4MTMsImV4cCI6MjA5MDEyMjgxM30.YUl4-O9q39Wn5xqUjp8S1F8VmTQH76PTIcQGpnrHXNE';
 
 let supabaseClient = null;
 
-// Initialize Supabase (works with both module and script tag approaches)
+/**
+ * Initialize Supabase client
+ * @returns {Object|null} Supabase client or null if library not loaded
+ */
 function initSupabase() {
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        // Supabase connected successfully
-        return supabaseClient;
-    } else if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        // Supabase connected successfully
-        return supabaseClient;
+    try {
+        if (typeof supabase !== 'undefined' && supabase.createClient) {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            debugLog('Supabase connected successfully');
+            return supabaseClient;
+        } else if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            debugLog('Supabase connected successfully');
+            return supabaseClient;
+        }
+        debugLog('Supabase library not loaded yet');
+        return null;
+    } catch (error) {
+        debugError('Failed to initialize Supabase:', error);
+        return null;
     }
-    // Supabase library not loaded yet
-    return null;
 }
 
-// Get Supabase client (initializes if needed)
+/**
+ * Get Supabase client (initializes if needed)
+ * @returns {Object|null} Supabase client
+ */
 function getSupabase() {
     if (!supabaseClient) {
         return initSupabase();

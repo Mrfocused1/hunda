@@ -2,64 +2,88 @@
 // 1 HUNDRED - Main JavaScript
 // ========================================
 
+// Use shared utilities if available
+const U =
+    typeof Utils !== 'undefined'
+        ? Utils
+        : {
+              config: { TAX_RATE: 0.2, FREE_SHIPPING_THRESHOLD: 50, SHIPPING_COST: 4.99, CURRENCY_SYMBOL: '£' },
+              sanitizeHTML: (str) =>
+                  str
+                      ?.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#039;') || '',
+              formatPrice: (price) => `£${parseFloat(price || 0).toFixed(2)}`,
+              calculateShipping: (subtotal) => (subtotal >= 50 ? 0 : 4.99),
+              getStorageItem: (key, defaultVal) =>
+                  JSON.parse(localStorage.getItem(`1hundred_${key}`) || 'null') || defaultVal,
+              setStorageItem: (key, value) => localStorage.setItem(`1hundred_${key}`, JSON.stringify(value)),
+              isValidEmail: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase())
+          };
+
 // --- STATE ---
 const state = {
-    cart: JSON.parse(localStorage.getItem('cart')) || [],
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    cart: U.getStorageItem('cart', []),
+    user: U.getStorageItem('user', null),
     isMenuOpen: false,
     isCartOpen: false,
     isSearchOpen: false
 };
 
 // --- PRODUCT DATA ---
-// Fallback products (used when Supabase is not available)
-const FALLBACK_PRODUCTS = [
-    {
-        id: 3,
-        title: '1H Star Cap',
-        price: 30,
-        category: 'Hats',
-        images: ['product-3.png'],
-        sizes: ['One Size'],
-        colors: ['White/Black']
-    },
-    {
-        id: 4,
-        title: 'The No Half Measures Hoodie',
-        price: 85,
-        category: 'Hoodies',
-        images: ['product-4.jpeg'],
-        sizes: ['S', 'M', 'L', 'XL'],
-        colors: ['Black']
-    },
-    {
-        id: 5,
-        title: 'Endless Possibilities Hoodie',
-        price: 85,
-        category: 'Hoodies',
-        images: ['product-5.jpeg'],
-        sizes: ['S', 'M', 'L', 'XL'],
-        colors: ['Blue']
-    },
-    {
-        id: 6,
-        title: '1H Multi Colour Cap',
-        price: 30,
-        category: 'Hats',
-        images: ['product-6.jpeg'],
-        sizes: ['One Size'],
-        colors: ['White/Black']
-    },
-    {
-        id: 7,
-        title: 'Relentless Trophy Tee',
-        price: 40,
-        category: 'Tops',
-        images: ['product-relentless-front.png', 'product-relentless-back.png'],
-        sizes: ['S', 'M', 'L', 'XL'],
-        colors: ['Grey']
-    }
-];
+// Use shared products config if available, otherwise use inline fallback
+const FALLBACK_PRODUCTS =
+    typeof PRODUCTS_CONFIG !== 'undefined'
+        ? PRODUCTS_CONFIG.fallbackProducts
+        : [
+              {
+                  id: 3,
+                  title: '1H Star Cap',
+                  price: 30,
+                  category: 'Hats',
+                  images: ['product-3.png'],
+                  sizes: ['One Size'],
+                  colors: ['White/Black']
+              },
+              {
+                  id: 4,
+                  title: 'The No Half Measures Hoodie',
+                  price: 85,
+                  category: 'Hoodies',
+                  images: ['product-4.jpeg'],
+                  sizes: ['S', 'M', 'L', 'XL'],
+                  colors: ['Black']
+              },
+              {
+                  id: 5,
+                  title: 'Endless Possibilities Hoodie',
+                  price: 85,
+                  category: 'Hoodies',
+                  images: ['product-5.jpeg'],
+                  sizes: ['S', 'M', 'L', 'XL'],
+                  colors: ['Blue']
+              },
+              {
+                  id: 6,
+                  title: '1H Multi Colour Cap',
+                  price: 30,
+                  category: 'Hats',
+                  images: ['product-6.jpeg'],
+                  sizes: ['One Size'],
+                  colors: ['White/Black']
+              },
+              {
+                  id: 7,
+                  title: 'Relentless Trophy Tee',
+                  price: 40,
+                  category: 'Tops',
+                  images: ['product-relentless-front.png', 'product-relentless-back.png'],
+                  sizes: ['S', 'M', 'L', 'XL'],
+                  colors: ['Grey']
+              }
+          ];
 
 // Active products (will be populated from Supabase or fallback)
 let products = [...FALLBACK_PRODUCTS];
@@ -244,7 +268,27 @@ function addToCart(productId, size, color, quantity = 1) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
 
+    // Check stock availability
+    const currentStock = product.stock || 0;
     const existingItem = state.cart.find((item) => item.id === productId && item.size === size && item.color === color);
+    const currentInCart = existingItem ? existingItem.quantity : 0;
+    const totalRequested = currentInCart + quantity;
+
+    if (currentStock <= 0) {
+        showToast('Sorry, this item is out of stock', 'error');
+        return;
+    }
+
+    if (totalRequested > currentStock) {
+        const availableToAdd = currentStock - currentInCart;
+        if (availableToAdd <= 0) {
+            showToast(`Maximum ${currentStock} items allowed in cart`, 'error');
+        } else {
+            showToast(`Only ${availableToAdd} more available. Added maximum to cart.`, 'warning');
+            quantity = availableToAdd;
+        }
+        if (quantity <= 0) return;
+    }
 
     // Get primary image (support local files and Supabase Storage)
     let primaryImage = 'product-1.png';
@@ -272,6 +316,14 @@ function addToCart(productId, size, color, quantity = 1) {
     saveCart();
     updateBadges();
     showToast('Added to bag');
+
+    // Schedule abandoned cart email reminder for logged-in users
+    const user = Auth?.getUser?.();
+    if (user?.email && typeof EmailService !== 'undefined') {
+        EmailService.scheduleAbandonedCart(user.email, {
+            firstName: user.firstName || user.name?.split(' ')[0] || 'Customer'
+        });
+    }
 }
 
 function removeFromCart(productId, size, color) {
@@ -306,11 +358,19 @@ function updateCartQuantity(productId, size, color, quantity) {
 }
 
 function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(state.cart));
+    const success = U.setStorageItem('cart', state.cart);
+    if (!success) {
+        showToast('Cart is full. Please remove some items.', 'error');
+    }
 }
 
 function getCartTotal() {
-    return state.cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    if (!state.cart || !Array.isArray(state.cart)) return 0;
+    return state.cart.reduce((total, item) => {
+        const price = parseFloat(item?.price) || 0;
+        const quantity = parseInt(item?.quantity) || 0;
+        return total + price * quantity;
+    }, 0);
 }
 
 function getCartCount() {
@@ -321,8 +381,9 @@ function updateBadges() {
     const cartCount = getCartCount();
     const cartBadge = document.getElementById('cart-count');
     const cartBadgeMobile = document.getElementById('cart-count-mobile');
+    const cartBadgeMobileHeader = document.getElementById('cart-count-mobile-header');
 
-    [cartBadge, cartBadgeMobile].forEach((badge) => {
+    [cartBadge, cartBadgeMobile, cartBadgeMobileHeader].forEach((badge) => {
         if (badge) {
             badge.textContent = cartCount;
             badge.classList.toggle('hidden', cartCount === 0);
@@ -391,23 +452,7 @@ function renderMiniCart() {
 // UI HELPERS
 // ========================================
 
-function showToast(message, duration = 3000) {
-    const toast = document.getElementById('toast');
-    const toastMsg = document.getElementById('toast-msg');
-
-    if (toast && toastMsg) {
-        toastMsg.textContent = message;
-        toast.classList.add('show');
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, duration);
-    }
-}
-
-function formatPrice(price) {
-    return `£${price.toFixed(2)}`;
-}
+// formatPrice now uses Utils.formatPrice
 
 // ========================================
 // QUICK VIEW MODAL
@@ -716,17 +761,34 @@ function initSearch() {
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Show loading state for products
+    const productsContainer = document.getElementById('products-grid') || document.getElementById('new-arrivals-grid');
+    if (productsContainer) {
+        productsContainer.innerHTML =
+            '<div class="flex justify-center items-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div></div>';
+    }
+
     initHeader();
     initLoader();
     updateBadges();
 
     // Initialize Supabase products with error handling
+    let productsLoaded = false;
     try {
         await initProducts();
+        productsLoaded = true;
+        debugLog('Products initialized successfully');
     } catch (err) {
-        console.error('Failed to initialize products:', err);
+        debugError('Failed to initialize products:', err);
         showToast('Using offline mode', 'warning');
     }
+
+    // Dispatch event when products are ready (for dependent components)
+    window.dispatchEvent(
+        new CustomEvent('productsInitialized', {
+            detail: { success: productsLoaded, products }
+        })
+    );
 
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') {
@@ -757,6 +819,15 @@ window.addEventListener('unhandledrejection', (e) => {
     showToast('Network error. Please check your connection.', 'error', 5000);
 });
 
+// Debug utility - only logs in development
+const DEBUG = window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app');
+window.debugLog = function (...args) {
+    if (DEBUG) console.log(...args);
+};
+window.debugError = function (...args) {
+    if (DEBUG) console.error(...args);
+};
+
 // Expose functions globally
 window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;
@@ -769,12 +840,16 @@ window.toggleCart = toggleCart;
 window.showToast = showToast;
 window.showLoading = showLoading;
 window.showError = showError;
-window.sanitizeHTML = function (str) {
-    if (!str) return '';
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+window.sanitizeHTML = U.sanitizeHTML;
+window.getCartTotal = getCartTotal;
+window.Utils = U;
+
+// Wishlist stub functions (feature not fully implemented)
+window.toggleWishlist = function (productId) {
+    showToast('Wishlist feature coming soon!');
+    debugLog('Wishlist toggle for product:', productId);
+};
+
+window.isInWishlist = function (productId) {
+    return false;
 };

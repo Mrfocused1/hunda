@@ -163,10 +163,10 @@ const AdminData = {
         return stored
             ? JSON.parse(stored)
             : {
-                  'order-confirmation': false,
-                  'shipping-confirmation': false,
-                  'abandoned-cart': false,
-                  welcome: false
+                  'order-confirmation': true,
+                  'shipping-confirmation': true,
+                  'abandoned-cart': true,
+                  welcome: true
               };
     },
 
@@ -228,13 +228,20 @@ function loadDashboard() {
     // Calculate stats
     const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
 
-    document.getElementById('stat-sales').textContent = `£${totalSales.toFixed(2)}`;
-    document.getElementById('stat-orders').textContent = orders.length;
-    document.getElementById('stat-products').textContent = products.length;
-    document.getElementById('stat-customers').textContent = customers.length;
+    const statSales = document.getElementById('stat-sales');
+    const statOrders = document.getElementById('stat-orders');
+    const statProducts = document.getElementById('stat-products');
+    const statCustomers = document.getElementById('stat-customers');
+
+    if (statSales) statSales.textContent = `£${totalSales.toFixed(2)}`;
+    if (statOrders) statOrders.textContent = orders.length;
+    if (statProducts) statProducts.textContent = products.length;
+    if (statCustomers) statCustomers.textContent = customers.length;
 
     // Recent orders
     const recentOrdersEl = document.getElementById('recent-orders-list');
+    if (!recentOrdersEl) return;
+
     const recentOrders = orders.slice(-5).reverse();
 
     if (recentOrders.length === 0) {
@@ -982,14 +989,36 @@ function sortOrders() {
     renderOrders();
 }
 
-function updateOrderStatus(orderId, status) {
+async function updateOrderStatus(orderId, status) {
     const orders = AdminData.getOrders();
     const order = orders.find((o) => o.id === orderId);
     if (order) {
+        const previousStatus = order.status;
         order.status = status;
         AdminData.saveOrders(orders);
         showToast(`Order ${orderId} updated to ${status}`);
         updateOrderStats();
+
+        // Send shipping notification when order is marked as shipped
+        if (status === 'shipped' && previousStatus !== 'shipped' && order.email) {
+            const trackingNumber = order.trackingNumber || '';
+            const carrier = order.carrier || '';
+
+            try {
+                if (typeof EmailService !== 'undefined') {
+                    await EmailService.sendShippingNotification(order.email, {
+                        firstName: order.customer?.split(' ')[0] || 'Customer',
+                        orderNumber: order.id,
+                        trackingNumber: trackingNumber,
+                        carrier: carrier
+                    });
+                    showToast(`Shipping notification sent to ${order.email}`);
+                }
+            } catch (error) {
+                console.error('Failed to send shipping notification:', error);
+                showToast('Order updated but email notification failed');
+            }
+        }
     }
 }
 
@@ -1053,10 +1082,10 @@ function updateCustomerStats() {
     const totalCustomers = allCustomers.length;
     const newThisMonth = allCustomers.filter((c) => new Date(c.joined) > thirtyDaysAgo).length;
     const vipCustomers = allCustomers.filter((c) => c.status === 'vip').length;
-    const avgOrderValue =
-        allCustomers.length > 0
-            ? allCustomers.reduce((sum, c) => sum + c.totalSpent / c.orders, 0) / allCustomers.length
-            : 0;
+    // Calculate AOV correctly: Total Revenue / Total Orders
+    const totalRevenue = allCustomers.reduce((sum, c) => sum + (c.totalSpent || 0), 0);
+    const totalOrders = allCustomers.reduce((sum, c) => sum + (c.orders || 0), 0);
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
     document.getElementById('customer-total-count').textContent = totalCustomers;
     document.getElementById('customer-new-count').textContent = newThisMonth;
@@ -1582,9 +1611,60 @@ function closeEmailPreviewModal() {
     currentPreviewEmailType = null;
 }
 
-function sendTestEmail() {
+async function sendTestEmail() {
     if (!currentPreviewEmailType) return;
-    showToast('Test email sent to your admin email address');
+
+    // Get current admin user
+    const adminUser = JSON.parse(sessionStorage.getItem('1hundred_admin_session') || '{}');
+    const email = adminUser.email || 'admin@1hundredornothing.co.uk';
+
+    showToast('Sending test email...');
+
+    try {
+        let result;
+        switch (currentPreviewEmailType) {
+            case 'order-confirmation':
+                result = await EmailService.sendOrderConfirmation(email, {
+                    firstName: adminUser.name?.split(' ')[0] || 'Test',
+                    orderNumber: 'TEST-001',
+                    total: '99.99',
+                    items: [{ name: 'Test Product', price: '99.99', quantity: 1 }]
+                });
+                break;
+            case 'shipping-confirmation':
+                result = await EmailService.sendShippingNotification(email, {
+                    firstName: adminUser.name?.split(' ')[0] || 'Test',
+                    orderNumber: 'TEST-001',
+                    trackingNumber: 'TRK123456789',
+                    carrier: 'Royal Mail'
+                });
+                break;
+            case 'welcome':
+                result = await EmailService.sendWelcomeEmail(email, {
+                    firstName: adminUser.name?.split(' ')[0] || 'Test'
+                });
+                break;
+            case 'abandoned-cart':
+                result = await EmailService.sendAbandonedCartEmail(email, {
+                    firstName: adminUser.name?.split(' ')[0] || 'Test',
+                    total: '99.99',
+                    items: [{ name: 'Test Product', price: '99.99' }]
+                });
+                break;
+            default:
+                showToast('Unknown email type');
+                return;
+        }
+
+        if (result.success) {
+            showToast('Test email sent successfully!');
+        } else {
+            showToast('Failed to send test email: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Test email error:', error);
+        showToast('Error sending test email');
+    }
 }
 
 // Content Management / Settings

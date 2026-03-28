@@ -40,6 +40,37 @@
         <!-- Theme Color -->
         <meta name="theme-color" content="#111111" />
 
+        <!-- Structured Data -->
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "1 HUNDRED",
+                "url": "https://www.1hundredornothing.co.uk",
+                "logo": "https://www.1hundredornothing.co.uk/logo.svg",
+                "description": "Premium unisex streetwear and fashion. No half measures.",
+                "sameAs": ["https://instagram.com/1hundred.uk"],
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "email": "hundredornothing@outlook.com",
+                    "contactType": "customer service"
+                }
+            }
+        </script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "1 HUNDRED",
+                "url": "https://www.1hundredornothing.co.uk",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "https://www.1hundredornothing.co.uk/shop?q={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                }
+            }
+        </script>
+
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
 
@@ -51,16 +82,19 @@
             rel="stylesheet" />
 
         <!-- Icons -->
-        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://unpkg.com/lucide@latest" defer></script>
 
         <!-- GSAP -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
 
         <!-- Custom Styles -->
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body class="antialiased">
+        <!-- Skip Navigation Link for Accessibility -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
         <!-- Page Loader -->
         <div id="page-loader" class="page-loader">
             <img src="logo.svg" alt="1 HUNDRED" />
@@ -92,6 +126,7 @@
                     <input
                         type="text"
                         id="mobile-search-input"
+                        aria-label="Search products"
                         placeholder="Search products..."
                         class="flex-1 bg-gray-100 rounded-full py-3 px-4 pl-10 text-sm" />
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
@@ -256,7 +291,7 @@
             </div>
         </div>
 
-        <main>
+        <main id="main-content">
             <!-- Hero Section -->
             <section class="relative h-screen overflow-hidden bg-black">
                 <div class="absolute inset-0" style="padding-top: 60px">
@@ -723,23 +758,31 @@
 
         <!-- Main JavaScript -->
         <!-- Supabase -->
-        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
         <script src="supabase.js"></script>
+        <script src="scripts/security.js"></script>
+        <script src="scripts/pricing.js"></script>
+        <script src="scripts/email-service.js"></script>
+        <script src="scripts/utils.js"></script>
+        <script src="scripts/products-config.js"></script>
         <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
 
         <script>
             // Render new arrivals
-            // Product slug mapping
-            const productSlugs = {
-                3: '1h-star-cap',
-                4: 'no-half-measures-hoodie',
-                5: 'endless-possibilities-hoodie',
-                6: '1h-multi-colour-cap',
-                7: 'relentless-trophy-tee'
-            };
-
+            // Use shared product config if available
             function getProductUrl(product) {
+                if (typeof PRODUCTS_CONFIG !== 'undefined') {
+                    return PRODUCTS_CONFIG.getProductUrl(product.id);
+                }
+                // Fallback if config not loaded
+                const productSlugs = {
+                    3: '1h-star-cap',
+                    4: 'no-half-measures-hoodie',
+                    5: 'endless-possibilities-hoodie',
+                    6: '1h-multi-colour-cap',
+                    7: 'relentless-trophy-tee'
+                };
                 return productSlugs[product.id] ? `/${productSlugs[product.id]}` : `/product?id=${product.id}`;
             }
 

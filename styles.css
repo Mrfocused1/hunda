@@ -13,6 +13,69 @@
     --red: #ef4444;
 }
 
+/* Skip Navigation Link for Accessibility */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px 16px;
+    z-index: 9999;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 0 0 4px;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Focus Visible Styles for Accessibility */
+:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgb(0 0 0 / 10%);
+}
+
+/* Mobile Touch Targets (minimum 44x44px) */
+@media (pointer: coarse) {
+    button,
+    .btn,
+    a.nav-link,
+    .mobile-nav-link,
+    .size-option,
+    .cart-quantity-btn,
+    .image-nav-arrow {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    input[type='checkbox'],
+    input[type='radio'] {
+        min-height: 24px;
+        min-width: 24px;
+    }
+
+    .footer-social-link {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
 /* Reset & Base */
 *,
 *::before,

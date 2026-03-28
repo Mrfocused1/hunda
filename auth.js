@@ -5,29 +5,80 @@
  * In production, replace with backend authentication.
  */
 
+/**
+ * Authentication System
+ *
+ * SECURITY NOTICE: This is client-side authentication for demo purposes.
+ * In production, use server-side authentication with secure sessions.
+ */
 const Auth = (function () {
-    const STORAGE_KEY = '1hundred_auth_user';
-    const SESSION_KEY = '1hundred_session';
+    const STORAGE_PREFIX = '1hundred_';
+    const STORAGE_KEY = `${STORAGE_PREFIX}auth_user`;
+    const SESSION_KEY = `${STORAGE_PREFIX}session`;
+    const USERS_KEY = `${STORAGE_PREFIX}users`;
 
-    // Demo users (in production, this would be on the backend)
-    const demoUsers = [
-        {
-            email: 'demo@1hundredornothing.co.uk',
-            password: 'password123',
-            firstName: 'Demo',
-            lastName: 'User'
+    // Simple hash function (client-side obfuscation only - NOT secure for production)
+    async function hashPassword(password) {
+        const encoder = new TextEncoder();
+        const salt = '1hundred_' + (typeof window !== 'undefined' ? window.location.hostname : 'salt');
+        const data = encoder.encode(password + salt);
+
+        if (typeof crypto !== 'undefined' && crypto.subtle) {
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
         }
-    ];
+
+        // Fallback for older browsers
+        return btoa(password + salt);
+    }
+
+    // Demo users with hashed passwords (in production, this would be on the backend)
+    let demoUsers = [];
+
+    // Initialize demo users with hashed passwords
+    async function initDemoUsers() {
+        demoUsers = [
+            {
+                email: 'demo@1hundredornothing.co.uk',
+                password: await hashPassword('password123'),
+                firstName: 'Demo',
+                lastName: 'User'
+            }
+        ];
+    }
+    initDemoUsers();
 
     // Get stored users from localStorage
     function getStoredUsers() {
-        const stored = localStorage.getItem('1hundred_users');
-        return stored ? JSON.parse(stored) : [...demoUsers];
+        const stored = localStorage.getItem(USERS_KEY);
+        if (stored) {
+            const users = JSON.parse(stored);
+            // Check if users have hashed passwords (migration)
+            return users.map((u) => {
+                // Detect if password is hashed (64 hex chars for SHA-256) or base64 encoded
+                const isHashed =
+                    u.password &&
+                    (/^[a-f0-9]{64}$/i.test(u.password) || // SHA-256 hex
+                        /^[A-Za-z0-9+/]{20,}={0,2}$/.test(u.password)); // Base64 fallback
+
+                return {
+                    ...u,
+                    password: u.password || '', // Ensure password field exists
+                    _needsPasswordMigration: !isHashed && u.password && u.password.length > 0
+                };
+            });
+        }
+        return [...demoUsers];
     }
 
     // Save users to localStorage
     function saveUsers(users) {
-        localStorage.setItem('1hundred_users', JSON.stringify(users));
+        try {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        } catch (e) {
+            debugError('Failed to save users:', e);
+        }
     }
 
     // Get current user
@@ -56,6 +107,8 @@ const Auth = (function () {
     function clearCurrentUser() {
         sessionStorage.removeItem(SESSION_KEY);
         localStorage.removeItem(STORAGE_KEY);
+        // Clear CSRF token on logout
+        sessionStorage.removeItem('csrf_token');
     }
 
     // Public API
@@ -81,9 +134,20 @@ const Auth = (function () {
          * @param {string} email
          * @param {string} password
          * @param {boolean} rememberMe
-         * @returns {Object} { success: boolean, message: string }
+         * @returns {Promise<Object>} { success: boolean, message: string }
          */
-        login: function (email, password, rememberMe = false) {
+        login: async function (email, password, rememberMe = false) {
+            // Rate limiting
+            if (typeof Security !== 'undefined') {
+                const rateCheck = Security.checkRateLimit('login', 5, 60000);
+                if (!rateCheck.allowed) {
+                    return {
+                        success: false,
+                        message: `Too many attempts. Please wait ${rateCheck.waitTime} seconds.`
+                    };
+                }
+            }
+
             const users = getStoredUsers();
             const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
 
@@ -91,7 +155,27 @@ const Auth = (function () {
                 return { success: false, message: 'Invalid email or password' };
             }
 
-            if (user.password !== password) {
+            // Handle plain text password migration
+            let passwordValid = false;
+
+            if (user._needsPasswordMigration) {
+                // Check plain text password
+                if (user.password === password) {
+                    passwordValid = true;
+                    // Migrate to hashed password
+                    user.password = await hashPassword(password);
+                    delete user._needsPasswordMigration;
+                    saveUsers(users);
+                }
+            } else {
+                // Normal hashed password comparison
+                const hashedPassword = await hashPassword(password);
+                if (user.password === hashedPassword) {
+                    passwordValid = true;
+                }
+            }
+
+            if (!passwordValid) {
                 return { success: false, message: 'Invalid email or password' };
             }
 
@@ -110,9 +194,20 @@ const Auth = (function () {
         /**
          * Register new user
          * @param {Object} userData
-         * @returns {Object} { success: boolean, message: string }
+         * @returns {Promise<Object>} { success: boolean, message: string }
          */
-        register: function (userData) {
+        register: async function (userData) {
+            // Rate limiting
+            if (typeof Security !== 'undefined') {
+                const rateCheck = Security.checkRateLimit('register', 3, 300000);
+                if (!rateCheck.allowed) {
+                    return {
+                        success: false,
+                        message: `Too many attempts. Please wait ${rateCheck.waitTime} seconds.`
+                    };
+                }
+            }
+
             const users = getStoredUsers();
 
             // Check if email already exists
@@ -120,10 +215,13 @@ const Auth = (function () {
                 return { success: false, message: 'An account with this email already exists' };
             }
 
+            // Hash password before storing
+            const hashedPassword = await hashPassword(userData.password);
+
             // Add new user
             users.push({
                 email: userData.email,
-                password: userData.password,
+                password: hashedPassword,
                 firstName: userData.firstName,
                 lastName: userData.lastName
             });
@@ -160,15 +258,69 @@ const Auth = (function () {
         },
 
         /**
-         * Require authentication (redirect if not logged in)
-         * @param {string} redirectUrl - URL to redirect back to after login
+         * Update user profile
+         * @param {Object} updates
+         * @returns {Object}
          */
-        requireAuth: function (redirectUrl = window.location.pathname) {
-            if (!this.isLoggedIn()) {
-                window.location.href = `/login?redirect=${encodeURIComponent(redirectUrl)}`;
-                return false;
+        updateProfile: function (updates) {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                return { success: false, message: 'Not logged in' };
             }
-            return true;
+
+            const users = getStoredUsers();
+            const userIndex = users.findIndex((u) => u.email === currentUser.email);
+
+            if (userIndex === -1) {
+                return { success: false, message: 'User not found' };
+            }
+
+            // Update user data
+            users[userIndex] = {
+                ...users[userIndex],
+                firstName: updates.firstName || users[userIndex].firstName,
+                lastName: updates.lastName || users[userIndex].lastName,
+                phone: updates.phone || users[userIndex].phone
+            };
+
+            saveUsers(users);
+
+            // Update current session
+            setCurrentUser(users[userIndex], localStorage.getItem(STORAGE_KEY) !== null);
+
+            return { success: true, message: 'Profile updated' };
+        },
+
+        /**
+         * Change password
+         * @param {string} currentPassword
+         * @param {string} newPassword
+         * @returns {Promise<Object>}
+         */
+        changePassword: async function (currentPassword, newPassword) {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                return { success: false, message: 'Not logged in' };
+            }
+
+            const users = getStoredUsers();
+            const userIndex = users.findIndex((u) => u.email === currentUser.email);
+
+            if (userIndex === -1) {
+                return { success: false, message: 'User not found' };
+            }
+
+            // Verify current password
+            const hashedCurrentPassword = await hashPassword(currentPassword);
+            if (users[userIndex].password !== hashedCurrentPassword) {
+                return { success: false, message: 'Current password is incorrect' };
+            }
+
+            // Update to new hashed password
+            users[userIndex].password = await hashPassword(newPassword);
+            saveUsers(users);
+
+            return { success: true, message: 'Password changed successfully' };
         },
 
         /**
@@ -182,38 +334,38 @@ const Auth = (function () {
             // Update account links
             const accountLinks = document.querySelectorAll('a[href="/account"], a[href="/login"]');
             accountLinks.forEach((link) => {
-                if (link.closest('#mobile-menu')) {
-                    // Mobile menu link
-                    if (isLoggedIn) {
-                        link.href = '/account';
-                        const span = link.querySelector('span');
-                        if (span) span.textContent = 'My Account';
-                    } else {
-                        link.href = '/login';
-                        const span = link.querySelector('span');
-                        if (span) span.textContent = 'Sign In';
+                if (isLoggedIn) {
+                    link.href = '/account';
+                    if (link.querySelector('.mobile-label')) {
+                        link.querySelector('.mobile-label').textContent = 'Account';
+                    }
+                } else {
+                    link.href = '/login';
+                    if (link.querySelector('.mobile-label')) {
+                        link.querySelector('.mobile-label').textContent = 'Login';
                     }
                 }
             });
 
-            // Update header account icon
-            const headerAccountIcons = document.querySelectorAll(
-                '#main-header .header-action[aria-label="Sign In"], #main-header .header-action[aria-label="Account"]'
-            );
-            headerAccountIcons.forEach((icon) => {
-                if (isLoggedIn) {
-                    icon.href = '/account';
-                    icon.setAttribute('aria-label', 'Account');
-                } else {
-                    icon.href = '/login';
-                    icon.setAttribute('aria-label', 'Sign In');
-                }
+            // Update user name displays
+            const userNameElements = document.querySelectorAll('.user-name');
+            userNameElements.forEach((el) => {
+                el.textContent = isLoggedIn ? user.firstName || 'Member' : 'Guest';
+            });
+
+            // Show/hide logged-in only elements
+            document.querySelectorAll('.logged-in-only').forEach((el) => {
+                el.style.display = isLoggedIn ? '' : 'none';
+            });
+
+            document.querySelectorAll('.logged-out-only').forEach((el) => {
+                el.style.display = isLoggedIn ? 'none' : '';
             });
         }
     };
 })();
 
-// Auto-update UI on page load
-document.addEventListener('DOMContentLoaded', function () {
+// Auto-update UI on load
+document.addEventListener('DOMContentLoaded', () => {
     Auth.updateUI();
 });

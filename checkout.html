@@ -17,6 +17,7 @@
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
             rel="stylesheet" />
         <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://js.stripe.com/v3/" async></script>
         <link rel="stylesheet" href="styles.css" />
         <style>
             .checkout-step-content {
@@ -216,12 +217,12 @@
                             <form id="shipping-form">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label class="form-label">First Name *</label>
-                                        <input type="text" class="form-input" required />
+                                        <label class="form-label" for="checkout-firstname">First Name *</label>
+                                        <input type="text" class="form-input" id="checkout-firstname" required />
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Last Name *</label>
-                                        <input type="text" class="form-input" required />
+                                        <label class="form-label" for="checkout-lastname">Last Name *</label>
+                                        <input type="text" class="form-input" id="checkout-lastname" required />
                                     </div>
                                 </div>
 
@@ -232,7 +233,13 @@
 
                                 <div class="form-group">
                                     <label class="form-label" for="checkout-phone">Phone *</label>
-                                    <input type="tel" class="form-input" id="checkout-phone" required />
+                                    <input
+                                        type="tel"
+                                        class="form-input"
+                                        id="checkout-phone"
+                                        required
+                                        pattern="[0-9\s\-\+\(\)]{10,}"
+                                        title="Please enter a valid phone number" />
                                 </div>
 
                                 <div class="form-group">
@@ -252,7 +259,13 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" for="checkout-postcode">Postcode *</label>
-                                        <input type="text" class="form-input" id="checkout-postcode" required />
+                                        <input
+                                            type="text"
+                                            class="form-input"
+                                            id="checkout-postcode"
+                                            required
+                                            pattern="[A-Za-z]{1,2}[0-9][A-Za-z0-9]?\s?[0-9][A-Za-z]{2}"
+                                            title="Please enter a valid UK postcode" />
                                     </div>
                                 </div>
 
@@ -335,54 +348,18 @@
                             </div>
 
                             <div id="card-form">
+                                <!-- Stripe Card Element will be mounted here -->
                                 <div class="form-group">
-                                    <label class="form-label" for="checkout-cardnumber">Card Number *</label>
-                                    <div class="relative">
-                                        <input
-                                            type="text"
-                                            id="checkout-cardnumber"
-                                            class="form-input pl-12"
-                                            placeholder="1234 5678 9012 3456"
-                                            maxlength="19" />
-                                        <i
-                                            data-lucide="credit-card"
-                                            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    <label class="form-label">Card Details *</label>
+                                    <div id="stripe-card-element" class="form-input p-3">
+                                        <!-- Stripe injects card input here -->
                                     </div>
+                                    <div id="stripe-card-errors" class="text-red-500 text-sm mt-2"></div>
                                 </div>
 
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="checkout-expiry">Expiry Date *</label>
-                                        <input
-                                            type="text"
-                                            class="form-input"
-                                            id="checkout-expiry"
-                                            placeholder="MM/YY"
-                                            maxlength="5" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label" for="checkout-cvv">CVV *</label>
-                                        <div class="relative">
-                                            <input
-                                                type="text"
-                                                class="form-input"
-                                                id="checkout-cvv"
-                                                placeholder="123"
-                                                maxlength="3" />
-                                            <i
-                                                data-lucide="help-circle"
-                                                class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="checkout-cardname">Name on Card *</label>
-                                    <input
-                                        type="text"
-                                        class="form-input"
-                                        id="checkout-cardname"
-                                        placeholder="JOHN SMITH" />
+                                <div class="flex items-center gap-2 mt-4">
+                                    <i data-lucide="shield-check" class="w-5 h-5 text-green-600"></i>
+                                    <span class="text-sm text-gray-600">Secure payment powered by Stripe</span>
                                 </div>
                             </div>
 
@@ -574,6 +551,11 @@
         <!-- Supabase -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
         <script src="supabase.js"></script>
+        <script src="scripts/security.js"></script>
+        <script src="scripts/pricing.js"></script>
+        <script src="scripts/email-service.js"></script>
+        <script src="scripts/stripe-service.js"></script>
+        <script src="scripts/products-config.js"></script>
         <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
@@ -654,15 +636,150 @@
                 document.getElementById('checkout-total').textContent = `£${total.toFixed(2)}`;
             }
 
-            function placeOrder() {
+            async function placeOrder() {
                 if (!document.getElementById('terms').checked) {
                     showToast('Please agree to the terms');
                     return;
                 }
 
+                // Get customer details
+                const email = document.getElementById('checkout-email')?.value;
+                const firstName = document.getElementById('checkout-firstname')?.value;
+                const lastName = document.getElementById('checkout-lastname')?.value;
+                const address1 = document.getElementById('checkout-address1')?.value;
+                const city = document.getElementById('checkout-city')?.value;
+                const postcode = document.getElementById('checkout-postcode')?.value;
+
+                // Generate order number
+                const orderNumber = '1H-' + Date.now().toString(36).toUpperCase();
+
+                // Get order total with defensive check
+                const subtotal = typeof getCartTotal === 'function' ? getCartTotal() : 0;
+                if (subtotal === 0) {
+                    showToast('Your cart is empty', 'error');
+                    return;
+                }
+                const shipping = subtotal >= 50 ? 0 : 4.99;
+                const tax = subtotal * 0.2;
+                const total = subtotal + shipping + tax;
+
+                // Get selected payment method
+                const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
+
+                // Validate required fields
+                if (!email || !firstName || !lastName) {
+                    showToast('Please fill in all required fields', 'error');
+                    return;
+                }
+
+                // Show loading state on button
+                const placeOrderBtn = document.getElementById('place-order-btn');
+                if (placeOrderBtn) {
+                    placeOrderBtn.disabled = true;
+                    placeOrderBtn.textContent = 'Processing...';
+                    placeOrderBtn.classList.add('btn-loading');
+                }
+
+                if (paymentMethod === 'card') {
+                    // Process Stripe payment
+                    try {
+                        // Check if Stripe is initialized
+                        if (!window.StripeService || !window.StripeService.stripe) {
+                            throw new Error('Payment system not ready. Please refresh and try again.');
+                        }
+
+                        // Create payment intent
+                        const { clientSecret } = await StripeService.createPaymentIntent(total, {
+                            orderNumber: orderNumber,
+                            customerEmail: email,
+                            customerName: `${firstName} ${lastName}`
+                        });
+
+                        // Confirm payment with Stripe
+                        await StripeService.confirmPayment(clientSecret, {
+                            name: `${firstName} ${lastName}`,
+                            email: email,
+                            address: {
+                                line1: address1,
+                                city: city,
+                                postal_code: postcode,
+                                country: 'GB'
+                            }
+                        });
+
+                        // Payment successful - show success
+                        showOrderSuccess(orderNumber, email, firstName, lastName, total);
+                    } catch (error) {
+                        console.error('Payment error:', error);
+                        const errorEl = document.getElementById('stripe-card-errors');
+                        if (errorEl) errorEl.textContent = error.message;
+                        showToast(error.message || 'Payment failed. Please try again.', 'error');
+
+                        // Reset button
+                        if (placeOrderBtn) {
+                            placeOrderBtn.disabled = false;
+                            placeOrderBtn.textContent = 'Place Order';
+                            placeOrderBtn.classList.remove('btn-loading');
+                        }
+                        return;
+                    }
+                } else if (paymentMethod === 'paypal') {
+                    // PayPal - redirect to PayPal (not implemented yet)
+                    showToast('PayPal integration coming soon', 'warning');
+                    if (placeOrderBtn) {
+                        placeOrderBtn.disabled = false;
+                        placeOrderBtn.textContent = 'Place Order';
+                        placeOrderBtn.classList.remove('btn-loading');
+                    }
+                    return;
+                } else if (paymentMethod === 'apple') {
+                    // Apple Pay - not implemented yet
+                    showToast('Apple Pay integration coming soon', 'warning');
+                    if (placeOrderBtn) {
+                        placeOrderBtn.disabled = false;
+                        placeOrderBtn.textContent = 'Place Order';
+                        placeOrderBtn.classList.remove('btn-loading');
+                    }
+                    return;
+                } else {
+                    // No payment method selected
+                    showToast('Please select a payment method', 'error');
+                    if (placeOrderBtn) {
+                        placeOrderBtn.disabled = false;
+                        placeOrderBtn.textContent = 'Place Order';
+                        placeOrderBtn.classList.remove('btn-loading');
+                    }
+                    return;
+                }
+            }
+
+            function showOrderSuccess(orderNumber, email, firstName, lastName, total) {
+                // Update order number in success message
+                const orderNumberEl = document.querySelector('#success-message .font-bold');
+                if (orderNumberEl) orderNumberEl.textContent = '#' + orderNumber;
+
                 // Show success
                 document.querySelectorAll('.checkout-step-content').forEach((el) => el.classList.remove('active'));
                 document.getElementById('success-message').classList.remove('hidden');
+
+                // Send order confirmation email
+                if (email && typeof EmailService !== 'undefined') {
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    EmailService.sendOrderConfirmation(email, {
+                        firstName: firstName || 'Customer',
+                        lastName: lastName || '',
+                        orderNumber: orderNumber,
+                        total: total.toFixed(2),
+                        items: cart.map((item) => ({
+                            name: item.title || item.name,
+                            price: (item.price * item.quantity).toFixed(2),
+                            quantity: item.quantity
+                        }))
+                    });
+
+                    // Clear any pending cart reminder
+                    EmailService.clearCartReminder();
+                }
 
                 // Clear cart
                 state.cart = [];
@@ -673,17 +790,77 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('DOMContentLoaded', async () => {
                 renderCheckoutSummary();
                 lucide.createIcons();
 
-                // Step navigation
-                document.querySelectorAll('[data-goto-step]').forEach((btn) => {
-                    btn.addEventListener('click', () => goToStep(parseInt(btn.dataset.gotoStep)));
-                });
+                // Initialize with error handling
+                try {
+                    renderCheckoutSummary();
+                    lucide.createIcons();
 
-                // Place order button
-                document.getElementById('place-order-btn')?.addEventListener('click', placeOrder);
+                    // Initialize Stripe - fetch key from server
+                    try {
+                        const configResponse = await fetch('/api/stripe-config');
+                        const config = await configResponse.json();
+
+                        if (config.success && config.data?.publishableKey) {
+                            await StripeService.init(config.data.publishableKey);
+                            debugLog('Stripe initialized in', config.data.mode, 'mode');
+                        } else {
+                            debugError('Stripe not configured');
+                            const errorEl = document.getElementById('stripe-card-errors');
+                            if (errorEl) {
+                                errorEl.textContent = 'Payment system not configured. Please contact support.';
+                            }
+                        }
+                    } catch (error) {
+                        debugError('Failed to load Stripe config:', error);
+                        const errorEl = document.getElementById('stripe-card-errors');
+                        if (errorEl) {
+                            errorEl.textContent = 'Unable to load payment system. Please refresh the page.';
+                        }
+                    }
+
+                    // Mount Stripe card element when payment step is shown
+                    const step2Element = document.getElementById('step-2');
+                    if (step2Element) {
+                        window.stripeCardObserver = new MutationObserver((mutations) => {
+                            mutations.forEach((mutation) => {
+                                if (mutation.target.id === 'step-2' && mutation.target.classList.contains('active')) {
+                                    if (window.StripeService && window.StripeService.mountCardElement) {
+                                        window.StripeService.mountCardElement('stripe-card-element');
+                                    }
+                                }
+                            });
+                        });
+
+                        window.stripeCardObserver.observe(step2Element, {
+                            attributes: true,
+                            attributeFilter: ['class']
+                        });
+                    }
+
+                    // Step navigation
+                    document.querySelectorAll('[data-goto-step]').forEach((btn) => {
+                        // Remove existing listener to prevent duplicates
+                        const newBtn = btn.cloneNode(true);
+                        btn.parentNode.replaceChild(newBtn, btn);
+                        newBtn.addEventListener('click', () => goToStep(parseInt(newBtn.dataset.gotoStep)));
+                    });
+
+                    // Place order button - use once to prevent duplicates
+                    const placeOrderBtn = document.getElementById('place-order-btn');
+                    if (placeOrderBtn) {
+                        placeOrderBtn.replaceWith(placeOrderBtn.cloneNode(true));
+                        document
+                            .getElementById('place-order-btn')
+                            ?.addEventListener('click', placeOrder, { once: true });
+                    }
+                } catch (initError) {
+                    debugError('Checkout initialization error:', initError);
+                    showToast('Failed to initialize checkout. Please refresh the page.', 'error');
+                }
             });
         </script>
     </body>

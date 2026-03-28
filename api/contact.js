@@ -1,24 +1,49 @@
 // Resend API endpoint for contact form
 // Requires RESEND_API_KEY environment variable
 
+// Email validation regex
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Standard API response format
+function createResponse(success, data = null, error = null, statusCode = 200) {
+    const response = { success };
+    if (data) response.data = data;
+    if (error) response.error = error;
+    return { response, statusCode };
+}
+
 export default async function handler(req, res) {
     // Only allow POST requests
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+        const { response, statusCode } = createResponse(false, null, 'Method not allowed', 405);
+        return res.status(statusCode).json(response);
     }
 
     const { name, email, subject, orderNumber, message } = req.body;
 
     // Validate required fields
     if (!name || !email || !subject || !message) {
-        return res.status(400).json({ error: 'Missing required fields' });
+        const { response, statusCode } = createResponse(false, null, 'Missing required fields', 400);
+        return res.status(statusCode).json(response);
+    }
+
+    // Validate email format
+    if (!EMAIL_REGEX.test(email)) {
+        const { response, statusCode } = createResponse(false, null, 'Invalid email address', 400);
+        return res.status(statusCode).json(response);
+    }
+
+    // Validate name length (prevent spam)
+    if (name.length > 100 || subject.length > 200 || message.length > 5000) {
+        const { response, statusCode } = createResponse(false, null, 'Input too long', 400);
+        return res.status(statusCode).json(response);
     }
 
     // Get API key from environment
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-        console.error('RESEND_API_KEY not configured');
-        return res.status(500).json({ error: 'Server configuration error' });
+        const { response, statusCode } = createResponse(false, null, 'Server configuration error', 500);
+        return res.status(statusCode).json(response);
     }
 
     // Construct email content
@@ -58,7 +83,7 @@ Sent from 1hundredornothing.co.uk/contact
                 Authorization: `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                from: process.env.FROM_EMAIL || 'contact@1hundredornothing.co.uk',
+                from: process.env.FROM_EMAIL || 'hundredornothing@outlook.com',
                 to: ['hundredornothing@outlook.com'],
                 reply_to: email,
                 subject: emailSubject,
@@ -70,25 +95,30 @@ Sent from 1hundredornothing.co.uk/contact
         const data = await response.json();
 
         if (!response.ok) {
-            console.error('Resend API error:', data);
-            return res.status(500).json({
-                error: 'Failed to send email',
-                details: data.message || 'Unknown error'
-            });
+            const { response: errorResponse, statusCode } = createResponse(
+                false,
+                null,
+                data.message || 'Failed to send email',
+                500
+            );
+            return res.status(statusCode).json(errorResponse);
         }
 
-        console.log('Email sent successfully:', data.id);
-        return res.status(200).json({
-            success: true,
-            message: 'Email sent successfully',
-            id: data.id
-        });
+        const { response: successResponse } = createResponse(
+            true,
+            { id: data.id, message: 'Email sent successfully' },
+            null,
+            200
+        );
+        return res.status(200).json(successResponse);
     } catch (error) {
-        console.error('Error sending email:', error);
-        return res.status(500).json({
-            error: 'Failed to send email',
-            details: error.message
-        });
+        const { response: errorResponse, statusCode } = createResponse(
+            false,
+            null,
+            error.message || 'Failed to send email',
+            500
+        );
+        return res.status(statusCode).json(errorResponse);
     }
 }
 

@@ -336,11 +336,12 @@
         <!-- Supabase -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
         <script src="supabase.js"></script>
+        <script src="scripts/security.js"></script>
         <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
             // Login form handling
-            document.getElementById('login-form').addEventListener('submit', function (e) {
+            document.getElementById('login-form').addEventListener('submit', async function (e) {
                 e.preventDefault();
 
                 const email = document.getElementById('email').value;
@@ -356,7 +357,7 @@
                 }
 
                 // Attempt login
-                const result = Auth.login(email, password, rememberMe);
+                const result = await Auth.login(email, password, rememberMe);
 
                 if (result.success) {
                     // Redirect to account or intended page

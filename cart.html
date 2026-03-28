@@ -301,6 +301,10 @@
         <!-- Supabase -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
         <script src="supabase.js"></script>
+        <script src="scripts/security.js"></script>
+        <script src="scripts/pricing.js"></script>
+        <script src="scripts/utils.js"></script>
+        <script src="scripts/email-service.js"></script>
         <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
@@ -384,7 +388,9 @@
             function updateSummary() {
                 const subtotal = getCartTotal();
                 const shipping = subtotal >= 50 ? 0 : 4.99;
-                const tax = subtotal * 0.2;
+                const countryCode = document.getElementById('checkout-country')?.value || 'GB';
+                const tax =
+                    typeof Pricing !== 'undefined' ? Pricing.calculateTax(subtotal, countryCode) : subtotal * 0.2;
                 const total = subtotal + shipping + tax - discount;
 
                 document.getElementById('summary-subtotal').textContent = `£${subtotal.toFixed(2)}`;
@@ -453,21 +459,25 @@
                     .join('');
             }
 
-            // Utility: Sanitize HTML to prevent XSS
-            function sanitizeHTML(str) {
-                if (!str) return '';
-                return str
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
-            }
+            // Use shared utilities
+            const U =
+                typeof Utils !== 'undefined'
+                    ? Utils
+                    : {
+                          sanitizeHTML: (str) =>
+                              str
+                                  ?.replace(/&/g, '&amp;')
+                                  .replace(/</g, '&lt;')
+                                  .replace(/>/g, '&gt;')
+                                  .replace(/"/g, '&quot;')
+                                  .replace(/'/g, '&#039;') || '',
+                          formatPrice: (price) => `£${parseFloat(price || 0).toFixed(2)}`,
+                          calculateShipping: (subtotal) => (subtotal >= 50 ? 0 : 4.99)
+                      };
 
-            // Utility: Format price consistently
-            function formatPrice(price) {
-                return `£${parseFloat(price).toFixed(2)}`;
-            }
+            // Backwards compatibility
+            const sanitizeHTML = U.sanitizeHTML;
+            const formatPrice = U.formatPrice;
 
             document.addEventListener('DOMContentLoaded', () => {
                 // Check if state is available (main.js loaded)
@@ -479,8 +489,11 @@
                             renderCartPage();
                             renderRecommended();
                         } else {
-                            container.innerHTML =
-                                '<div class="p-8 text-center text-red-500">Error loading cart. Please refresh the page.</div>';
+                            const container = document.getElementById('cart-items-container');
+                            if (container) {
+                                container.innerHTML =
+                                    '<div class="p-8 text-center text-red-500">Error loading cart. Please refresh the page.</div>';
+                            }
                         }
                     }, 100);
                     return;
@@ -492,7 +505,7 @@
                 document.getElementById('apply-promo-btn')?.addEventListener('click', applyPromo);
 
                 // Event delegation for cart items
-                const cartItems = document.getElementById('cart-items');
+                const cartItems = document.getElementById('cart-items-container');
                 if (cartItems) {
                     cartItems.addEventListener('click', function (e) {
                         // Quantity update
