@@ -8,7 +8,7 @@ async function testLiveSite() {
     const browser = await puppeteer.launch({ headless: false, slowMo: 100 });
     const page = await browser.newPage();
 
-    console.log('Testing LIVE site: 1hundred.shop\n');
+    console.log('Testing LIVE site: www.1hundredornothing.co.uk\n');
 
     // Capture console logs from the page
     page.on('console', (msg) => console.log('PAGE CONSOLE:', msg.text()));
@@ -17,7 +17,7 @@ async function testLiveSite() {
     try {
         // Go to shop page
         console.log('1. Navigating to shop page...');
-        await page.goto('https://1hundred.shop/shop', { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.goto('https://www.1hundredornothing.co.uk/shop', { waitUntil: 'networkidle2', timeout: 60000 });
         await sleep(3000);
 
         // Check if products are loaded

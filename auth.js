@@ -12,7 +12,7 @@ const Auth = (function () {
     // Demo users (in production, this would be on the backend)
     const demoUsers = [
         {
-            email: 'demo@1hundred.com',
+            email: 'demo@1hundredornothing.co.uk',
             password: 'password123',
             firstName: 'Demo',
             lastName: 'User'

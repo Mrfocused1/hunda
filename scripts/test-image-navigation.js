@@ -21,7 +21,7 @@ async function testImageNavigation() {
         page.on('pageerror', (err) => console.log('ERROR:', err.message));
 
         console.log('1. Navigating to shop page...');
-        await page.goto('https://1hundred.shop/shop.html', {
+        await page.goto('https://www.1hundredornothing.co.uk/shop.html', {
             waitUntil: 'networkidle2',
             timeout: 30000
         });

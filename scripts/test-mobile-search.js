@@ -12,7 +12,7 @@ async function testMobileSearch() {
     });
     const page = await browser.newPage();
 
-    console.log('Testing MOBILE search on LIVE site: 1hundred.shop\n');
+    console.log('Testing MOBILE search on LIVE site: www.1hundredornothing.co.uk\n');
 
     // Capture console logs from the page
     page.on('console', (msg) => console.log('PAGE CONSOLE:', msg.text()));
@@ -21,7 +21,7 @@ async function testMobileSearch() {
     try {
         // Go to homepage
         console.log('1. Navigating to homepage...');
-        await page.goto('https://1hundred.shop', { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.goto('https://www.1hundredornothing.co.uk', { waitUntil: 'networkidle2', timeout: 60000 });
         await sleep(2000);
 
         // Open mobile menu

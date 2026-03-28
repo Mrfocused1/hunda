@@ -6,7 +6,7 @@ A modern, responsive e-commerce website for 1 HUNDRED streetwear brand, built wi
 
 ## 🚀 Live Demo
 
-**Website URL:** [https://1hundred.com](https://1hundred.com) *(Update with your Vercel URL)*
+**Website URL:** [https://www.1hundredornothing.co.uk](https://www.1hundredornothing.co.uk) *(Update with your Vercel URL)*
 
 ## ✨ Features
 
@@ -172,7 +172,7 @@ vercel --prod
 ## 👤 Admin Access
 
 **Default Admin Credentials:**
-- Email: `admin@1hundred.com`
+- Email: `admin@1hundredornothing.co.uk`
 - Password: `admin123`
 
 > ⚠️ **Change these credentials in production!**
@@ -214,7 +214,7 @@ Private - All rights reserved © 2026 1 HUNDRED
 
 ## 🤝 Support
 
-For support, email support@1hundred.com or open an issue.
+For support, email hundredornothing@outlook.com or open an issue.
 
 ---
 
