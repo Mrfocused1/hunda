@@ -256,11 +256,7 @@
                             <div class="bg-gray-50 p-8 md:p-10 rounded-2xl">
                                 <h2 class="text-2xl font-display font-bold uppercase mb-6">Send Us a Message</h2>
 
-                                <form
-                                    id="contact-form"
-                                    action="https://formspree.io/f/xnqevweq"
-                                    method="POST"
-                                    class="space-y-6">
+                                <form id="contact-form" class="space-y-6">
                                     <!-- Name -->
                                     <div>
                                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
@@ -278,7 +274,7 @@
                                     <!-- Email -->
                                     <div>
                                         <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Email Address *
+                                            Your Email Address *
                                         </label>
                                         <input
                                             type="email"
@@ -336,9 +332,6 @@
                                             placeholder="How can we help you?"></textarea>
                                     </div>
 
-                                    <!-- Hidden field for recipient email -->
-                                    <input type="hidden" name="_replyto" value="hundredornothing@outlook.com" />
-
                                     <!-- Submit Button -->
                                     <button
                                         type="submit"
@@ -348,7 +341,7 @@
                                     </button>
 
                                     <p class="text-sm text-gray-500 text-center">
-                                        By submitting this form, you agree to our privacy policy.
+                                        This will open your email client to send the message.
                                     </p>
                                 </form>
                             </div>
@@ -420,14 +413,55 @@
             // Initialize Lucide icons
             lucide.createIcons();
 
-            // Contact form handling
+            // Contact form handling - uses mailto to open user's email client
             document.getElementById('contact-form')?.addEventListener('submit', function (e) {
+                e.preventDefault();
+
                 const btn = document.getElementById('submit-btn');
-                btn.textContent = 'Sending...';
+                btn.textContent = 'Opening Email...';
                 btn.disabled = true;
 
-                // Form will submit to Formspree
-                // Success/error handling is done via Formspree redirect
+                // Get form values
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const orderNumber = document.getElementById('order-number').value;
+                const message = document.getElementById('message').value;
+
+                // Construct email subject
+                const emailSubject = `1 HUNDRED Contact: ${subject}${orderNumber ? ` (Order: ${orderNumber})` : ''}`;
+
+                // Construct email body
+                const emailBody = `Name: ${name}
+Email: ${email}
+Subject: ${subject}
+${orderNumber ? `Order Number: ${orderNumber}\n` : ''}
+Message:
+${message}
+
+---
+Sent from 1hundred.shop/contact`;
+
+                // Create mailto URL
+                const mailtoUrl = `mailto:hundredornothing@outlook.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+                // Open email client
+                window.location.href = mailtoUrl;
+
+                // Reset button after a delay
+                setTimeout(() => {
+                    btn.textContent = 'Send Message';
+                    btn.disabled = false;
+
+                    // Show success toast
+                    const toast = document.getElementById('toast');
+                    const toastMsg = document.getElementById('toast-msg');
+                    if (toast && toastMsg) {
+                        toastMsg.textContent = 'Email client opened!';
+                        toast.classList.add('visible');
+                        setTimeout(() => toast.classList.remove('visible'), 3000);
+                    }
+                }, 1000);
             });
         </script>
     </body>
