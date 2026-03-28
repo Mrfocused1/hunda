@@ -748,6 +748,13 @@
                         .map((product) => {
                             // Get primary image (support local files and Supabase Storage)
                             let primaryImage = 'product-1.png';
+                            const allImages =
+                                product.images && Array.isArray(product.images)
+                                    ? product.images
+                                    : product.image
+                                      ? [product.image]
+                                      : ['product-1.png'];
+
                             if (product.images && Array.isArray(product.images) && product.images.length > 0) {
                                 primaryImage =
                                     typeof getProductImageUrl !== 'undefined'
@@ -759,12 +766,33 @@
                                         ? getProductImageUrl(product.image)
                                         : product.image;
                             }
+
+                            // Build image URLs array for data attribute
+                            const imageUrls = allImages.map((img) =>
+                                typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(img) : img
+                            );
+
+                            // Show navigation arrows only if more than 1 image
+                            const hasMultipleImages = allImages.length > 1;
+                            const navArrows = hasMultipleImages
+                                ? `
+                                <button class="image-nav-arrow image-nav-prev" data-product-id="${product.id}" title="Previous image">
+                                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                </button>
+                                <button class="image-nav-arrow image-nav-next" data-product-id="${product.id}" title="Next image">
+                                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                </button>
+                                <div class="image-nav-dots">${allImages.map((_, i) => `<span class="image-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}</div>
+                            `
+                                : '';
+
                             const productUrl = product.slug ? `/${product.slug}` : `/product?id=${product.id}`;
                             return `
                     <div class="product-card" data-product-id="${product.id}">
-                        <div class="product-image-wrapper" data-quick-view="${product.id}">
+                        <div class="product-image-wrapper ${hasMultipleImages ? 'has-multiple-images' : ''}" data-quick-view="${product.id}" data-images='${JSON.stringify(imageUrls)}' data-current-index="0">
                             <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
                             ${product.isNew ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
+                            ${navArrows}
                             <div class="product-quick-actions">
                                 <button class="quick-action-btn" title="Quick View" data-quick-view="${product.id}">
                                     <i data-lucide="eye" class="w-5 h-5"></i>
@@ -1087,6 +1115,44 @@
                 document.getElementById('clear-filters-btn')?.addEventListener('click', clearFilters);
                 document.getElementById('clear-filters-link')?.addEventListener('click', clearFilters);
                 document.getElementById('clear-filters-empty')?.addEventListener('click', clearFilters);
+
+                // Image navigation for product cards
+                document.getElementById('products-grid')?.addEventListener('click', function (e) {
+                    const arrow = e.target.closest('.image-nav-arrow');
+                    if (!arrow) return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const wrapper = arrow.closest('.product-image-wrapper');
+                    if (!wrapper) return;
+
+                    const images = JSON.parse(wrapper.dataset.images || '[]');
+                    if (images.length <= 1) return;
+
+                    let currentIndex = parseInt(wrapper.dataset.currentIndex || '0');
+                    const isPrev = arrow.classList.contains('image-nav-prev');
+
+                    if (isPrev) {
+                        currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
+                    } else {
+                        currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
+                    }
+
+                    wrapper.dataset.currentIndex = currentIndex;
+
+                    // Update image
+                    const img = wrapper.querySelector('.product-image');
+                    if (img) {
+                        img.src = images[currentIndex];
+                    }
+
+                    // Update dots
+                    const dots = wrapper.querySelectorAll('.image-dot');
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === currentIndex);
+                    });
+                });
 
                 // Close quick view button
                 const closeQuickViewModal = function () {

@@ -564,6 +564,73 @@ body {
     transform: scale(1);
 }
 
+/* Image Navigation Arrows */
+.image-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background: rgb(255 255 255 / 95%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+    z-index: 10;
+    cursor: pointer;
+    border: none;
+    color: #111;
+}
+
+.image-nav-arrow:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.image-nav-prev {
+    left: 0.5rem;
+}
+
+.image-nav-next {
+    right: 0.5rem;
+}
+
+.product-image-wrapper.has-multiple-images:hover .image-nav-arrow {
+    opacity: 1;
+}
+
+.image-nav-dots {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.375rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+.product-image-wrapper.has-multiple-images:hover .image-nav-dots {
+    opacity: 1;
+}
+
+.image-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 60%);
+    transition: all 0.2s ease;
+}
+
+.image-dot.active {
+    background: #fff;
+    transform: scale(1.2);
+}
+
 .wishlist-btn.active {
     color: var(--red);
     opacity: 1;
@@ -1641,6 +1708,7 @@ body {
     100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.5;
     }
@@ -1666,9 +1734,11 @@ body {
     100% {
         transform: translateX(0);
     }
+
     25% {
         transform: translateX(-5px);
     }
+
     75% {
         transform: translateX(5px);
     }
