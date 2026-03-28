@@ -1,9 +1,24 @@
 {
-    // Chrome DevTools Mobile Device Presets
-    // Open DevTools (Cmd+Option+I / Ctrl+Shift+I)
-    // Click "Toggle Device Toolbar" (Cmd+Shift+M / Ctrl+Shift+M)
-    // Select these devices from the dropdown:
-
+    "[typescript]": {
+        "editor.defaultFormatter": "denoland.vscode-deno"
+    },
+    "deno.enablePaths": ["supabase/functions"],
+    "deno.lint": true,
+    "deno.unstable": [
+        "bare-node-builtins",
+        "byonm",
+        "sloppy-imports",
+        "unsafe-proto",
+        "webgpu",
+        "broadcast-channel",
+        "worker-options",
+        "cron",
+        "kv",
+        "ffi",
+        "fs",
+        "http",
+        "net"
+    ],
     "editor.tokenColorCustomizations": {
         "comments": "#6b7280"
     }
