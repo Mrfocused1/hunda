@@ -311,6 +311,16 @@
                     <p id="category-description" class="text-gray-500 mt-2 max-w-2xl">
                         Discover our complete collection of premium streetwear essentials.
                     </p>
+                    <!-- Active Search Indicator -->
+                    <div id="active-search-indicator" class="hidden mt-4 flex items-center gap-2">
+                        <span class="text-sm text-gray-600">Searching for:</span>
+                        <span
+                            id="active-search-term"
+                            class="text-sm font-bold bg-black text-white px-3 py-1 rounded-full"></span>
+                        <button id="clear-search-btn" class="text-sm text-gray-500 hover:text-black underline ml-2">
+                            Clear search
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -663,6 +673,22 @@
                     currentFilters.search = search;
                     document.getElementById('search-input').value = search;
                 }
+
+                updateSearchIndicator();
+            }
+
+            // Update search indicator visibility
+            function updateSearchIndicator() {
+                const indicator = document.getElementById('active-search-indicator');
+                const term = document.getElementById('active-search-term');
+                if (indicator && term) {
+                    if (currentFilters.search) {
+                        indicator.classList.remove('hidden');
+                        term.textContent = currentFilters.search;
+                    } else {
+                        indicator.classList.add('hidden');
+                    }
+                }
             }
 
             // Render products
@@ -693,11 +719,12 @@
                     }
                     // Search filter
                     if (currentFilters.search) {
-                        return p.title.toLowerCase().includes(currentFilters.search.toLowerCase());
+                        const matchesSearch = p.title.toLowerCase().includes(currentFilters.search.toLowerCase());
+                        if (!matchesSearch) return false;
                     }
                     // New arrivals
                     if (new URLSearchParams(window.location.search).get('new')) {
-                        return p.isNew;
+                        if (!p.isNew) return false;
                     }
                     return true;
                 });
@@ -830,7 +857,16 @@
                 // Search input
                 document.getElementById('search-input')?.addEventListener('input', (e) => {
                     currentFilters.search = e.target.value;
+                    updateSearchIndicator();
                     renderProducts();
+                    // Update URL
+                    const url = new URL(window.location);
+                    if (e.target.value) {
+                        url.searchParams.set('q', e.target.value);
+                    } else {
+                        url.searchParams.delete('q');
+                    }
+                    window.history.replaceState({}, '', url);
                 });
             }
 
@@ -849,8 +885,12 @@
                     .querySelectorAll('.size-option, .color-swatch')
                     .forEach((btn) => btn.classList.remove('active'));
                 document.getElementById('sort-select').value = 'recommended';
+                document.getElementById('search-input').value = '';
+                updateSearchIndicator();
 
                 renderProducts();
+                // Clear URL params
+                window.history.replaceState({}, '', window.location.pathname);
             }
 
             function updateProductCount() {
@@ -1046,6 +1086,18 @@
                         }
                     });
                 }
+
+                // Clear search button handler
+                document.getElementById('clear-search-btn')?.addEventListener('click', function () {
+                    currentFilters.search = '';
+                    document.getElementById('search-input').value = '';
+                    updateSearchIndicator();
+                    renderProducts();
+                    // Update URL to remove search param
+                    const url = new URL(window.location);
+                    url.searchParams.delete('q');
+                    window.history.replaceState({}, '', url);
+                });
             });
         </script>
     </body>
