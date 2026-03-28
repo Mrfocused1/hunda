@@ -164,12 +164,21 @@ function getProductImageUrl(imagePath, bucket = 'product-images') {
         return imagePath;
     }
 
+    // If it looks like a Supabase Storage uploaded file (product-*-*.png), get public URL
+    if (imagePath && /^product-[a-z]+-\d+.*\.(png|jpe?g|webp|gif)$/i.test(imagePath)) {
+        if (typeof StorageAPI !== 'undefined') {
+            return StorageAPI.getPublicUrl(bucket, imagePath);
+        }
+        // Fallback: construct URL manually if StorageAPI not available
+        return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${imagePath}`;
+    }
+
     // If it's a simple local filename (no slashes, common image extensions), return as-is
     if (imagePath && !imagePath.includes('/') && /\.(png|jpe?g|webp|gif)$/i.test(imagePath)) {
         return imagePath;
     }
 
-    // If it's a storage path (contains folder structure or was uploaded), get the public URL
+    // If it's a storage path (contains folder structure), get the public URL
     if (imagePath && imagePath.includes('/') && typeof StorageAPI !== 'undefined') {
         return StorageAPI.getPublicUrl(bucket, imagePath);
     }
