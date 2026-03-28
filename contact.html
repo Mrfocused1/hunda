@@ -341,7 +341,7 @@
                                     </button>
 
                                     <p class="text-sm text-gray-500 text-center">
-                                        This will open your email client to send the message.
+                                        We'll respond to your enquiry within 24-48 hours.
                                     </p>
                                 </form>
                             </div>
@@ -413,55 +413,70 @@
             // Initialize Lucide icons
             lucide.createIcons();
 
-            // Contact form handling - uses mailto to open user's email client
-            document.getElementById('contact-form')?.addEventListener('submit', function (e) {
+            // Contact form handling - sends via Resend API
+            document.getElementById('contact-form')?.addEventListener('submit', async function (e) {
                 e.preventDefault();
 
                 const btn = document.getElementById('submit-btn');
-                btn.textContent = 'Opening Email...';
+                const originalText = btn.textContent;
+                btn.textContent = 'Sending...';
                 btn.disabled = true;
 
                 // Get form values
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const subject = document.getElementById('subject').value;
-                const orderNumber = document.getElementById('order-number').value;
-                const message = document.getElementById('message').value;
+                const formData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    subject: document.getElementById('subject').value,
+                    orderNumber: document.getElementById('order-number').value,
+                    message: document.getElementById('message').value
+                };
 
-                // Construct email subject
-                const emailSubject = `1 HUNDRED Contact: ${subject}${orderNumber ? ` (Order: ${orderNumber})` : ''}`;
+                try {
+                    const response = await fetch('/api/contact', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
 
-                // Construct email body
-                const emailBody = `Name: ${name}
-Email: ${email}
-Subject: ${subject}
-${orderNumber ? `Order Number: ${orderNumber}\n` : ''}
-Message:
-${message}
+                    const result = await response.json();
 
----
-Sent from 1hundred.shop/contact`;
+                    if (response.ok && result.success) {
+                        // Show success toast
+                        const toast = document.getElementById('toast');
+                        const toastMsg = document.getElementById('toast-msg');
+                        if (toast && toastMsg) {
+                            toastMsg.textContent = 'Message sent successfully!';
+                            toast.classList.add('visible');
+                            setTimeout(() => toast.classList.remove('visible'), 5000);
+                        }
 
-                // Create mailto URL
-                const mailtoUrl = `mailto:hundredornothing@outlook.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                        // Reset form
+                        document.getElementById('contact-form').reset();
+                        btn.textContent = 'Sent!';
+                    } else {
+                        throw new Error(result.error || 'Failed to send');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
 
-                // Open email client
-                window.location.href = mailtoUrl;
-
-                // Reset button after a delay
-                setTimeout(() => {
-                    btn.textContent = 'Send Message';
-                    btn.disabled = false;
-
-                    // Show success toast
+                    // Show error toast
                     const toast = document.getElementById('toast');
                     const toastMsg = document.getElementById('toast-msg');
                     if (toast && toastMsg) {
-                        toastMsg.textContent = 'Email client opened!';
+                        toastMsg.textContent = 'Failed to send. Please try email instead.';
                         toast.classList.add('visible');
-                        setTimeout(() => toast.classList.remove('visible'), 3000);
+                        setTimeout(() => toast.classList.remove('visible'), 5000);
                     }
-                }, 1000);
+
+                    btn.textContent = originalText;
+                } finally {
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }, 3000);
+                }
             });
         </script>
     </body>
