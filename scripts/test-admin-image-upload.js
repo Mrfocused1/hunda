@@ -19,7 +19,7 @@ async function testAdminImageUpload() {
     try {
         // Go to admin login page first
         console.log('1. Navigating to admin login page...');
-        await page.goto('http://localhost:3000/admin-login.html', { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto('https://1hundred.shop/admin-login.html', { waitUntil: 'networkidle2', timeout: 30000 });
         await sleep(2000);
 
         // Check if login form exists
@@ -34,7 +34,7 @@ async function testAdminImageUpload() {
 
         // Now navigate to admin page
         console.log('   Navigating to admin page...');
-        await page.goto('http://localhost:3000/admin.html', { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto('https://1hundred.shop/admin.html', { waitUntil: 'networkidle2', timeout: 30000 });
         await sleep(2000);
 
         // Wait for products to load
