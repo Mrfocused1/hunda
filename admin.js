@@ -725,36 +725,23 @@ async function saveProduct(event) {
 
             result = await ProductAPI.update(productId, productData);
         } else {
-            // Create new - first create product without images to get an ID
-            const tempProductData = {
+            // Create new - upload images first, then create product with all data
+            // This avoids the RLS issue with UPDATE after CREATE
+            let images = currentProductImages.length > 0 ? [...currentProductImages] : ['product-1.png'];
+
+            // Upload any base64 images first (will use 'new' as temp ID in filename)
+            if (images.some((img) => img.startsWith('data:'))) {
+                showToast('📤 Uploading images...');
+                images = await uploadProductImages(images, 'new');
+            }
+
+            const productData = {
                 ...baseProductData,
-                images: ['product-1.png'],
-                image: 'product-1.png'
+                images: images,
+                image: images[0]
             };
 
-            result = await ProductAPI.create(tempProductData);
-
-            if (!result.error && result.data) {
-                productId = result.data.id;
-
-                // Now upload images with the correct product ID
-                let images = currentProductImages.length > 0 ? currentProductImages : ['product-1.png'];
-
-                if (images.some((img) => img.startsWith('data:'))) {
-                    showToast('📤 Uploading images...');
-                    images = await uploadProductImages(images, productId);
-
-                    // Update product with correct image paths
-                    const updateResult = await ProductAPI.update(productId, {
-                        images: images,
-                        image: images[0]
-                    });
-
-                    if (updateResult.data) {
-                        result.data = updateResult.data;
-                    }
-                }
-            }
+            result = await ProductAPI.create(productData);
         }
 
         if (result.error) {
