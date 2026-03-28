@@ -1117,8 +1117,9 @@
                 document.getElementById('clear-filters-empty')?.addEventListener('click', clearFilters);
 
                 // Image navigation for product cards
-                document.getElementById('products-grid')?.addEventListener('click', function (e) {
+                document.getElementById('product-grid')?.addEventListener('click', function (e) {
                     const arrow = e.target.closest('.image-nav-arrow');
+
                     if (!arrow) return;
 
                     e.preventDefault();
@@ -1143,6 +1144,7 @@
 
                     // Update image
                     const img = wrapper.querySelector('.product-image');
+
                     if (img) {
                         img.src = images[currentIndex];
                     }
