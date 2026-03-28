@@ -187,7 +187,7 @@
                                     id="promo-input"
                                     placeholder="Enter code"
                                     class="flex-1 border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-black" />
-                                <button onclick="applyPromo()" class="btn btn-secondary">Apply</button>
+                                <button id="apply-promo-btn" class="btn btn-secondary">Apply</button>
                             </div>
                             <p id="promo-message" class="text-sm mt-2 hidden"></p>
                         </div>
@@ -370,11 +370,11 @@
                         </div>
                         <div class="cart-item-actions">
                             <div class="cart-quantity-selector">
-                                <button class="cart-quantity-btn" onclick="updateCartQuantity(${item.id}, '${safeSize}', '${safeColor}', ${item.quantity - 1})">-</button>
+                                <button class="cart-quantity-btn" data-update-qty data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}" data-qty="${item.quantity - 1}">-</button>
                                 <input type="text" class="cart-quantity-input" value="${item.quantity}" readonly>
-                                <button class="cart-quantity-btn" onclick="updateCartQuantity(${item.id}, '${safeSize}', '${safeColor}', ${item.quantity + 1})">+</button>
+                                <button class="cart-quantity-btn" data-update-qty data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}" data-qty="${item.quantity + 1}">+</button>
                             </div>
-                            <button class="remove-btn" onclick="removeFromCart(${item.id}, '${safeSize}', '${safeColor}')">Remove</button>
+                            <button class="remove-btn" data-remove-cart data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}">Remove</button>
                         </div>
                     </div>
                 </div>
@@ -492,6 +492,44 @@
                 }
                 renderCartPage();
                 renderRecommended();
+
+                // Apply promo button
+                document.getElementById('apply-promo-btn')?.addEventListener('click', applyPromo);
+
+                // Event delegation for cart items
+                const cartItems = document.getElementById('cart-items');
+                if (cartItems) {
+                    cartItems.addEventListener('click', function (e) {
+                        // Quantity update
+                        const qtyBtn = e.target.closest('[data-update-qty]');
+                        if (qtyBtn) {
+                            const id = parseInt(qtyBtn.dataset.id);
+                            const size = qtyBtn.dataset.size;
+                            const color = qtyBtn.dataset.color;
+                            const qty = parseInt(qtyBtn.dataset.qty);
+                            if (typeof updateCartQuantity === 'function') {
+                                updateCartQuantity(id, size, color, qty);
+                                renderCartPage();
+                                updateSummary();
+                            }
+                            return;
+                        }
+
+                        // Remove item
+                        const removeBtn = e.target.closest('[data-remove-cart]');
+                        if (removeBtn) {
+                            const id = parseInt(removeBtn.dataset.id);
+                            const size = removeBtn.dataset.size;
+                            const color = removeBtn.dataset.color;
+                            if (typeof removeFromCart === 'function') {
+                                removeFromCart(id, size, color);
+                                renderCartPage();
+                                updateSummary();
+                            }
+                            return;
+                        }
+                    });
+                }
             });
         </script>
     </body>

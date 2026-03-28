@@ -290,7 +290,7 @@
                         <div class="bg-white rounded-lg shadow-sm p-6 md:p-8">
                             <div class="flex items-center justify-between mb-6">
                                 <h2 class="text-2xl font-display font-bold uppercase">Payment</h2>
-                                <button onclick="goToStep(1)" class="text-sm underline">Back to Shipping</button>
+                                <button data-goto-step="1" class="text-sm underline">Back to Shipping</button>
                             </div>
 
                             <div class="space-y-4 mb-8">
@@ -397,7 +397,7 @@
                             </div>
 
                             <div class="mt-8">
-                                <button onclick="goToStep(3)" class="btn btn-primary btn-full">Review Order</button>
+                                <button data-goto-step="3" class="btn btn-primary btn-full">Review Order</button>
                             </div>
                         </div>
                     </div>
@@ -407,7 +407,7 @@
                         <div class="bg-white rounded-lg shadow-sm p-6 md:p-8">
                             <div class="flex items-center justify-between mb-6">
                                 <h2 class="text-2xl font-display font-bold uppercase">Review Order</h2>
-                                <button onclick="goToStep(2)" class="text-sm underline">Back to Payment</button>
+                                <button data-goto-step="2" class="text-sm underline">Back to Payment</button>
                             </div>
 
                             <!-- Order Items -->
@@ -422,7 +422,7 @@
                             <div class="border-b border-gray-200 pb-6 mb-6">
                                 <div class="flex justify-between items-start mb-4">
                                     <h3 class="font-bold uppercase text-sm">Shipping Address</h3>
-                                    <button onclick="goToStep(1)" class="text-sm underline">Edit</button>
+                                    <button data-goto-step="1" class="text-sm underline">Edit</button>
                                 </div>
                                 <p class="text-gray-600 text-sm">
                                     John Smith<br />
@@ -436,7 +436,7 @@
                             <div class="border-b border-gray-200 pb-6 mb-6">
                                 <div class="flex justify-between items-start mb-4">
                                     <h3 class="font-bold uppercase text-sm">Payment Method</h3>
-                                    <button onclick="goToStep(2)" class="text-sm underline">Edit</button>
+                                    <button data-goto-step="2" class="text-sm underline">Edit</button>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <i data-lucide="credit-card" class="w-6 h-6"></i>
@@ -453,7 +453,7 @@
                                 </label>
                             </div>
 
-                            <button onclick="placeOrder()" class="btn btn-primary btn-full">Place Order</button>
+                            <button id="place-order-btn" class="btn btn-primary btn-full">Place Order</button>
                         </div>
                     </div>
 
@@ -681,6 +681,14 @@
             document.addEventListener('DOMContentLoaded', () => {
                 renderCheckoutSummary();
                 lucide.createIcons();
+
+                // Step navigation
+                document.querySelectorAll('[data-goto-step]').forEach((btn) => {
+                    btn.addEventListener('click', () => goToStep(parseInt(btn.dataset.gotoStep)));
+                });
+
+                // Place order button
+                document.getElementById('place-order-btn')?.addEventListener('click', placeOrder);
             });
         </script>
     </body>

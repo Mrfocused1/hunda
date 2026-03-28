@@ -196,7 +196,7 @@
                         <h2 class="text-xl font-bold uppercase" id="user-fullname">Welcome</h2>
                         <p class="text-gray-500 text-sm" id="user-email-display"></p>
                     </div>
-                    <button onclick="logout()" class="btn btn-secondary btn-sm mt-4 md:mt-0 flex items-center gap-2">
+                    <button id="logout-btn" class="btn btn-secondary btn-sm mt-4 md:mt-0 flex items-center gap-2">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                         Sign Out
                     </button>
@@ -207,7 +207,6 @@
                     <button class="account-tab active" data-tab="orders">My Orders</button>
                     <button class="account-tab" data-tab="addresses">Addresses</button>
                     <button class="account-tab" data-tab="details">Account Details</button>
-                    <button class="account-tab" data-tab="wishlist">Wishlist</button>
                 </div>
 
                 <!-- Orders Tab -->
@@ -230,9 +229,7 @@
                 <div id="addresses" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold uppercase">Saved Addresses</h2>
-                        <button class="btn btn-primary btn-sm" onclick="showToast('Add address feature coming soon')">
-                            Add New
-                        </button>
+                        <button class="btn btn-primary btn-sm" class="show-toast-btn">Add New</button>
                     </div>
 
                     <div id="addresses-list" class="grid md:grid-cols-2 gap-4">
@@ -303,15 +300,6 @@
 
                         <button type="submit" class="btn btn-primary mt-4">Save Changes</button>
                     </form>
-                </div>
-
-                <!-- Wishlist Tab -->
-                <div id="wishlist" class="tab-content">
-                    <h2 class="text-xl font-bold uppercase mb-6">My Wishlist</h2>
-
-                    <div id="wishlist-grid" class="wishlist-grid">
-                        <!-- Wishlist items rendered by JS -->
-                    </div>
                 </div>
             </section>
         </main>
@@ -458,9 +446,7 @@
                         <a href="/product?id=${p.id}">
                             <img src="${p.image}" alt="${p.title}" class="product-image">
                         </a>
-                        <button class="remove-wishlist-btn" onclick="removeFromWishlist(${p.id})">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
+                        
                     </div>
                     <a href="/product?id=${p.id}">
                         <div class="product-info mt-3">
@@ -469,7 +455,7 @@
                         </div>
                         <p class="product-category">${p.category}</p>
                     </a>
-                    <button onclick="addToCart(${p.id}, 'M', 'Black', 1)" class="btn btn-primary btn-full btn-sm mt-3">Add to Bag</button>
+                    <button data-add-cart="${p.id}" data-size="M" data-color="Black" data-qty="1" class="btn btn-primary btn-full btn-sm mt-3">Add to Bag</button>
                 </div>
             `
                     )
@@ -563,9 +549,9 @@
                         ${address.country}
                     </p>
                     <div class="flex gap-2 mt-4">
-                        <button class="text-sm underline" onclick="showToast('Edit feature coming soon')">Edit</button>
-                        ${!address.isDefault ? '<button class="text-sm underline" onclick="showToast(\'Set as default coming soon\')">Set as Default</button>' : ''}
-                        <button class="text-sm underline text-red-500" onclick="showToast('Delete feature coming soon')">Delete</button>
+                        <button class="text-sm underline" class="show-toast-btn">Edit</button>
+                        ${!address.isDefault ? '<button class="text-sm underline" class="show-toast-btn">Set as Default</button>' : ''}
+                        <button class="text-sm underline text-red-500" class="show-toast-btn">Delete</button>
                     </div>
                 </div>
             `
@@ -599,6 +585,36 @@
                 loadAccountDetails();
 
                 lucide.createIcons();
+
+                // Logout button
+                document.getElementById('logout-btn')?.addEventListener('click', () => {
+                    if (typeof logout === 'function') logout();
+                });
+
+                // Show toast buttons (temporary features)
+                document.querySelectorAll('.show-toast-btn').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        if (typeof showToast === 'function') {
+                            showToast('This feature is coming soon!', 'info');
+                        }
+                    });
+                });
+
+                // Add to cart buttons
+                document.querySelectorAll('[data-add-cart]').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const id = parseInt(btn.dataset.addCart);
+                        const size = btn.dataset.size;
+                        const color = btn.dataset.color;
+                        const qty = parseInt(btn.dataset.qty);
+                        if (typeof addToCart === 'function') {
+                            addToCart(id, size, color, qty);
+                            if (typeof showToast !== 'undefined') {
+                                showToast('Added to bag', 'success');
+                            }
+                        }
+                    });
+                });
             });
         </script>
     </body>

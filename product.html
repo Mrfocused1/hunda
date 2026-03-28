@@ -233,21 +233,12 @@
                         <div class="pdp-section" style="border: none">
                             <div class="flex gap-4">
                                 <div class="quantity-selector">
-                                    <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
+                                    <button class="quantity-btn" id="qty-minus">-</button>
                                     <input type="text" id="quantity" class="quantity-input" value="1" readonly />
-                                    <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
+                                    <button class="quantity-btn" id="qty-plus">+</button>
                                 </div>
-                                <button id="add-to-bag-btn" class="btn btn-primary flex-1" onclick="addToBag()">
-                                    Add to Bag
-                                </button>
+                                <button id="add-to-bag-btn" class="btn btn-primary flex-1">Add to Bag</button>
                             </div>
-                            <button
-                                id="wishlist-btn"
-                                class="btn btn-secondary btn-full mt-4 flex items-center justify-center gap-2"
-                                onclick="toggleProductWishlist()">
-                                <i data-lucide="heart" class="w-5 h-5"></i>
-                                <span>Add to Wishlist</span>
-                            </button>
                         </div>
 
                         <!-- Product Details Accordion -->
@@ -255,7 +246,7 @@
                             <div class="py-4 border-b border-gray-200">
                                 <button
                                     class="flex justify-between items-center w-full font-bold uppercase text-sm"
-                                    onclick="toggleAccordion('details-content')">
+                                    data-accordion="details-content">
                                     <span>Product Details</span>
                                     <i
                                         data-lucide="chevron-down"
@@ -273,7 +264,7 @@
                             <div class="py-4 border-b border-gray-200">
                                 <button
                                     class="flex justify-between items-center w-full font-bold uppercase text-sm"
-                                    onclick="toggleAccordion('shipping-content')">
+                                    data-accordion="shipping-content">
                                     <span>Shipping & Returns</span>
                                     <i
                                         data-lucide="chevron-down"
@@ -462,7 +453,7 @@
                 document.getElementById('thumbnails').innerHTML = thumbnails
                     .map(
                         (img, i) => `
-                <button class="pdp-thumbnail ${i === 0 ? 'active' : ''}" onclick="setMainImage('${img}', this)">
+                <button class="pdp-thumbnail ${i === 0 ? 'active' : ''}" data-set-image="${img}">
                     <img src="${img}" alt="Product thumbnail">
                 </button>
             `
@@ -476,7 +467,7 @@
                 <button class="color-swatch ${color === 'White' ? 'border' : ''}"
                         style="background: ${getColorCode(color)};"
                         data-color="${color}"
-                        onclick="selectColor('${color}', this)">
+                        data-select-color="${color}">
                 </button>
             `
                     )
@@ -486,7 +477,7 @@
                 document.getElementById('size-options').innerHTML = currentProduct.sizes
                     .map(
                         (size) => `
-                <button class="size-option" data-size="${size}" onclick="selectSize('${size}', this)">${size}</button>
+                <button class="size-option" data-size="${size}" data-select-size="${size}">${size}</button>
             `
                     )
                     .join('');
@@ -598,7 +589,36 @@
                     .join('');
             }
 
-            document.addEventListener('DOMContentLoaded', loadProduct);
+            document.addEventListener('DOMContentLoaded', () => {
+                loadProduct();
+
+                // Quantity buttons
+                document.getElementById('qty-minus')?.addEventListener('click', () => updateQuantity(-1));
+                document.getElementById('qty-plus')?.addEventListener('click', () => updateQuantity(1));
+
+                // Add to bag
+                document.getElementById('add-to-bag-btn')?.addEventListener('click', addToBag);
+
+                // Accordion toggles
+                document.querySelectorAll('[data-accordion]').forEach(btn => {
+                    btn.addEventListener('click', () => toggleAccordion(btn.dataset.accordion));
+                });
+
+                // Thumbnail clicks
+                document.querySelectorAll('[data-set-image]').forEach(thumb => {
+                    thumb.addEventListener('click', () => setMainImage(thumb.dataset.setImage, thumb));
+                });
+
+                // Color selection
+                document.querySelectorAll('[data-select-color]').forEach(btn => {
+                    btn.addEventListener('click', () => selectColor(btn.dataset.selectColor, btn));
+                });
+
+                // Size selection
+                document.querySelectorAll('[data-select-size]').forEach(btn => {
+                    btn.addEventListener('click', () => selectSize(btn.dataset.selectSize, btn));
+                });
+            });
         </script>
     </body>
 </html>
