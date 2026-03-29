@@ -794,7 +794,7 @@
                                 : '';
 
                             const productUrl = product.slug ? `/${product.slug}` : `/product?id=${product.id}`;
-                            const isHoodie = product.category === 'Hoodies';
+                            const isHoodie = product.category === 'hoodies';
                             return `
                     <div class="product-card" data-product-id="${product.id}" ${isHoodie ? 'style="pointer-events: none;"' : ''}>
                         <div class="product-image-wrapper ${hasMultipleImages ? 'has-multiple-images' : ''}" ${!isHoodie ? `data-quick-view="${product.id}"` : ''} data-images='${JSON.stringify(imageUrls)}' data-current-index="0">
@@ -1070,7 +1070,7 @@
                             e.stopPropagation();
                             const productId = parseInt(quickViewBtn.dataset.quickView);
                             const product = allProducts.find((p) => p.id === productId);
-                            if (product && product.category === 'Hoodies') {
+                            if (product && product.category === 'hoodies') {
                                 showToast('Coming Soon', 'info');
                                 return;
                             }
@@ -1087,7 +1087,7 @@
                             e.stopPropagation();
                             const productId = parseInt(addCartBtn.dataset.addCart);
                             const product = allProducts.find((p) => p.id === productId);
-                            if (product && product.category === 'Hoodies') {
+                            if (product && product.category === 'hoodies') {
                                 showToast('Coming Soon', 'info');
                                 return;
                             }
@@ -1111,7 +1111,7 @@
                         if (productCard) {
                             const productId = parseInt(productCard.dataset.productId);
                             const product = allProducts.find((p) => p.id === productId);
-                            if (product && product.category === 'Hoodies') {
+                            if (product && product.category === 'hoodies') {
                                 e.preventDefault();
                                 showToast('Coming Soon', 'info');
                                 return;
