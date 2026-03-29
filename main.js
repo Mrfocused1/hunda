@@ -78,7 +78,7 @@ const FALLBACK_PRODUCTS =
                   id: 7,
                   title: 'Relentless Trophy Tee',
                   price: 40,
-                  category: 'Tops',
+                  category: 'T-Shirts',
                   images: ['product-relentless-front.png', 'product-relentless-back.png'],
                   sizes: ['S', 'M', 'L', 'XL'],
                   colors: ['Grey']
@@ -145,7 +145,7 @@ function updateCategories() {
 }
 
 let categories = [
-    { name: 'Tops', slug: 'tops', count: 1 },
+    { name: 'T-Shirts', slug: 't-shirts', count: 1 },
     { name: 'Hoodies', slug: 'hoodies', count: 2 },
     { name: 'Hats', slug: 'hats', count: 2 }
 ];

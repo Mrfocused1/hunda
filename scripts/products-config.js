@@ -103,7 +103,7 @@ Without limits.`
             id: 7,
             title: 'Relentless Trophy Tee',
             price: 40,
-            category: 'Tops',
+            category: 'T-Shirts',
             images: ['product-relentless-front.png', 'product-relentless-back.png'],
             sizes: ['S', 'M', 'L', 'XL'],
             colors: ['Grey'],
