@@ -229,7 +229,7 @@
                 <div id="addresses" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold uppercase">Saved Addresses</h2>
-                        <button class="btn btn-primary btn-sm" class="show-toast-btn">Add New</button>
+                        <button class="btn btn-primary btn-sm show-toast-btn">Add New</button>
                     </div>
 
                     <div id="addresses-list" class="grid md:grid-cols-2 gap-4">
@@ -414,7 +414,7 @@
                 const noOrders = document.getElementById('no-orders');
 
                 // Get orders from localStorage or use empty array
-                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                const orders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
 
                 if (orders.length === 0) {
                     ordersList.classList.add('hidden');
@@ -464,7 +464,7 @@
                 const noAddresses = document.getElementById('no-addresses');
 
                 // Get addresses from localStorage or use empty array
-                const addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+                const addresses = JSON.parse(localStorage.getItem('1hundred_addresses') || '[]');
 
                 if (addresses.length === 0) {
                     addressesList.classList.add('hidden');
@@ -488,9 +488,9 @@
                         ${address.country}
                     </p>
                     <div class="flex gap-2 mt-4">
-                        <button class="text-sm underline" class="show-toast-btn">Edit</button>
-                        ${!address.isDefault ? '<button class="text-sm underline" class="show-toast-btn">Set as Default</button>' : ''}
-                        <button class="text-sm underline text-red-500" class="show-toast-btn">Delete</button>
+                        <button class="text-sm underline show-toast-btn">Edit</button>
+                        ${!address.isDefault ? '<button class="text-sm underline show-toast-btn">Set as Default</button>' : ''}
+                        <button class="text-sm underline text-red-500 show-toast-btn">Delete</button>
                     </div>
                 </div>
             `
@@ -500,7 +500,7 @@
 
             // Load account details
             function loadAccountDetails() {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const user = JSON.parse(localStorage.getItem('1hundred_user') || '{}');
 
                 document.getElementById('user-firstname').value = user.firstName || '';
                 document.getElementById('user-lastname').value = user.lastName || '';

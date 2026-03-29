@@ -782,7 +782,7 @@
 
                 // Send order confirmation email
                 if (email && typeof EmailService !== 'undefined') {
-                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
                     EmailService.sendOrderConfirmation(email, {
                         firstName: firstName || 'Customer',
                         lastName: lastName || '',

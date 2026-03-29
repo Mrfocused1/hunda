@@ -260,7 +260,10 @@ async function testAbandonedCart(browser) {
 
     const result = await page.evaluate(() => {
         // Simulate logged-in user
-        localStorage.setItem('cart', JSON.stringify([{ id: 1, title: 'Test Product', price: 50, quantity: 1 }]));
+        localStorage.setItem(
+            '1hundred_cart',
+            JSON.stringify([{ id: 1, title: 'Test Product', price: 50, quantity: 1 }])
+        );
 
         // Test scheduling
         if (typeof EmailService !== 'undefined') {
@@ -268,7 +271,7 @@ async function testAbandonedCart(browser) {
                 firstName: 'Test'
             });
 
-            const reminder = localStorage.getItem('cartReminder');
+            const reminder = localStorage.getItem('1hundred_cartReminder');
             return reminder ? JSON.parse(reminder) : null;
         }
         return null;

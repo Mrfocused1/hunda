@@ -81,7 +81,7 @@ async function testLiveSite() {
 
         // Check cart count before adding
         const cartCountBefore = await page.evaluate(() => {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
             return cart.reduce((sum, item) => sum + item.quantity, 0);
         });
         console.log(`\n4. Cart count before: ${cartCountBefore}`);
@@ -100,7 +100,7 @@ async function testLiveSite() {
 
         // Check cart count after
         const cartCountAfter = await page.evaluate(() => {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
             return cart.reduce((sum, item) => sum + item.quantity, 0);
         });
         console.log(`   Cart count after: ${cartCountAfter}`);

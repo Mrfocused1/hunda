@@ -137,12 +137,12 @@ const EmailService = {
             cartData,
             timestamp: Date.now()
         };
-        localStorage.setItem('cartReminder', JSON.stringify(cartReminder));
+        localStorage.setItem('1hundred_cartReminder', JSON.stringify(cartReminder));
     },
 
     // Check and send abandoned cart emails (call on page load)
     async checkAbandonedCarts() {
-        const reminder = localStorage.getItem('cartReminder');
+        const reminder = localStorage.getItem('1hundred_cartReminder');
         if (!reminder) return;
 
         const { email, cartData, timestamp } = JSON.parse(reminder);
@@ -150,7 +150,7 @@ const EmailService = {
 
         // Check if 1 hour has passed and cart still has items
         if (Date.now() - timestamp >= oneHour) {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
             if (cart.length > 0) {
                 // Calculate total
                 const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
@@ -161,13 +161,13 @@ const EmailService = {
                 });
             }
             // Clear the reminder
-            localStorage.removeItem('cartReminder');
+            localStorage.removeItem('1hundred_cartReminder');
         }
     },
 
     // Clear abandoned cart reminder (call after successful checkout)
     clearCartReminder() {
-        localStorage.removeItem('cartReminder');
+        localStorage.removeItem('1hundred_cartReminder');
     }
 };
 
