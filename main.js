@@ -270,6 +270,11 @@ function addToCart(productId, size, color, quantity = 1) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
 
+    if (product.category === 'Hoodies') {
+        showToast('Coming Soon', 'info');
+        return;
+    }
+
     // Check stock availability
     const currentStock = product.stock || 0;
     const existingItem = state.cart.find((item) => item.id === productId && item.size === size && item.color === color);
@@ -494,6 +499,12 @@ function renderMiniCart() {
 function openQuickView(productId) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
+
+    // Block hoodies - show coming soon
+    if (product.category === 'Hoodies') {
+        showToast('Coming Soon', 'info');
+        return;
+    }
 
     const modal = document.getElementById('quick-view-modal');
     const overlay = document.getElementById('quick-view-overlay');
