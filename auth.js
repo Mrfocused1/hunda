@@ -13,7 +13,7 @@
  */
 const Auth = (function () {
     const STORAGE_PREFIX = '1hundred_';
-    const STORAGE_KEY = `${STORAGE_PREFIX}auth_user`;
+    const STORAGE_KEY = `${STORAGE_PREFIX}user`;
     const SESSION_KEY = `${STORAGE_PREFIX}session`;
     const USERS_KEY = `${STORAGE_PREFIX}users`;
 

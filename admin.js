@@ -805,7 +805,8 @@ async function saveProduct(event) {
             }
         } else {
             // Create new
-            const newId = Math.max(...adminProducts.map((p) => p.id), 0) + 1;
+            const ids = adminProducts.map((p) => p.id);
+            const newId = (ids.length > 0 ? Math.max(...ids) : 0) + 1;
             adminProducts.push({ ...productData, id: newId });
         }
         showToast('✅ Product saved locally');
@@ -858,7 +859,7 @@ async function deleteProduct(id) {
         loadProducts();
     } else {
         // Local fallback
-        const index = adminProducts.findIndex((p) => p.id === id);
+        const index = adminProducts.findIndex((p) => p.id === parseInt(id));
         if (index !== -1) {
             adminProducts.splice(index, 1);
             showToast('✅ Product deleted locally');
@@ -1188,7 +1189,7 @@ function renderCustomers() {
                 <div class="customer-card-header">
                     <div class="customer-avatar ${customer.status}">${initials}</div>
                     <div class="customer-info">
-                        <div class="customer-name">${customer.firstName} ${customer.lastName}</div>
+                        <div class="customer-name">${customer.firstName || ''} ${customer.lastName || ''}</div>
                         <div class="customer-email">${customer.email}</div>
                     </div>
                 </div>
@@ -1816,11 +1817,11 @@ function handleImport(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
         try {
             const data = JSON.parse(e.target.result);
 
-            if (data.products) AdminData.saveProducts(data.products);
+            if (data.products) await AdminData.saveProducts(data.products);
             if (data.orders) AdminData.saveOrders(data.orders);
             if (data.customers) AdminData.saveCustomers(data.customers);
             if (data.emailSettings) AdminData.saveEmailSettings(data.emailSettings);
@@ -1891,9 +1892,12 @@ document.addEventListener('DOMContentLoaded', function () {
     loadContent();
 
     // Close modal on overlay click
-    document.getElementById('product-modal').addEventListener('click', function (e) {
-        if (e.target === this) closeProductModal();
-    });
+    const productModal = document.getElementById('product-modal');
+    if (productModal) {
+        productModal.addEventListener('click', function (e) {
+            if (e.target === this) closeProductModal();
+        });
+    }
 
     // Close customer modal on overlay click
     const customerModal = document.getElementById('customer-modal');

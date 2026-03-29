@@ -107,7 +107,8 @@ async function initProducts() {
                     category: p.category,
                     images: p.images || [p.image],
                     sizes: p.sizes || ['S', 'M', 'L', 'XL'],
-                    colors: p.colors || ['Default']
+                    colors: p.colors || ['Default'],
+                    stock: p.stock ?? 0
                 }));
                 // Products loaded from Supabase
             } else {
@@ -265,6 +266,7 @@ function toggleCart(open) {
 // ========================================
 
 function addToCart(productId, size, color, quantity = 1) {
+    quantity = Math.max(1, Math.floor(Number(quantity) || 1));
     const product = products.find((p) => p.id === productId);
     if (!product) return;
 
@@ -641,7 +643,9 @@ function addToCartFromQV(btn) {
     const productTitle = product ? product.title : 'Item';
 
     // Add to cart
-    addToCart(productId, size, 'Black', 1);
+    const productForColor = products.find((p) => p.id === productId);
+    const color = productForColor?.colors?.[0] || 'Black';
+    addToCart(productId, size, color, 1);
 
     // Close quick view and open cart drawer
     closeQuickView();
