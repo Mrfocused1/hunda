@@ -445,6 +445,7 @@
                 }
 
                 discount = Math.min(discountAmount, subtotal);
+                localStorage.setItem('1hundred_checkout_discount', discount.toString());
                 message.textContent = discountMsg;
                 message.className = 'text-sm mt-2 text-green-600';
                 message.classList.remove('hidden');

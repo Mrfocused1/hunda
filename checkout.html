@@ -466,6 +466,10 @@
                                 <span class="text-gray-600">Tax</span>
                                 <span id="checkout-tax" class="font-medium">£0.00</span>
                             </div>
+                            <div id="checkout-discount-row" class="flex justify-between text-green-600 hidden">
+                                <span>Discount</span>
+                                <span id="checkout-discount">-£0.00</span>
+                            </div>
                         </div>
 
                         <div class="border-t border-gray-200 mt-4 pt-4">
@@ -653,9 +657,20 @@
 
                     // Update totals
                     const subtotal = getCartTotal();
-                    const shipping = subtotal >= 50 ? 0 : 4.99;
-                    const tax = subtotal * 0.2;
-                    const total = subtotal + shipping + tax;
+                    const discount = parseFloat(localStorage.getItem('1hundred_checkout_discount') || '0');
+                    const countryCode = document.getElementById('checkout-country')?.value || 'United Kingdom';
+                    const shipping =
+                        typeof Pricing !== 'undefined'
+                            ? Pricing.calculateShipping(subtotal, countryCode)
+                            : subtotal >= 50
+                              ? 0
+                              : 4.99;
+                    const taxableAmount = subtotal - discount;
+                    const tax =
+                        typeof Pricing !== 'undefined'
+                            ? Pricing.calculateTax(taxableAmount, countryCode)
+                            : taxableAmount * 0.2;
+                    const total = Math.max(0, subtotal + shipping + tax - discount);
 
                     const subtotalEl = document.getElementById('checkout-subtotal');
                     const shippingEl = document.getElementById('checkout-shipping');
@@ -666,6 +681,13 @@
                     if (shippingEl) shippingEl.textContent = shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`;
                     if (taxEl) taxEl.textContent = `£${tax.toFixed(2)}`;
                     if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
+
+                    const discountRow = document.getElementById('checkout-discount-row');
+                    const discountEl = document.getElementById('checkout-discount');
+                    if (discount > 0 && discountRow && discountEl) {
+                        discountRow.classList.remove('hidden');
+                        discountEl.textContent = `-£${discount.toFixed(2)}`;
+                    }
                 } catch (err) {
                     debugError('renderCheckoutSummary failed:', err);
                 }
@@ -695,9 +717,20 @@
                     showToast('Your cart is empty', 'error');
                     return;
                 }
-                const shipping = subtotal >= 50 ? 0 : 4.99;
-                const tax = subtotal * 0.2;
-                const total = subtotal + shipping + tax;
+                const discount = parseFloat(localStorage.getItem('1hundred_checkout_discount') || '0');
+                const countryCode = document.getElementById('checkout-country')?.value || 'United Kingdom';
+                const shipping =
+                    typeof Pricing !== 'undefined'
+                        ? Pricing.calculateShipping(subtotal, countryCode)
+                        : subtotal >= 50
+                          ? 0
+                          : 4.99;
+                const taxableAmount = subtotal - discount;
+                const tax =
+                    typeof Pricing !== 'undefined'
+                        ? Pricing.calculateTax(taxableAmount, countryCode)
+                        : taxableAmount * 0.2;
+                const total = Math.max(0, subtotal + shipping + tax - discount);
 
                 // Get selected payment method
                 const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
@@ -811,16 +844,17 @@
                             price: (item.price * item.quantity).toFixed(2),
                             quantity: item.quantity
                         }))
-                    });
+                    }).catch((err) => debugError('Order confirmation email failed:', err));
 
                     // Clear any pending cart reminder
                     EmailService.clearCartReminder();
                 }
 
-                // Clear cart
+                // Clear cart and discount
                 state.cart = [];
                 saveCart();
                 updateBadges();
+                localStorage.removeItem('1hundred_checkout_discount');
 
                 lucide.createIcons();
                 window.scrollTo({ top: 0, behavior: 'smooth' });

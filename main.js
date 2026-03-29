@@ -727,7 +727,7 @@ function showToast(message, type = 'success', duration = 3000) {
     };
     const iconName = iconMap[type] || 'check-circle';
 
-    toast.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i><span id="toast-msg">${message}</span>`;
+    toast.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i><span id="toast-msg">${U.sanitizeHTML(message)}</span>`;
     toast.className = `toast ${type}`;
     toast.style.display = 'flex';
 
