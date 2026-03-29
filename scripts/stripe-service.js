@@ -62,7 +62,7 @@ const StripeService = {
                 throw new Error(data.error || 'Failed to create payment intent');
             }
 
-            return data;
+            return data.data || data;
         } catch (error) {
             console.error('Payment intent error:', error);
             throw error;

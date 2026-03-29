@@ -608,7 +608,7 @@
                     }
                 }
 
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
@@ -860,18 +860,18 @@
                 updateBadges();
                 localStorage.removeItem('1hundred_checkout_discount');
 
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             document.addEventListener('DOMContentLoaded', async () => {
                 renderCheckoutSummary();
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
 
                 // Initialize with error handling
                 try {
                     renderCheckoutSummary();
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
 
                     // Initialize Stripe - fetch key from server
                     try {
@@ -953,9 +953,7 @@
                     const placeOrderBtn = document.getElementById('place-order-btn');
                     if (placeOrderBtn) {
                         placeOrderBtn.replaceWith(placeOrderBtn.cloneNode(true));
-                        document
-                            .getElementById('place-order-btn')
-                            ?.addEventListener('click', placeOrder, { once: true });
+                        document.getElementById('place-order-btn')?.addEventListener('click', placeOrder);
                     }
                 } catch (initError) {
                     debugError('Checkout initialization error:', initError);
