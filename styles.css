@@ -705,7 +705,7 @@ body {
     transform: scale(1.2);
 }
 
-product-info {
+.product-info {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;

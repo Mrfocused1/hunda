@@ -75,6 +75,7 @@
                 <a href="/shop" class="mobile-nav-link">Shop All</a>
                 <a href="/shop?new=true" class="mobile-nav-link">New In</a>
                 <a href="/about" class="mobile-nav-link">About Us</a>
+                <a href="/contact" class="mobile-nav-link">Contact Us</a>
 
                 <div class="border-t border-gray-200 mt-4 pt-4">
                     <a href="/login" class="mobile-nav-link">
@@ -108,6 +109,7 @@
                         <a href="/shop" class="nav-link">Shop All</a>
                         <a href="/shop?new=true" class="nav-link">New In</a>
                         <a href="/about" class="nav-link">About Us</a>
+                        <a href="/contact" class="nav-link">Contact Us</a>
                     </nav>
 
                     <!-- Center: Search -->
@@ -264,8 +266,8 @@
                                             class="form-input"
                                             id="checkout-postcode"
                                             required
-                                            pattern="[A-Za-z]{1,2}[0-9][A-Za-z0-9]?\s?[0-9][A-Za-z]{2}"
-                                            title="Please enter a valid UK postcode" />
+                                            pattern="[A-Za-z0-9\s\-]{3,10}"
+                                            title="Please enter a valid postcode" />
                                     </div>
                                 </div>
 
@@ -614,6 +616,11 @@
 
                     if (!state.cart || state.cart.length === 0) {
                         container.innerHTML = '<p class="text-gray-500 text-sm">Your bag is empty</p>';
+                        const placeBtn = document.getElementById('place-order-btn');
+                        if (placeBtn) placeBtn.disabled = true;
+                        document.querySelectorAll('[data-goto-step]').forEach((btn) => {
+                            if (parseInt(btn.dataset.gotoStep) > 1) btn.disabled = true;
+                        });
                         return;
                     }
 

@@ -567,6 +567,19 @@
                 // Account details form
                 document.getElementById('account-details-form')?.addEventListener('submit', function (e) {
                     e.preventDefault();
+                    const user = typeof Auth !== 'undefined' ? Auth.getUser() : null;
+                    if (user) {
+                        const updated = {
+                            ...user,
+                            firstName: document.getElementById('user-firstname')?.value?.trim() || user.firstName,
+                            lastName: document.getElementById('user-lastname')?.value?.trim() || user.lastName,
+                            email: document.getElementById('user-email')?.value?.trim() || user.email,
+                            phone: document.getElementById('user-phone')?.value?.trim() || user.phone
+                        };
+                        if (typeof Auth !== 'undefined' && Auth.updateProfile) {
+                            Auth.updateProfile(updated);
+                        }
+                    }
                     showToast('Details updated successfully', 'success');
                 });
 
