@@ -26,7 +26,7 @@ const CONFIG = {
         { path: '/product?id=1', name: 'product-detail' },
         { path: '/cart', name: 'cart' },
         { path: '/checkout', name: 'checkout' },
-        { path: '/wishlist', name: 'wishlist' },
+
         { path: '/account', name: 'account' },
         { path: '/about', name: 'about' }
     ],

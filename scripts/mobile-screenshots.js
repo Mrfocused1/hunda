@@ -7,7 +7,7 @@ const pages = [
     'product.html',
     'cart.html',
     'checkout.html',
-    'wishlist.html',
+
     'account.html',
     'about.html',
     'login.html',

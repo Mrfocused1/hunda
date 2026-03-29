@@ -1047,26 +1047,6 @@
                 const productGrid = document.getElementById('product-grid');
                 if (productGrid) {
                     productGrid.addEventListener('click', function (e) {
-                        // Wishlist button
-                        const wishlistBtn = e.target.closest('[data-wishlist]');
-                        if (wishlistBtn) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const productId = parseInt(wishlistBtn.dataset.wishlist);
-                            if (typeof toggleWishlist === 'function') {
-                                toggleWishlist(productId);
-                                // Update visual state
-                                wishlistBtn.classList.toggle('active');
-                                const icon = wishlistBtn.querySelector('i');
-                                if (icon) {
-                                    icon.style.fill = wishlistBtn.classList.contains('active')
-                                        ? 'currentColor'
-                                        : 'none';
-                                }
-                            }
-                            return;
-                        }
-
                         // Quick view
                         const quickViewBtn = e.target.closest('[data-quick-view]');
                         if (quickViewBtn) {

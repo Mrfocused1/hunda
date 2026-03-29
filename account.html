@@ -6,7 +6,7 @@
         <title>My Account | 1 HUNDRED</title>
         <meta
             name="description"
-            content="Manage your 1 HUNDRED account. View orders, update details, and manage your wishlist." />
+            content="Manage your 1 HUNDRED account. View orders, update details, and track deliveries." />
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://www.1hundredornothing.co.uk/account" />
         <link rel="icon" type="image/svg+xml" href="logo.svg" />
@@ -405,61 +405,8 @@
 
                     tab.classList.add('active');
                     document.getElementById(tab.dataset.tab).classList.add('active');
-
-                    if (tab.dataset.tab === 'wishlist') {
-                        renderWishlistTab();
-                    }
                 });
             });
-
-            function renderWishlistTab() {
-                const container = document.getElementById('wishlist-grid');
-
-                if (state.wishlist.length === 0) {
-                    container.innerHTML = `
-                    <div class="col-span-full empty-state">
-                        <i data-lucide="heart" class="empty-state-icon mx-auto"></i>
-                        <h3 class="empty-state-title">Your wishlist is empty</h3>
-                        <p class="empty-state-text">Save items you love for later</p>
-                        <a href="/shop" class="btn btn-primary mt-4">Start Shopping</a>
-                    </div>
-                `;
-                    lucide.createIcons();
-                    return;
-                }
-
-                const wishlistProducts = allProducts.filter((p) => state.wishlist.includes(p.id));
-
-                container.innerHTML = wishlistProducts
-                    .map(
-                        (p) => `
-                <div class="wishlist-item">
-                    <div class="product-image-wrapper">
-                        <a href="/product?id=${p.id}">
-                            <img src="${p.image}" alt="${p.title}" class="product-image">
-                        </a>
-                        
-                    </div>
-                    <a href="/product?id=${p.id}">
-                        <div class="product-info mt-3">
-                            <h3 class="product-title">${p.title}</h3>
-                            <span class="product-price">£${p.price.toFixed(2)}</span>
-                        </div>
-                        <p class="product-category">${p.category}</p>
-                    </a>
-                    <button data-add-cart="${p.id}" data-size="M" data-color="Black" data-qty="1" class="btn btn-primary btn-full btn-sm mt-3">Add to Bag</button>
-                </div>
-            `
-                    )
-                    .join('');
-
-                lucide.createIcons();
-            }
-
-            function removeFromWishlist(productId) {
-                toggleWishlist(productId);
-                renderWishlistTab();
-            }
 
             // Render orders
             function renderOrders() {

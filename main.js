@@ -445,10 +445,6 @@ function renderMiniCart() {
 }
 
 // ========================================
-// WISHLIST FUNCTIONS
-// ========================================
-
-// ========================================
 // UI HELPERS
 // ========================================
 
@@ -843,13 +839,3 @@ window.showError = showError;
 window.sanitizeHTML = U.sanitizeHTML;
 window.getCartTotal = getCartTotal;
 window.Utils = U;
-
-// Wishlist stub functions (feature not fully implemented)
-window.toggleWishlist = function (productId) {
-    showToast('Wishlist feature coming soon!');
-    debugLog('Wishlist toggle for product:', productId);
-};
-
-window.isInWishlist = function (productId) {
-    return false;
-};

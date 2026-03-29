@@ -8,16 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const PAGES = [
-    'index.html',
-    'shop.html',
-    'product.html',
-    'cart.html',
-    'checkout.html',
-    'wishlist.html',
-    'account.html',
-    'about.html'
-];
+const PAGES = ['index.html', 'shop.html', 'product.html', 'cart.html', 'checkout.html', 'account.html', 'about.html'];
 
 const CHECKS = {
     desktopNav: /Shop All.*New In.*About Us/s,

@@ -11,7 +11,6 @@
         '1hundred_email_activity',
         '1hundred_store_content',
         'cart',
-        'wishlist',
         'orders',
         'addresses'
     ];
