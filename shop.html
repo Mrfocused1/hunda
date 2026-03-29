@@ -799,6 +799,7 @@
                         <div class="product-image-wrapper ${hasMultipleImages ? 'has-multiple-images' : ''}" data-quick-view="${product.id}" data-images='${JSON.stringify(imageUrls)}' data-current-index="0">
                             <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
                             ${product.isNew ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
+                            ${product.category === 'Hoodies' ? '<span class="absolute top-2 right-2 bg-gray-800 text-white text-xs font-bold uppercase px-2 py-1 rounded">Coming Soon</span>' : ''}
                             ${navArrows}
                             <div class="product-quick-actions">
                                 <button class="quick-action-btn" title="Quick View" data-quick-view="${product.id}">
@@ -1053,6 +1054,11 @@
                             e.preventDefault();
                             e.stopPropagation();
                             const productId = parseInt(quickViewBtn.dataset.quickView);
+                            const product = allProducts.find((p) => p.id === productId);
+                            if (product && product.category === 'Hoodies') {
+                                showToast('Coming Soon', 'info');
+                                return;
+                            }
                             if (typeof openQuickView === 'function') {
                                 openQuickView(productId);
                             }
@@ -1066,6 +1072,10 @@
                             e.stopPropagation();
                             const productId = parseInt(addCartBtn.dataset.addCart);
                             const product = allProducts.find((p) => p.id === productId);
+                            if (product && product.category === 'Hoodies') {
+                                showToast('Coming Soon', 'info');
+                                return;
+                            }
                             if (product && typeof addToCart === 'function') {
                                 // Auto-select size if only one option
                                 const size = product.sizes.length === 1 ? product.sizes[0] : 'M';
@@ -1079,6 +1089,18 @@
                                 }
                             }
                             return;
+                        }
+
+                        // Intercept product link clicks for Hoodies
+                        const productCard = e.target.closest('.product-card');
+                        if (productCard) {
+                            const productId = parseInt(productCard.dataset.productId);
+                            const product = allProducts.find((p) => p.id === productId);
+                            if (product && product.category === 'Hoodies') {
+                                e.preventDefault();
+                                showToast('Coming Soon', 'info');
+                                return;
+                            }
                         }
                     });
                 }
