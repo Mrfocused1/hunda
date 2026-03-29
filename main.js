@@ -270,7 +270,7 @@ function addToCart(productId, size, color, quantity = 1) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
 
-    if (product.category === 'Hoodies') {
+    if (product.category?.toLowerCase() === 'hoodies') {
         showToast('Coming Soon', 'info');
         return;
     }
@@ -501,7 +501,7 @@ function openQuickView(productId) {
     if (!product) return;
 
     // Block hoodies - show coming soon
-    if (product.category === 'Hoodies') {
+    if (product.category?.toLowerCase() === 'hoodies') {
         showToast('Coming Soon', 'info');
         return;
     }

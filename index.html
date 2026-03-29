@@ -800,7 +800,7 @@
                             primaryImage = product.image;
                         }
                         const productUrl = getProductUrl(product);
-                        const isHoodie = product.category === 'Hoodies';
+                        const isHoodie = product.category?.toLowerCase() === 'hoodies';
                         return `
                 <div class="product-card" data-product-id="${product.id}" ${isHoodie ? 'style="pointer-events: none;"' : ''}>
                     <div class="product-image-wrapper" ${!isHoodie ? `data-quick-view="${product.id}"` : ''}>
@@ -917,15 +917,7 @@
                 const featuredAddBtn = document.getElementById('featured-add-to-bag');
                 if (featuredAddBtn) {
                     featuredAddBtn.addEventListener('click', function () {
-                        if (typeof addToCart !== 'undefined') {
-                            addToCart(4, 'M', 'Black', 1);
-                            if (typeof showToast !== 'undefined') {
-                                showToast('The No Half Measures Hoodie added to bag', 'success');
-                            }
-                            if (typeof toggleCart !== 'undefined') {
-                                toggleCart(true);
-                            }
-                        }
+                        showToast('Coming Soon', 'info');
                     });
                 }
 
