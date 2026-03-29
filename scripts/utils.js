@@ -35,9 +35,10 @@ const Utils = {
      * @returns {string} Formatted price
      */
     formatPrice(price) {
+        const symbol = this?.config?.CURRENCY_SYMBOL || '£';
         const numPrice = parseFloat(price);
-        if (isNaN(numPrice)) return `${this.config.CURRENCY_SYMBOL}0.00`;
-        return `${this.config.CURRENCY_SYMBOL}${numPrice.toFixed(2)}`;
+        if (isNaN(numPrice)) return `${symbol}0.00`;
+        return `${symbol}${numPrice.toFixed(2)}`;
     },
 
     /**
@@ -46,7 +47,9 @@ const Utils = {
      * @returns {number} Shipping cost
      */
     calculateShipping(subtotal) {
-        return subtotal >= this.config.FREE_SHIPPING_THRESHOLD ? 0 : this.config.SHIPPING_COST;
+        const threshold = this?.config?.FREE_SHIPPING_THRESHOLD || 50;
+        const cost = this?.config?.SHIPPING_COST || 4.99;
+        return subtotal >= threshold ? 0 : cost;
     },
 
     /**
@@ -55,7 +58,8 @@ const Utils = {
      * @returns {number} Tax amount
      */
     calculateTax(amount) {
-        return amount * this.config.TAX_RATE;
+        const rate = this?.config?.TAX_RATE || 0.2;
+        return amount * rate;
     },
 
     /**
@@ -64,7 +68,8 @@ const Utils = {
      * @returns {string} Prefixed key
      */
     getStorageKey(key) {
-        return `${this.config.STORAGE_PREFIX}${key}`;
+        const prefix = this?.config?.STORAGE_PREFIX || '1hundred_';
+        return `${prefix}${key}`;
     },
 
     /**
