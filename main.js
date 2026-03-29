@@ -407,32 +407,67 @@ function renderMiniCart() {
             </div>
         `;
     } else {
+        // Sanitize item data for safe HTML insertion
         container.innerHTML = state.cart
-            .map(
-                (item) => `
-            <div class="flex gap-4 mb-4">
+            .map((item) => {
+                const safeTitle = U.sanitizeHTML(item.title);
+                const safeColor = U.sanitizeHTML(item.color);
+                const safeSize = U.sanitizeHTML(item.size);
+                const safeImage = U.sanitizeHTML(item.image);
+                return `
+            <div class="flex gap-4 mb-4" data-cart-item="${item.id}" data-size="${safeSize}" data-color="${safeColor}">
                 <div class="w-20 h-24 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
+                    <img src="${safeImage}" alt="${safeTitle}" class="w-full h-full object-cover">
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-start gap-2">
-                        <h4 class="font-bold text-sm uppercase truncate">${item.title}</h4>
+                        <h4 class="font-bold text-sm uppercase truncate">${safeTitle}</h4>
                         <span class="font-bold text-sm">£${item.price.toFixed(2)}</span>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">${item.color} | ${item.size}</p>
+                    <p class="text-xs text-gray-500 mt-1">${safeColor} | ${safeSize}</p>
                     <div class="flex items-center justify-between mt-2">
                         <div class="flex items-center border border-gray-200 rounded">
-                            <button onclick="updateCartQuantity(${item.id}, '${item.size}', '${item.color}', ${item.quantity - 1})" class="px-2 py-1 text-xs hover:bg-gray-100">-</button>
+                            <button class="px-2 py-1 text-xs hover:bg-gray-100 cart-qty-minus" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}">-</button>
                             <span class="px-2 text-xs font-bold">${item.quantity}</span>
-                            <button onclick="updateCartQuantity(${item.id}, '${item.size}', '${item.color}', ${item.quantity + 1})" class="px-2 py-1 text-xs hover:bg-gray-100">+</button>
+                            <button class="px-2 py-1 text-xs hover:bg-gray-100 cart-qty-plus" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}">+</button>
                         </div>
-                        <button onclick="removeFromCart(${item.id}, '${item.size}', '${item.color}')" class="text-xs text-gray-400 underline hover:text-red-500">Remove</button>
+                        <button class="text-xs text-gray-400 underline hover:text-red-500 cart-remove" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}">Remove</button>
                     </div>
                 </div>
             </div>
-        `
-            )
+        `;
+            })
             .join('');
+
+        // Add event listeners for cart actions (CSP-compatible)
+        container.querySelectorAll('.cart-qty-minus').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                const size = btn.dataset.size;
+                const color = btn.dataset.color;
+                const item = state.cart.find((i) => i.id === id && i.size === size && i.color === color);
+                if (item) updateCartQuantity(id, size, color, item.quantity - 1);
+            });
+        });
+
+        container.querySelectorAll('.cart-qty-plus').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                const size = btn.dataset.size;
+                const color = btn.dataset.color;
+                const item = state.cart.find((i) => i.id === id && i.size === size && i.color === color);
+                if (item) updateCartQuantity(id, size, color, item.quantity + 1);
+            });
+        });
+
+        container.querySelectorAll('.cart-remove').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                const size = btn.dataset.size;
+                const color = btn.dataset.color;
+                removeFromCart(id, size, color);
+            });
+        });
     }
 
     if (subtotalEl) subtotalEl.textContent = `£${getCartTotal().toFixed(2)}`;

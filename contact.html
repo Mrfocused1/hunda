@@ -418,18 +418,59 @@
                 e.preventDefault();
 
                 const btn = document.getElementById('submit-btn');
+                const nameInput = document.getElementById('name');
+                const emailInput = document.getElementById('email');
+                const subjectInput = document.getElementById('subject');
+                const orderNumberInput = document.getElementById('order-number');
+                const messageInput = document.getElementById('message');
+
+                if (!btn || !nameInput || !emailInput || !subjectInput || !messageInput) {
+                    return;
+                }
+
                 const originalText = btn.textContent;
                 btn.textContent = 'Sending...';
                 btn.disabled = true;
 
                 // Get form values
                 const formData = {
-                    name: document.getElementById('name').value,
-                    email: document.getElementById('email').value,
-                    subject: document.getElementById('subject').value,
-                    orderNumber: document.getElementById('order-number').value,
-                    message: document.getElementById('message').value
+                    name: nameInput.value.trim(),
+                    email: emailInput.value.trim(),
+                    subject: subjectInput.value.trim(),
+                    orderNumber: orderNumberInput?.value?.trim() || '',
+                    message: messageInput.value.trim()
                 };
+
+                // Basic validation
+                if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+
+                    const toast = document.getElementById('toast');
+                    const toastMsg = document.getElementById('toast-msg');
+                    if (toast && toastMsg) {
+                        toastMsg.textContent = 'Please fill in all required fields';
+                        toast.classList.add('visible');
+                        setTimeout(() => toast.classList.remove('visible'), 5000);
+                    }
+                    return;
+                }
+
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(formData.email)) {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+
+                    const toast = document.getElementById('toast');
+                    const toastMsg = document.getElementById('toast-msg');
+                    if (toast && toastMsg) {
+                        toastMsg.textContent = 'Please enter a valid email address';
+                        toast.classList.add('visible');
+                        setTimeout(() => toast.classList.remove('visible'), 5000);
+                    }
+                    return;
+                }
 
                 try {
                     const response = await fetch('/api/contact', {

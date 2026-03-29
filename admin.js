@@ -1592,18 +1592,35 @@ function previewEmail(emailType) {
         total: '£89.99'
     };
 
+    // Sanitize function (same as in main.js)
+    const sanitizeHTML = (str) => {
+        if (!str) return '';
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
     let previewHtml = template.body
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
         .replace(/\n/g, '<br>')
         .replace(/{{firstName}}/g, sampleData.firstName)
         .replace(/{{orderNumber}}/g, sampleData.orderNumber)
         .replace(/{{total}}/g, sampleData.total);
 
-    const subjectLine = `<div style="background: #f3f4f6; padding: 0.75rem 1rem; margin: -2rem -2rem 1.5rem -2rem; font-size: 0.875rem; border-bottom: 1px solid #e5e7eb;"><strong>Subject:</strong> ${template.subject}</div>`;
+    const subjectLine = `<div style="background: #f3f4f6; padding: 0.75rem 1rem; margin: -2rem -2rem 1.5rem -2rem; font-size: 0.875rem; border-bottom: 1px solid #e5e7eb;"><strong>Subject:</strong> ${sanitizeHTML(template.subject)}</div>`;
 
-    document.getElementById('email-preview-modal-title').textContent = `${emailType.replace(/-/g, ' ')} Preview`;
-    document.getElementById('email-preview-content').innerHTML = subjectLine + previewHtml;
+    const modalTitle = document.getElementById('email-preview-modal-title');
+    const previewContent = document.getElementById('email-preview-content');
+    const modal = document.getElementById('email-preview-modal');
 
-    document.getElementById('email-preview-modal').classList.add('active');
+    if (modalTitle) modalTitle.textContent = `${emailType.replace(/-/g, ' ')} Preview`;
+    if (previewContent) previewContent.innerHTML = subjectLine + previewHtml;
+    if (modal) modal.classList.add('active');
 }
 
 function closeEmailPreviewModal() {

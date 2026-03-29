@@ -341,13 +341,19 @@
         <script src="auth.js"></script>
         <script>
             // Login form handling
-            document.getElementById('login-form').addEventListener('submit', async function (e) {
+            document.getElementById('login-form')?.addEventListener('submit', async function (e) {
                 e.preventDefault();
 
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const rememberMe = document.getElementById('remember-me').checked;
+                const emailInput = document.getElementById('email');
+                const passwordInput = document.getElementById('password');
+                const rememberMeInput = document.getElementById('remember-me');
                 const errorDiv = document.getElementById('error-message');
+
+                if (!emailInput || !passwordInput || !errorDiv) return;
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                const rememberMe = rememberMeInput?.checked || false;
 
                 // Simple validation
                 if (!email || !password) {
@@ -356,16 +362,40 @@
                     return;
                 }
 
-                // Attempt login
-                const result = await Auth.login(email, password, rememberMe);
+                // Email format validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    errorDiv.textContent = 'Please enter a valid email address';
+                    errorDiv.classList.add('show');
+                    return;
+                }
 
-                if (result.success) {
-                    // Redirect to account or intended page
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirect = urlParams.get('redirect') || '/account';
-                    window.location.href = redirect;
-                } else {
-                    errorDiv.textContent = result.message;
+                try {
+                    // Attempt login
+                    const result = await Auth.login(email, password, rememberMe);
+
+                    if (result.success) {
+                        // Redirect to account or intended page (validate redirect URL)
+                        const urlParams = new URLSearchParams(window.location.search);
+                        let redirect = urlParams.get('redirect') || '/account';
+
+                        // Security: Only allow relative URLs to prevent open redirect
+                        if (
+                            redirect.startsWith('http://') ||
+                            redirect.startsWith('https://') ||
+                            redirect.startsWith('//')
+                        ) {
+                            redirect = '/account';
+                        }
+
+                        window.location.href = redirect;
+                    } else {
+                        errorDiv.textContent = result.message;
+                        errorDiv.classList.add('show');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    errorDiv.textContent = 'An error occurred. Please try again.';
                     errorDiv.classList.add('show');
                 }
             });
