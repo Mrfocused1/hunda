@@ -465,25 +465,27 @@
                     .join('');
             }
 
-            // Use shared utilities
-            const U =
-                typeof Utils !== 'undefined'
-                    ? Utils
-                    : {
-                          sanitizeHTML: (str) =>
-                              str
-                                  ?.replace(/&/g, '&amp;')
-                                  .replace(/</g, '&lt;')
-                                  .replace(/>/g, '&gt;')
-                                  .replace(/"/g, '&quot;')
-                                  .replace(/'/g, '&#039;') || '',
-                          formatPrice: (price) => `£${parseFloat(price || 0).toFixed(2)}`,
-                          calculateShipping: (subtotal) => (subtotal >= 50 ? 0 : 4.99)
-                      };
+            // Use shared utilities (only define if not already loaded from main.js)
+            const CartUtils =
+                typeof U !== 'undefined'
+                    ? U
+                    : typeof Utils !== 'undefined'
+                      ? Utils
+                      : {
+                            sanitizeHTML: (str) =>
+                                str
+                                    ?.replace(/&/g, '&amp;')
+                                    .replace(/</g, '&lt;')
+                                    .replace(/>/g, '&gt;')
+                                    .replace(/"/g, '&quot;')
+                                    .replace(/'/g, '&#039;') || '',
+                            formatPrice: (price) => `£${parseFloat(price || 0).toFixed(2)}`,
+                            calculateShipping: (subtotal) => (subtotal >= 50 ? 0 : 4.99)
+                        };
 
             // Backwards compatibility
-            const sanitizeHTML = U.sanitizeHTML;
-            const formatPrice = U.formatPrice;
+            const sanitizeHTML = CartUtils.sanitizeHTML;
+            const formatPrice = CartUtils.formatPrice;
 
             document.addEventListener('DOMContentLoaded', () => {
                 // Check if state is available (main.js loaded)

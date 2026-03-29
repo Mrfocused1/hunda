@@ -4,6 +4,10 @@
     "description": "1 HUNDRED - Premium Streetwear E-commerce",
     "scripts": {
         "dev": "npx serve . -p 3000",
+        "test": "npm run test:e2e && npm run test:email-admin",
+        "test:e2e": "node scripts/comprehensive-e2e-test.js",
+        "test:email-admin": "node scripts/email-admin-tests.js",
+        "test:e2e:local": "TEST_URL=http://localhost:3000 node scripts/comprehensive-e2e-test.js",
         "test:screenshots": "node scripts/screenshot-test.js",
         "test:screenshots:mobile": "node scripts/screenshot-test.js --mobile",
         "test:screenshots:desktop": "node scripts/screenshot-test.js --desktop",

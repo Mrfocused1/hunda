@@ -2,12 +2,12 @@
 // Supports: order-confirmation, shipping, welcome, abandoned-cart, contact
 
 // Debug utility
-const DEBUG = window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app');
+const EMAIL_DEBUG = window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app');
 const debugLog = (...args) => {
-    if (DEBUG) console.log(...args);
+    if (EMAIL_DEBUG) console.log(...args);
 };
 const debugError = (...args) => {
-    if (DEBUG) console.error(...args);
+    if (EMAIL_DEBUG) console.error(...args);
 };
 
 const EmailService = {
