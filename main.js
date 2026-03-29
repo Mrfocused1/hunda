@@ -471,11 +471,16 @@ function openQuickView(productId) {
         primaryImage = product.image;
     }
 
-    // Populate modal
-    document.getElementById('qv-image').src = primaryImage;
-    document.getElementById('qv-title').textContent = product.title;
-    document.getElementById('qv-price').textContent = formatPrice(product.price);
-    document.getElementById('qv-category').textContent = product.category;
+    // Populate modal with null checks
+    const qvImage = document.getElementById('qv-image');
+    const qvTitle = document.getElementById('qv-title');
+    const qvPrice = document.getElementById('qv-price');
+    const qvCategory = document.getElementById('qv-category');
+
+    if (qvImage) qvImage.src = primaryImage;
+    if (qvTitle) qvTitle.textContent = product.title;
+    if (qvPrice) qvPrice.textContent = formatPrice(product.price);
+    if (qvCategory) qvCategory.textContent = product.category;
 
     // Render sizes
     const sizeContainer = document.getElementById('qv-sizes');

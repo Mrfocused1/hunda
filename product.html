@@ -372,7 +372,7 @@
                     image: 'product-5.jpeg',
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Blue'],
-                    description:\n\nA refined expression of intent, the Endless Possibilities Hoodie is defined by its balance of structure and ease. Crafted in a washed blue finish, the silhouette is relaxed yet precise, offering a quiet sense of presence.\n\nThe signature 1H mark anchors the piece, while subtle text detailing speaks to a mindset of limitless direction. Studded accents introduce a restrained edge, complementing the garment's considered construction and tactile depth.\n\nUnderstated yet deliberate, this piece moves beyond trend—designed for those who operate with clarity and purpose.\n\nWithout limits.`
+                    description: `A refined expression of intent, the Endless Possibilities Hoodie is defined by its balance of structure and ease. Crafted in a washed blue finish, the silhouette is relaxed yet precise, offering a quiet sense of presence.\n\nThe signature 1H mark anchors the piece, while subtle text detailing speaks to a mindset of limitless direction. Studded accents introduce a restrained edge, complementing the garment's considered construction and tactile depth.\n\nUnderstated yet deliberate, this piece moves beyond trend—designed for those who operate with clarity and purpose.\n\nWithout limits.`
                 },
                 {
                     id: 6,
@@ -409,24 +409,6 @@
 
                 currentProduct = allProducts.find((p) => p.id === productId) || allProducts[0];
 
-                // Update page
-                document.title = `${currentProduct.title} | 1 HUNDRED`;
-
-                // Update meta tags for SEO
-                document.getElementById('page-title').textContent = `${currentProduct.title} | 1 HUNDRED`;
-                document.getElementById('page-description').setAttribute('content',
-                    `${currentProduct.title} - ${currentProduct.description?.substring(0, 150) || 'Premium streetwear from 1 HUNDRED'}`);
-                document.getElementById('og-url').setAttribute('content', window.location.href);
-                document.getElementById('og-title').setAttribute('content', `${currentProduct.title} | 1 HUNDRED`);
-                document.getElementById('og-description').setAttribute('content',
-                    currentProduct.description?.substring(0, 200) || 'Premium streetwear from 1 HUNDRED');
-                document.getElementById('og-image').setAttribute('content',
-                    `${window.location.origin}/${primaryImage}`);
-
-                document.getElementById('breadcrumb-product').textContent = currentProduct.title;
-                document.getElementById('breadcrumb-category').textContent = currentProduct.category;
-                document.getElementById('breadcrumb-category').href = `/shop?category=${currentProduct.category}`;
-
                 // Get primary image (support both old single image and new images array)
                 let primaryImage = 'product-1.png';
                 if (currentProduct.images && Array.isArray(currentProduct.images)) {
@@ -434,11 +416,54 @@
                 } else if (currentProduct.image) {
                     primaryImage = currentProduct.image;
                 }
-                document.getElementById('main-image').src = primaryImage;
-                document.getElementById('main-image').alt = currentProduct.title;
-                document.getElementById('product-title').textContent = currentProduct.title;
-                document.getElementById('product-price').textContent = `£${currentProduct.price.toFixed(2)}`;
-                document.getElementById('product-description').textContent = currentProduct.description;
+
+                // Update page
+                document.title = `${currentProduct.title} | 1 HUNDRED`;
+
+                // Update meta tags for SEO with null checks
+                const pageTitle = document.getElementById('page-title');
+                const pageDescription = document.getElementById('page-description');
+                const ogUrl = document.getElementById('og-url');
+                const ogTitle = document.getElementById('og-title');
+                const ogDescription = document.getElementById('og-description');
+                const ogImage = document.getElementById('og-image');
+                const breadcrumbProduct = document.getElementById('breadcrumb-product');
+                const breadcrumbCategory = document.getElementById('breadcrumb-category');
+
+                if (pageTitle) pageTitle.textContent = `${currentProduct.title} | 1 HUNDRED`;
+                if (pageDescription)
+                    pageDescription.setAttribute(
+                        'content',
+                        `${currentProduct.title} - ${currentProduct.description?.substring(0, 150) || 'Premium streetwear from 1 HUNDRED'}`
+                    );
+                if (ogUrl) ogUrl.setAttribute('content', window.location.href);
+                if (ogTitle) ogTitle.setAttribute('content', `${currentProduct.title} | 1 HUNDRED`);
+                if (ogDescription)
+                    ogDescription.setAttribute(
+                        'content',
+                        currentProduct.description?.substring(0, 200) || 'Premium streetwear from 1 HUNDRED'
+                    );
+                if (ogImage) ogImage.setAttribute('content', `${window.location.origin}/${primaryImage}`);
+                if (breadcrumbProduct) breadcrumbProduct.textContent = currentProduct.title;
+                if (breadcrumbCategory) {
+                    breadcrumbCategory.textContent = currentProduct.category;
+                    breadcrumbCategory.href = `/shop?category=${currentProduct.category}`;
+                }
+                const mainImage = document.getElementById('main-image');
+                const productTitle = document.getElementById('product-title');
+                const productPrice = document.getElementById('product-price');
+                const productDescription = document.getElementById('product-description');
+                const thumbnailsContainer = document.getElementById('thumbnails');
+                const colorOptions = document.getElementById('color-options');
+                const sizeOptions = document.getElementById('size-options');
+
+                if (mainImage) {
+                    mainImage.src = primaryImage;
+                    mainImage.alt = currentProduct.title;
+                }
+                if (productTitle) productTitle.textContent = currentProduct.title;
+                if (productPrice) productPrice.textContent = `£${currentProduct.price.toFixed(2)}`;
+                if (productDescription) productDescription.textContent = currentProduct.description;
 
                 // Render thumbnails - use all available images if array exists
                 let thumbnails = [primaryImage, primaryImage, primaryImage];
@@ -447,42 +472,46 @@
                 } else if (currentProduct.image) {
                     thumbnails = [currentProduct.image, currentProduct.image, currentProduct.image];
                 }
-                document.getElementById('thumbnails').innerHTML = thumbnails
-                    .map(
-                        (img, i) => `
+                if (thumbnailsContainer) {
+                    thumbnailsContainer.innerHTML = thumbnails
+                        .map(
+                            (img, i) => `
                 <button class="pdp-thumbnail ${i === 0 ? 'active' : ''}" data-set-image="${img}">
                     <img src="${img}" alt="Product thumbnail">
                 </button>
             `
-                    )
-                    .join('');
+                        )
+                        .join('');
+                }
 
                 // Render color options
-                document.getElementById('color-options').innerHTML = currentProduct.colors
-                    .map(
-                        (color) => `
+                if (colorOptions) {
+                    colorOptions.innerHTML = currentProduct.colors
+                        .map(
+                            (color) => `
                 <button class="color-swatch ${color === 'White' ? 'border' : ''}"
                         style="background: ${getColorCode(color)};"
                         data-color="${color}"
                         data-select-color="${color}">
                 </button>
             `
-                    )
-                    .join('');
+                        )
+                        .join('');
+                }
 
                 // Render size options
-                document.getElementById('size-options').innerHTML = currentProduct.sizes
-                    .map(
-                        (size) => `
+                if (sizeOptions) {
+                    sizeOptions.innerHTML = currentProduct.sizes
+                        .map(
+                            (size) => `
                 <button class="size-option" data-size="${size}" data-select-size="${size}">${size}</button>
             `
-                    )
-                    .join('');
+                        )
+                        .join('');
+                }
 
                 // Select defaults
                 selectColor(currentProduct.colors[0], document.querySelector('.color-swatch'));
-
-
 
                 // Render related products
                 renderRelatedProducts();
@@ -496,16 +525,18 @@
             }
 
             function setMainImage(src, thumb) {
-                document.getElementById('main-image').src = src;
+                const mainImage = document.getElementById('main-image');
+                if (mainImage) mainImage.src = src;
                 document.querySelectorAll('.pdp-thumbnail').forEach((t) => t.classList.remove('active'));
-                thumb.classList.add('active');
+                if (thumb) thumb.classList.add('active');
             }
 
             function selectColor(color, btn) {
                 selectedColor = color;
-                document.getElementById('selected-color').textContent = color;
+                const selectedColorEl = document.getElementById('selected-color');
+                if (selectedColorEl) selectedColorEl.textContent = color;
                 document.querySelectorAll('.color-swatch').forEach((b) => b.classList.remove('active'));
-                btn.classList.add('active');
+                if (btn) btn.classList.add('active');
             }
 
             function selectSize(size, btn) {
@@ -542,13 +573,12 @@
                         // Get primary image (support both old single image and new images array)
                         let pImage = 'product-1.png';
                         if (p.images && Array.isArray(p.images) && p.images.length > 0) {
-                            pImage = typeof getProductImageUrl !== 'undefined'
-                                ? getProductImageUrl(p.images[0])
-                                : p.images[0];
+                            pImage =
+                                typeof getProductImageUrl !== 'undefined'
+                                    ? getProductImageUrl(p.images[0])
+                                    : p.images[0];
                         } else if (p.image) {
-                            pImage = typeof getProductImageUrl !== 'undefined'
-                                ? getProductImageUrl(p.image)
-                                : p.image;
+                            pImage = typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(p.image) : p.image;
                         }
                         return `
                 <div class="product-card">
@@ -579,27 +609,27 @@
                 document.getElementById('add-to-bag-btn')?.addEventListener('click', addToBag);
 
                 // Accordion toggles
-                document.querySelectorAll('[data-accordion]').forEach(btn => {
+                document.querySelectorAll('[data-accordion]').forEach((btn) => {
                     btn.addEventListener('click', () => toggleAccordion(btn.dataset.accordion));
                 });
 
                 // Thumbnail clicks
-                document.querySelectorAll('[data-set-image]').forEach(thumb => {
+                document.querySelectorAll('[data-set-image]').forEach((thumb) => {
                     thumb.addEventListener('click', () => setMainImage(thumb.dataset.setImage, thumb));
                 });
 
                 // Color selection
-                document.querySelectorAll('[data-select-color]').forEach(btn => {
+                document.querySelectorAll('[data-select-color]').forEach((btn) => {
                     btn.addEventListener('click', () => selectColor(btn.dataset.selectColor, btn));
                 });
 
                 // Size selection
-                document.querySelectorAll('[data-select-size]').forEach(btn => {
+                document.querySelectorAll('[data-select-size]').forEach((btn) => {
                     btn.addEventListener('click', () => selectSize(btn.dataset.selectSize, btn));
                 });
 
                 // Newsletter form
-                document.getElementById('newsletter-form')?.addEventListener('submit', function(e) {
+                document.getElementById('newsletter-form')?.addEventListener('submit', function (e) {
                     e.preventDefault();
                     showToast('Thanks for subscribing!', 'success');
                     this.reset();

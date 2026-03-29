@@ -343,10 +343,10 @@
                 emptyState.classList.add('hidden');
                 cartContent.classList.remove('hidden');
 
-                document.getElementById('item-count').textContent = state.cart.reduce(
-                    (sum, item) => sum + item.quantity,
-                    0
-                );
+                const itemCount = document.getElementById('item-count');
+                if (itemCount) {
+                    itemCount.textContent = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+                }
 
                 container.innerHTML = state.cart
                     .map((item, index) => {
@@ -393,15 +393,21 @@
                     typeof Pricing !== 'undefined' ? Pricing.calculateTax(subtotal, countryCode) : subtotal * 0.2;
                 const total = subtotal + shipping + tax - discount;
 
-                document.getElementById('summary-subtotal').textContent = `£${subtotal.toFixed(2)}`;
-                document.getElementById('summary-shipping').textContent =
-                    shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`;
-                document.getElementById('summary-tax').textContent = `£${tax.toFixed(2)}`;
-                document.getElementById('summary-total').textContent = `£${total.toFixed(2)}`;
+                const summarySubtotal = document.getElementById('summary-subtotal');
+                const summaryShipping = document.getElementById('summary-shipping');
+                const summaryTax = document.getElementById('summary-tax');
+                const summaryTotal = document.getElementById('summary-total');
+                const discountRow = document.getElementById('discount-row');
+                const summaryDiscount = document.getElementById('summary-discount');
+
+                if (summarySubtotal) summarySubtotal.textContent = `£${subtotal.toFixed(2)}`;
+                if (summaryShipping) summaryShipping.textContent = shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`;
+                if (summaryTax) summaryTax.textContent = `£${tax.toFixed(2)}`;
+                if (summaryTotal) summaryTotal.textContent = `£${total.toFixed(2)}`;
 
                 if (discount > 0) {
-                    document.getElementById('discount-row').classList.remove('hidden');
-                    document.getElementById('summary-discount').textContent = `-£${discount.toFixed(2)}`;
+                    if (discountRow) discountRow.classList.remove('hidden');
+                    if (summaryDiscount) summaryDiscount.textContent = `-£${discount.toFixed(2)}`;
                 }
             }
 

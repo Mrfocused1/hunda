@@ -356,12 +356,19 @@
             // Load user data
             const user = Auth.getUser();
             if (user) {
-                document.getElementById('user-name').textContent = user.firstName || 'Member';
-                document.getElementById('user-fullname').textContent = `Welcome, ${user.firstName || 'Member'}`;
-                document.getElementById('user-email-display').textContent = user.email;
-                document.getElementById('user-firstname').value = user.firstName || '';
-                document.getElementById('user-lastname').value = user.lastName || '';
-                document.getElementById('user-email').value = user.email;
+                const userNameEl = document.getElementById('user-name');
+                const userFullnameEl = document.getElementById('user-fullname');
+                const userEmailDisplayEl = document.getElementById('user-email-display');
+                const userFirstnameEl = document.getElementById('user-firstname');
+                const userLastnameEl = document.getElementById('user-lastname');
+                const userEmailEl = document.getElementById('user-email');
+
+                if (userNameEl) userNameEl.textContent = user.firstName || 'Member';
+                if (userFullnameEl) userFullnameEl.textContent = `Welcome, ${user.firstName || 'Member'}`;
+                if (userEmailDisplayEl) userEmailDisplayEl.textContent = user.email;
+                if (userFirstnameEl) userFirstnameEl.value = user.firstName || '';
+                if (userLastnameEl) userLastnameEl.value = user.lastName || '';
+                if (userEmailEl) userEmailEl.value = user.email;
             }
 
             // Logout function
