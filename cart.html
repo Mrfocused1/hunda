@@ -334,7 +334,7 @@
                 const emptyState = document.getElementById('empty-cart');
                 const cartContent = document.getElementById('cart-content');
 
-                if (state.cart.length === 0) {
+                if (!state.cart || state.cart.length === 0) {
                     emptyState.classList.remove('hidden');
                     cartContent.classList.add('hidden');
                     return;

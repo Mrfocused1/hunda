@@ -841,6 +841,11 @@
             document.addEventListener('DOMContentLoaded', () => {
                 renderNewArrivals();
 
+                // Re-render when products are loaded from Supabase
+                window.addEventListener('productsInitialized', () => {
+                    renderNewArrivals();
+                });
+
                 // Add to Bag button handler (CSP-compatible)
                 const addToBagBtn = document.getElementById('qv-add-to-bag-btn');
                 if (addToBagBtn) {

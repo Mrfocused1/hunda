@@ -592,48 +592,65 @@
             }
 
             function renderCheckoutSummary() {
-                const container = document.getElementById('summary-items');
-                const reviewContainer = document.getElementById('review-items');
+                try {
+                    const container = document.getElementById('summary-items');
+                    const reviewContainer = document.getElementById('review-items');
 
-                if (state.cart.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-sm">Your bag is empty</p>';
-                    return;
-                }
+                    if (!container) {
+                        debugError('Container #summary-items not found');
+                        return;
+                    }
 
-                const itemsHtml = state.cart
-                    .map(
-                        (item) => `
+                    if (!state.cart || state.cart.length === 0) {
+                        container.innerHTML = '<p class="text-gray-500 text-sm">Your bag is empty</p>';
+                        return;
+                    }
+
+                    const itemsHtml = state.cart
+                        .map((item) => {
+                            const safeTitle = U.sanitizeHTML(item.title);
+                            const safeImage = U.sanitizeHTML(item.image);
+                            const safeColor = U.sanitizeHTML(item.color);
+                            const safeSize = U.sanitizeHTML(item.size);
+                            return `
                 <div class="flex gap-4">
                     <div class="w-16 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
+                        <img src="${safeImage}" alt="${safeTitle}" class="w-full h-full object-cover">
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="font-medium text-sm uppercase truncate">${item.title}</h4>
-                        <p class="text-xs text-gray-500">${item.color} / ${item.size}</p>
+                        <h4 class="font-medium text-sm uppercase truncate">${safeTitle}</h4>
+                        <p class="text-xs text-gray-500">${safeColor} / ${safeSize}</p>
                         <p class="text-sm font-medium mt-1">Qty: ${item.quantity}</p>
                     </div>
                     <div class="text-right">
                         <span class="font-medium text-sm">£${(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                 </div>
-            `
-                    )
-                    .join('');
+            `;
+                        })
+                        .join('');
 
-                container.innerHTML = itemsHtml;
-                if (reviewContainer) reviewContainer.innerHTML = itemsHtml;
+                    container.innerHTML = itemsHtml;
+                    if (reviewContainer) reviewContainer.innerHTML = itemsHtml;
 
-                // Update totals
-                const subtotal = getCartTotal();
-                const shipping = subtotal >= 50 ? 0 : 4.99;
-                const tax = subtotal * 0.2;
-                const total = subtotal + shipping + tax;
+                    // Update totals
+                    const subtotal = getCartTotal();
+                    const shipping = subtotal >= 50 ? 0 : 4.99;
+                    const tax = subtotal * 0.2;
+                    const total = subtotal + shipping + tax;
 
-                document.getElementById('checkout-subtotal').textContent = `£${subtotal.toFixed(2)}`;
-                document.getElementById('checkout-shipping').textContent =
-                    shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`;
-                document.getElementById('checkout-tax').textContent = `£${tax.toFixed(2)}`;
-                document.getElementById('checkout-total').textContent = `£${total.toFixed(2)}`;
+                    const subtotalEl = document.getElementById('checkout-subtotal');
+                    const shippingEl = document.getElementById('checkout-shipping');
+                    const taxEl = document.getElementById('checkout-tax');
+                    const totalEl = document.getElementById('checkout-total');
+
+                    if (subtotalEl) subtotalEl.textContent = `£${subtotal.toFixed(2)}`;
+                    if (shippingEl) shippingEl.textContent = shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`;
+                    if (taxEl) taxEl.textContent = `£${tax.toFixed(2)}`;
+                    if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
+                } catch (err) {
+                    debugError('renderCheckoutSummary failed:', err);
+                }
             }
 
             async function placeOrder() {
@@ -642,13 +659,14 @@
                     return;
                 }
 
-                // Get customer details
-                const email = document.getElementById('checkout-email')?.value;
-                const firstName = document.getElementById('checkout-firstname')?.value;
-                const lastName = document.getElementById('checkout-lastname')?.value;
-                const address1 = document.getElementById('checkout-address1')?.value;
-                const city = document.getElementById('checkout-city')?.value;
-                const postcode = document.getElementById('checkout-postcode')?.value;
+                // Get customer details from state or form
+                const shippingDetails = state.shipping || {};
+                const email = shippingDetails.email || document.getElementById('checkout-email')?.value;
+                const firstName = shippingDetails.firstName || document.getElementById('checkout-firstname')?.value;
+                const lastName = shippingDetails.lastName || document.getElementById('checkout-lastname')?.value;
+                const address1 = shippingDetails.address1 || document.getElementById('checkout-address1')?.value;
+                const city = shippingDetails.city || document.getElementById('checkout-city')?.value;
+                const postcode = shippingDetails.postcode || document.getElementById('checkout-postcode')?.value;
 
                 // Generate order number
                 const orderNumber = '1H-' + Date.now().toString(36).toUpperCase();
@@ -841,7 +859,33 @@
                         });
                     }
 
-                    // Step navigation
+                    // Shipping form submit handler
+                    const shippingForm = document.getElementById('shipping-form');
+                    if (shippingForm) {
+                        shippingForm.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            // Validate email
+                            const email = document.getElementById('checkout-email')?.value;
+                            if (!email || !U.isValidEmail(email)) {
+                                showToast('Please enter a valid email address', 'error');
+                                document.getElementById('checkout-email')?.focus();
+                                return;
+                            }
+                            // Save shipping details to state
+                            state.shipping = {
+                                firstName: document.getElementById('checkout-firstname')?.value?.trim(),
+                                lastName: document.getElementById('checkout-lastname')?.value?.trim(),
+                                email: email,
+                                address1: document.getElementById('checkout-address1')?.value?.trim(),
+                                address2: document.getElementById('checkout-address2')?.value?.trim(),
+                                city: document.getElementById('checkout-city')?.value?.trim(),
+                                postcode: document.getElementById('checkout-postcode')?.value?.trim()
+                            };
+                            goToStep(2);
+                        });
+                    }
+
+                    // Step navigation (for back buttons)
                     document.querySelectorAll('[data-goto-step]').forEach((btn) => {
                         // Remove existing listener to prevent duplicates
                         const newBtn = btn.cloneNode(true);
@@ -860,6 +904,14 @@
                 } catch (initError) {
                     debugError('Checkout initialization error:', initError);
                     showToast('Failed to initialize checkout. Please refresh the page.', 'error');
+                }
+            });
+
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', () => {
+                if (window.stripeCardObserver) {
+                    window.stripeCardObserver.disconnect();
+                    window.stripeCardObserver = null;
                 }
             });
         </script>

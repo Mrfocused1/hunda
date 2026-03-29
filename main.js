@@ -398,7 +398,7 @@ function renderMiniCart() {
 
     if (!container) return;
 
-    if (state.cart.length === 0) {
+    if (!state.cart || state.cart.length === 0) {
         container.innerHTML = `
             <div class="empty-state" style="padding: 3rem 1rem;">
                 <i data-lucide="shopping-bag" class="empty-state-icon"></i>
@@ -758,7 +758,10 @@ function initSearch() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Show loading state for products
-    const productsContainer = document.getElementById('products-grid') || document.getElementById('new-arrivals-grid');
+    const productsContainer =
+        document.getElementById('product-grid') ||
+        document.getElementById('products-grid') ||
+        document.getElementById('new-arrivals-grid');
     if (productsContainer) {
         productsContainer.innerHTML =
             '<div class="flex justify-center items-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div></div>';
