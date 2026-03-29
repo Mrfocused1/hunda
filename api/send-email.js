@@ -53,7 +53,7 @@ export default async function handler(req, res) {
     // Get email template based on type (with sanitized data)
     const template = getEmailTemplate(type, data);
     if (!template) {
-        return res.status(400).json({ error: 'Invalid email type' });
+        return res.status(400).json(createResponse(false, null, 'Invalid email type'));
     }
 
     try {

@@ -471,7 +471,7 @@ function renderMiniCart() {
     }
 
     if (subtotalEl) subtotalEl.textContent = `£${getCartTotal().toFixed(2)}`;
-    if (countEl) countEl.textContent = state.cart.length;
+    if (countEl) countEl.textContent = getCartCount();
 
     // Re-initialize Lucide icons
     if (typeof lucide !== 'undefined') {
@@ -514,7 +514,7 @@ function openQuickView(productId) {
 
     if (qvImage) qvImage.src = primaryImage;
     if (qvTitle) qvTitle.textContent = product.title;
-    if (qvPrice) qvPrice.textContent = formatPrice(product.price);
+    if (qvPrice) qvPrice.textContent = U.formatPrice(product.price);
     if (qvCategory) qvCategory.textContent = product.category;
 
     // Render sizes
@@ -523,7 +523,7 @@ function openQuickView(productId) {
 
     if (sizeContainer) {
         // Check if only one size (auto-select it)
-        if (product.sizes.length === 1) {
+        if (product.sizes && product.sizes.length === 1) {
             const size = product.sizes[0];
             sizeContainer.innerHTML = `
                 <div class="size-option active" data-size="${size}" style="cursor: default; opacity: 0.7;">${size}</div>
@@ -880,5 +880,6 @@ window.showToast = showToast;
 window.showLoading = showLoading;
 window.showError = showError;
 window.sanitizeHTML = U.sanitizeHTML;
+window.formatPrice = U.formatPrice;
 window.getCartTotal = getCartTotal;
 window.Utils = U;

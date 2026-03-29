@@ -109,6 +109,28 @@ async function initAdminSupabase() {
     const adminSession = sessionStorage.getItem('1hundred_admin_session');
     if (!adminSession && !window.location.href.includes('admin-login')) {
         window.location.href = '/admin-login';
+        return;
+    }
+    // Validate session structure to prevent trivial bypass
+    if (adminSession && !window.location.href.includes('admin-login')) {
+        try {
+            const session = JSON.parse(adminSession);
+            if (!session || !session.email || !session.timestamp) {
+                sessionStorage.removeItem('1hundred_admin_session');
+                window.location.href = '/admin-login';
+                return;
+            }
+            // Expire sessions after 4 hours
+            const maxAge = 4 * 60 * 60 * 1000;
+            if (Date.now() - session.timestamp > maxAge) {
+                sessionStorage.removeItem('1hundred_admin_session');
+                window.location.href = '/admin-login';
+                return;
+            }
+        } catch (e) {
+            sessionStorage.removeItem('1hundred_admin_session');
+            window.location.href = '/admin-login';
+        }
     }
 })();
 
@@ -423,7 +445,7 @@ function renderProducts() {
         })
         .join('');
 
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 // Product search and filter
@@ -961,7 +983,7 @@ function renderOrders() {
         })
         .join('');
 
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 // Order search and filters
@@ -1146,7 +1168,7 @@ function renderCustomers() {
     // Render customer cards
     grid.innerHTML = paginated
         .map((customer) => {
-            const initials = `${customer.firstName[0]}${customer.lastName[0]}`.toUpperCase();
+            const initials = `${customer.firstName?.[0] || '?'}${customer.lastName?.[0] || '?'}`.toUpperCase();
             const joinedDate = new Date(customer.joined).toLocaleDateString('en-GB', {
                 month: 'short',
                 year: 'numeric'
@@ -1185,7 +1207,7 @@ function renderCustomers() {
                         <div class="customer-stat-label">Spent</div>
                     </div>
                     <div class="customer-stat">
-                        <div class="customer-stat-value">£${(customer.totalSpent / customer.orders).toFixed(0)}</div>
+                        <div class="customer-stat-value">£${(customer.orders > 0 ? customer.totalSpent / customer.orders : 0).toFixed(0)}</div>
                         <div class="customer-stat-label">AOV</div>
                     </div>
                 </div>
@@ -1209,7 +1231,7 @@ function renderCustomers() {
         })
         .join('');
 
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 // Search functionality
@@ -1249,12 +1271,12 @@ function viewCustomerDetails(customerId) {
     const customer = allCustomers.find((c) => c.id === customerId);
     if (!customer) return;
 
-    const initials = `${customer.firstName[0]}${customer.lastName[0]}`.toUpperCase();
+    const initials = `${customer.firstName?.[0] || '?'}${customer.lastName?.[0] || '?'}`.toUpperCase();
     const joinedDate = new Date(customer.joined).toLocaleDateString('en-GB', {
         month: 'long',
         year: 'numeric'
     });
-    const aov = (customer.totalSpent / customer.orders).toFixed(2);
+    const aov = (customer.orders > 0 ? customer.totalSpent / customer.orders : 0).toFixed(2);
 
     document.getElementById('customer-modal-avatar').textContent = initials;
     document.getElementById('customer-modal-avatar').className = `customer-detail-avatar ${customer.status}`;
@@ -1298,7 +1320,7 @@ function viewCustomerDetails(customerId) {
     }
 
     document.getElementById('customer-modal').classList.add('active');
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 function closeCustomerModal() {

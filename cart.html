@@ -382,16 +382,19 @@
                     .join('');
 
                 updateSummary();
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             }
 
             function updateSummary() {
                 const subtotal = getCartTotal();
                 const shipping = subtotal >= 50 ? 0 : 4.99;
                 const countryCode = document.getElementById('checkout-country')?.value || 'GB';
+                const taxableAmount = subtotal - discount;
                 const tax =
-                    typeof Pricing !== 'undefined' ? Pricing.calculateTax(subtotal, countryCode) : subtotal * 0.2;
-                const total = subtotal + shipping + tax - discount;
+                    typeof Pricing !== 'undefined'
+                        ? Pricing.calculateTax(taxableAmount, countryCode)
+                        : taxableAmount * 0.2;
+                const total = Math.max(0, subtotal + shipping + tax - discount);
 
                 const summarySubtotal = document.getElementById('summary-subtotal');
                 const summaryShipping = document.getElementById('summary-shipping');
@@ -415,24 +418,35 @@
                 const input = document.getElementById('promo-input');
                 const message = document.getElementById('promo-message');
                 const code = input.value.trim().toUpperCase();
+                const subtotal = getCartTotal();
+
+                let discountAmount = 0;
+                let discountMsg = '';
 
                 if (code === 'SAVE15') {
-                    discount = getCartTotal() * 0.15;
-                    message.textContent = '15% discount applied!';
-                    message.className = 'text-sm mt-2 text-green-600';
-                    message.classList.remove('hidden');
-                    updateSummary();
+                    discountAmount = subtotal * 0.15;
+                    discountMsg = '15% discount applied!';
+                } else if (code === 'SAVE10') {
+                    discountAmount = subtotal * 0.1;
+                    discountMsg = '10% discount applied!';
                 } else if (code === 'WELCOME10') {
-                    discount = 10;
-                    message.textContent = '£10 discount applied!';
-                    message.className = 'text-sm mt-2 text-green-600';
-                    message.classList.remove('hidden');
-                    updateSummary();
+                    discountAmount = Math.min(10, subtotal);
+                    discountMsg = '£10 discount applied!';
+                } else if (code === 'WELCOME20') {
+                    discountAmount = Math.min(20, subtotal);
+                    discountMsg = '£20 discount applied!';
                 } else {
                     message.textContent = 'Invalid promo code';
                     message.className = 'text-sm mt-2 text-red-500';
                     message.classList.remove('hidden');
+                    return;
                 }
+
+                discount = Math.min(discountAmount, subtotal);
+                message.textContent = discountMsg;
+                message.className = 'text-sm mt-2 text-green-600';
+                message.classList.remove('hidden');
+                updateSummary();
             }
 
             function renderRecommended() {

@@ -164,6 +164,7 @@
                         '1hundred_admin_session',
                         JSON.stringify({
                             email: email,
+                            timestamp: Date.now(),
                             loggedInAt: new Date().toISOString()
                         })
                     );
