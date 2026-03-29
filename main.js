@@ -106,7 +106,7 @@ async function initProducts() {
                     price: p.price,
                     category: p.category,
                     images: p.images || [p.image],
-                    sizes: p.sizes || ['S', 'M', 'L', 'XL'],
+                    sizes: p.sizes || (p.category === 'Hats' ? ['One Size'] : ['S', 'M', 'L', 'XL']),
                     colors: p.colors || ['Default'],
                     stock: p.stock ?? 0
                 }));
