@@ -143,6 +143,16 @@
                 .section-title {
                     font-size: 1.25rem;
                 }
+                /* Content settings: collapse 2-col grids to single column */
+                #settings-general [style*='grid-template-columns: 1fr 1fr'],
+                #settings-homepage [style*='grid-template-columns: 1fr 1fr'],
+                #settings-social [style*='grid-template-columns: 1fr 1fr'] {
+                    grid-template-columns: 1fr !important;
+                }
+                /* Ensure form inputs meet touch target size */
+                .form-input {
+                    min-height: 44px;
+                }
             }
 
             /* Stats Cards */
@@ -505,6 +515,24 @@
                     gap: 0.5rem;
                     font-size: 0.875rem;
                     font-weight: 600;
+                    min-width: 44px;
+                    min-height: 44px;
+                }
+                .admin-header-right a,
+                .admin-header-right .flex {
+                    min-width: 44px;
+                    min-height: 44px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .btn-sm {
+                    min-height: 44px;
+                    padding: 0.625rem 1rem;
+                }
+                .btn-icon {
+                    min-width: 44px;
+                    min-height: 44px;
                 }
             }
 
