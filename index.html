@@ -994,6 +994,9 @@
                 const newArrivalsGrid = document.getElementById('new-arrivals-grid');
                 if (newArrivalsGrid) {
                     newArrivalsGrid.addEventListener('click', function (e) {
+                        // Ignore clicks on image navigation arrows
+                        if (e.target.closest('.image-nav-arrow')) return;
+
                         // Quick view
                         const quickViewBtn = e.target.closest('[data-quick-view]');
                         if (quickViewBtn) {
