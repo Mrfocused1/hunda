@@ -331,6 +331,41 @@
                                     <label for="save-address" class="text-sm">Save this address for next time</label>
                                 </div>
 
+                                <!-- Guest Account Creation -->
+                                <div
+                                    id="guest-account-section"
+                                    class="mt-4 border-t border-gray-200 pt-4"
+                                    style="display: none">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="create-account" class="w-4 h-4" />
+                                        <label for="create-account" class="text-sm font-medium"
+                                            >Create an account for faster checkout next time</label
+                                        >
+                                    </div>
+                                    <div id="account-password-fields" class="mt-3 space-y-3" style="display: none">
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label class="form-label" for="checkout-password">Password *</label>
+                                            <input
+                                                type="password"
+                                                class="form-input"
+                                                id="checkout-password"
+                                                minlength="8"
+                                                autocomplete="new-password"
+                                                placeholder="Minimum 8 characters" />
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0">
+                                            <label class="form-label" for="checkout-password-confirm"
+                                                >Confirm Password *</label
+                                            >
+                                            <input
+                                                type="password"
+                                                class="form-input"
+                                                id="checkout-password-confirm"
+                                                autocomplete="new-password" />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mt-8">
                                     <button type="submit" class="btn btn-primary btn-full">Continue to Payment</button>
                                 </div>
@@ -870,6 +905,37 @@
             }
 
             function showOrderSuccess(orderNumber, email, firstName, lastName, total) {
+                // Save order to localStorage (before cart is cleared)
+                try {
+                    const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
+                    const order = {
+                        id: orderNumber,
+                        date: new Date().toLocaleDateString('en-GB', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        }),
+                        status: 'Processing',
+                        items: cart.map((item) => ({
+                            title: item.title,
+                            image: item.image || 'product-1.png',
+                            price: item.price,
+                            quantity: item.quantity,
+                            size: item.size,
+                            color: item.color
+                        })),
+                        total: total,
+                        shipping: state.shipping || {},
+                        email: email,
+                        customer: `${firstName || ''} ${lastName || ''}`.trim()
+                    };
+                    const existingOrders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
+                    existingOrders.unshift(order);
+                    localStorage.setItem('1hundred_orders', JSON.stringify(existingOrders));
+                } catch (e) {
+                    console.error('Failed to save order:', e);
+                }
+
                 // Update order number in success message
                 const orderNumberEl = document.querySelector('#success-message .font-bold');
                 if (orderNumberEl) orderNumberEl.textContent = '#' + orderNumber;
@@ -955,10 +1021,52 @@
                         });
                     }
 
+                    // Auto-fill checkout for logged-in users
+                    if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
+                        const user = Auth.getUser();
+                        if (user) {
+                            const setIfEmpty = (id, val) => {
+                                const el = document.getElementById(id);
+                                if (el && !el.value && val) el.value = val;
+                            };
+                            setIfEmpty('checkout-firstname', user.firstName);
+                            setIfEmpty('checkout-lastname', user.lastName);
+                            setIfEmpty('checkout-email', user.email);
+                            setIfEmpty('checkout-phone', user.phone);
+                        }
+                        // Load saved address
+                        const addresses = JSON.parse(localStorage.getItem('1hundred_addresses') || '[]');
+                        const defaultAddr = addresses.find((a) => a.isDefault) || addresses[0];
+                        if (defaultAddr) {
+                            const setIfEmpty = (id, val) => {
+                                const el = document.getElementById(id);
+                                if (el && !el.value && val) el.value = val;
+                            };
+                            setIfEmpty('checkout-phone', defaultAddr.phone);
+                            setIfEmpty('checkout-address1', defaultAddr.address1 || defaultAddr.street);
+                            setIfEmpty('checkout-address2', defaultAddr.address2);
+                            setIfEmpty('checkout-city', defaultAddr.city);
+                            setIfEmpty('checkout-postcode', defaultAddr.postcode);
+                            if (defaultAddr.country) {
+                                const countryEl = document.getElementById('checkout-country');
+                                if (countryEl) countryEl.value = defaultAddr.country;
+                            }
+                        }
+                    } else {
+                        // Show guest account creation option
+                        const guestSection = document.getElementById('guest-account-section');
+                        if (guestSection) guestSection.style.display = 'block';
+
+                        document.getElementById('create-account')?.addEventListener('change', function () {
+                            const fields = document.getElementById('account-password-fields');
+                            if (fields) fields.style.display = this.checked ? 'block' : 'none';
+                        });
+                    }
+
                     // Shipping form submit handler
                     const shippingForm = document.getElementById('shipping-form');
                     if (shippingForm) {
-                        shippingForm.addEventListener('submit', (e) => {
+                        shippingForm.addEventListener('submit', async (e) => {
                             e.preventDefault();
                             // Validate email
                             const email = document.getElementById('checkout-email')?.value;
@@ -979,6 +1087,82 @@
                                 postcode: document.getElementById('checkout-postcode')?.value?.trim(),
                                 country: document.getElementById('checkout-country')?.value || 'GB'
                             };
+
+                            // Save address if checkbox is checked
+                            const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn();
+                            if (document.getElementById('save-address')?.checked && isLoggedIn) {
+                                const addresses = JSON.parse(localStorage.getItem('1hundred_addresses') || '[]');
+                                const newAddress = {
+                                    name: `${state.shipping.firstName} ${state.shipping.lastName}`,
+                                    street: state.shipping.address1,
+                                    address1: state.shipping.address1,
+                                    address2: state.shipping.address2,
+                                    city: state.shipping.city,
+                                    postcode: state.shipping.postcode,
+                                    country: state.shipping.country,
+                                    phone: state.shipping.phone,
+                                    isDefault: addresses.length === 0
+                                };
+                                const isDuplicate = addresses.some(
+                                    (a) => a.street === newAddress.street && a.postcode === newAddress.postcode
+                                );
+                                if (!isDuplicate) {
+                                    addresses.push(newAddress);
+                                    localStorage.setItem('1hundred_addresses', JSON.stringify(addresses));
+                                }
+                            }
+
+                            // Handle guest account creation
+                            if (document.getElementById('create-account')?.checked && !isLoggedIn) {
+                                const password = document.getElementById('checkout-password')?.value;
+                                const confirmPassword = document.getElementById('checkout-password-confirm')?.value;
+
+                                if (!password || password.length < 8) {
+                                    showToast('Password must be at least 8 characters', 'error');
+                                    document.getElementById('checkout-password')?.focus();
+                                    return;
+                                }
+                                if (password !== confirmPassword) {
+                                    showToast('Passwords do not match', 'error');
+                                    document.getElementById('checkout-password-confirm')?.focus();
+                                    return;
+                                }
+
+                                try {
+                                    const regResult = await Auth.register({
+                                        email: email,
+                                        password: password,
+                                        firstName: state.shipping.firstName,
+                                        lastName: state.shipping.lastName
+                                    });
+                                    if (regResult.success) {
+                                        showToast('Account created!', 'success');
+                                        // Save their address too
+                                        const addresses = JSON.parse(
+                                            localStorage.getItem('1hundred_addresses') || '[]'
+                                        );
+                                        if (addresses.length === 0) {
+                                            addresses.push({
+                                                name: `${state.shipping.firstName} ${state.shipping.lastName}`,
+                                                street: state.shipping.address1,
+                                                address1: state.shipping.address1,
+                                                address2: state.shipping.address2,
+                                                city: state.shipping.city,
+                                                postcode: state.shipping.postcode,
+                                                country: state.shipping.country,
+                                                phone: state.shipping.phone,
+                                                isDefault: true
+                                            });
+                                            localStorage.setItem('1hundred_addresses', JSON.stringify(addresses));
+                                        }
+                                    } else {
+                                        showToast(regResult.message || 'Could not create account', 'warning');
+                                    }
+                                } catch (err) {
+                                    showToast('Could not create account', 'warning');
+                                }
+                            }
+
                             goToStep(2);
                         });
                     }

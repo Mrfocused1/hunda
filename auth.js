@@ -324,6 +324,40 @@ const Auth = (function () {
         },
 
         /**
+         * Reset password (client-side demo)
+         * @param {string} email
+         * @param {string} newPassword
+         * @returns {Promise<Object>}
+         */
+        resetPassword: async function (email, newPassword) {
+            const users = getStoredUsers();
+            const userIndex = users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
+
+            if (userIndex === -1) {
+                return { success: false, message: 'No account found with this email' };
+            }
+
+            if (!newPassword || newPassword.length < 8) {
+                return { success: false, message: 'Password must be at least 8 characters' };
+            }
+
+            users[userIndex].password = await hashPassword(newPassword);
+            saveUsers(users);
+
+            return { success: true, message: 'Password reset successfully' };
+        },
+
+        /**
+         * Check if email exists
+         * @param {string} email
+         * @returns {boolean}
+         */
+        emailExists: function (email) {
+            const users = getStoredUsers();
+            return users.some((u) => u.email.toLowerCase() === email.toLowerCase());
+        },
+
+        /**
          * Update UI based on auth state
          * Call this on page load
          */

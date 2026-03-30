@@ -231,7 +231,7 @@
                 <div id="addresses" class="tab-content">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold uppercase">Saved Addresses</h2>
-                        <button class="btn btn-primary btn-sm show-toast-btn">Add New</button>
+                        <a href="/checkout" class="btn btn-primary btn-sm">Add New</a>
                     </div>
 
                     <div id="addresses-list" class="grid md:grid-cols-2 gap-4">
@@ -492,22 +492,42 @@
                         (address, index) => `
                 <div class="border border-gray-200 p-6 rounded-lg ${address.isDefault ? 'relative' : ''}">
                     ${address.isDefault ? '<span class="absolute top-4 right-4 bg-black text-white text-xs px-2 py-1 uppercase font-bold">Default</span>' : ''}
-                    <h3 class="font-bold mb-2">${address.name}</h3>
+                    <h3 class="font-bold mb-2">${address.name || 'Address'}</h3>
                     <p class="text-gray-600 text-sm">
-                        ${address.street}<br>
-                        ${address.city}<br>
-                        ${address.postcode}<br>
-                        ${address.country}
+                        ${address.street || address.address1 || ''}<br>
+                        ${address.city || ''}<br>
+                        ${address.postcode || ''}<br>
+                        ${address.country || ''}
                     </p>
                     <div class="flex gap-2 mt-4">
-                        <button class="text-sm underline show-toast-btn">Edit</button>
-                        ${!address.isDefault ? '<button class="text-sm underline show-toast-btn">Set as Default</button>' : ''}
-                        <button class="text-sm underline text-red-500 show-toast-btn">Delete</button>
+                        ${!address.isDefault ? `<button class="text-sm underline set-default-btn" data-index="${index}">Set as Default</button>` : ''}
+                        <button class="text-sm underline text-red-500 delete-addr-btn" data-index="${index}">Delete</button>
                     </div>
                 </div>
             `
                     )
                     .join('');
+
+                // Wire up address action buttons
+                addressesList.querySelectorAll('.delete-addr-btn').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.index);
+                        addresses.splice(idx, 1);
+                        localStorage.setItem('1hundred_addresses', JSON.stringify(addresses));
+                        renderAddresses();
+                        if (typeof showToast !== 'undefined') showToast('Address deleted', 'success');
+                    });
+                });
+
+                addressesList.querySelectorAll('.set-default-btn').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.index);
+                        addresses.forEach((a, i) => (a.isDefault = i === idx));
+                        localStorage.setItem('1hundred_addresses', JSON.stringify(addresses));
+                        renderAddresses();
+                        if (typeof showToast !== 'undefined') showToast('Default address updated', 'success');
+                    });
+                });
             }
 
             // Load account details
