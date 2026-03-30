@@ -705,6 +705,75 @@ body {
     transform: scale(1.2);
 }
 
+/* Featured Product Image Navigation */
+.featured-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background: rgb(255 255 255 / 90%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+    z-index: 10;
+    cursor: pointer;
+    border: none;
+    color: #111;
+}
+
+.featured-nav-arrow:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.featured-nav-prev {
+    left: 1rem;
+}
+
+.featured-nav-next {
+    right: 1rem;
+}
+
+#featured-image-wrapper:hover .featured-nav-arrow {
+    opacity: 1;
+}
+
+.featured-nav-dots {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.featured-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 30%);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.featured-dot.active {
+    background: #111;
+    transform: scale(1.25);
+}
+
+/* Mobile: always show arrows on featured product */
+@media (width <= 768px) {
+    .featured-nav-arrow {
+        opacity: 1;
+    }
+}
+
 .product-info {
     display: flex;
     justify-content: space-between;

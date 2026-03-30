@@ -518,12 +518,37 @@
                 <div class="container-main">
                     <div class="bg-gray-50 rounded-2xl overflow-hidden">
                         <div class="grid md:grid-cols-2">
-                            <div class="aspect-square md:aspect-auto bg-gray-100 relative group">
-                                <img src="product-1.png" alt="Featured Product" class="w-full h-full object-cover" />
+                            <div
+                                class="aspect-square md:aspect-auto bg-gray-100 relative group"
+                                id="featured-image-wrapper"
+                                data-images='["product-relentless-front.png","product-relentless-back.png"]'
+                                data-current-index="0">
+                                <img
+                                    id="featured-product-img"
+                                    src="product-relentless-front.png"
+                                    alt="Relentless Trophy Tee"
+                                    class="w-full h-full object-cover" />
                                 <span
                                     class="absolute top-4 left-4 bg-black text-white px-3 py-1 text-xs font-bold uppercase tracking-wider"
                                     >Best Seller</span
                                 >
+                                <!-- Image navigation arrows -->
+                                <button
+                                    class="featured-nav-arrow featured-nav-prev"
+                                    id="featured-prev"
+                                    aria-label="Previous image">
+                                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                </button>
+                                <button
+                                    class="featured-nav-arrow featured-nav-next"
+                                    id="featured-next"
+                                    aria-label="Next image">
+                                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                </button>
+                                <div class="featured-nav-dots">
+                                    <span class="featured-dot active" data-index="0"></span>
+                                    <span class="featured-dot" data-index="1"></span>
+                                </div>
                             </div>
                             <div class="p-8 md:p-12 lg:p-16 flex flex-col justify-center">
                                 <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
@@ -531,30 +556,29 @@
                                 </p>
                                 <h2
                                     class="text-3xl md:text-4xl lg:text-5xl font-display font-bold uppercase mb-4 leading-tight">
-                                    Featured Product
+                                    Relentless Trophy Tee
                                 </h2>
                                 <p class="text-gray-500 mb-6 leading-relaxed">
-                                    Premium quality garment featuring unique design elements. Made from high-grade
-                                    materials for lasting comfort and style.
+                                    The Relentless Trophy Tee distills discipline into design. A monochrome composition
+                                    of a faceless, armored figure holding its reward — symbolizing victory earned
+                                    through persistence, not chance.
                                 </p>
-                                <div class="text-2xl font-bold mb-8">£45.00</div>
+                                <div class="text-2xl font-bold mb-8">£40.00</div>
 
                                 <div class="flex flex-wrap gap-3 mb-8">
                                     <span class="px-4 py-2 bg-white border border-gray-200 text-sm font-medium"
                                         >Premium Cotton</span
                                     >
                                     <span class="px-4 py-2 bg-white border border-gray-200 text-sm font-medium"
-                                        >Oversized Fit</span
+                                        >Regular Fit</span
                                     >
                                     <span class="px-4 py-2 bg-white border border-gray-200 text-sm font-medium"
-                                        >Made in UK</span
+                                        >S / M / L / XL</span
                                     >
                                 </div>
 
                                 <div class="flex flex-col sm:flex-row gap-4">
-                                    <button class="btn btn-primary" disabled style="opacity: 0.7; cursor: not-allowed">
-                                        Coming Soon
-                                    </button>
+                                    <a href="/relentless-trophy-tee" class="btn btn-primary"> Shop Now </a>
                                 </div>
                             </div>
                         </div>
@@ -887,6 +911,37 @@
                 // Re-render when products are loaded from Supabase
                 window.addEventListener('productsInitialized', () => {
                     renderNewArrivals();
+                });
+
+                // Featured product image navigation
+                document.getElementById('featured-image-wrapper')?.addEventListener('click', function (e) {
+                    const arrow = e.target.closest('.featured-nav-arrow');
+                    const dot = e.target.closest('.featured-dot');
+                    if (!arrow && !dot) return;
+
+                    const wrapper = document.getElementById('featured-image-wrapper');
+                    const images = JSON.parse(wrapper.dataset.images || '[]');
+                    if (images.length <= 1) return;
+
+                    let currentIndex = parseInt(wrapper.dataset.currentIndex || '0');
+
+                    if (arrow) {
+                        if (arrow.classList.contains('featured-nav-prev')) {
+                            currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
+                        } else {
+                            currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
+                        }
+                    } else if (dot) {
+                        currentIndex = parseInt(dot.dataset.index);
+                    }
+
+                    wrapper.dataset.currentIndex = currentIndex;
+                    const img = document.getElementById('featured-product-img');
+                    if (img) img.src = images[currentIndex];
+
+                    wrapper.querySelectorAll('.featured-dot').forEach((d, i) => {
+                        d.classList.toggle('active', i === currentIndex);
+                    });
                 });
 
                 // Image navigation for product cards
