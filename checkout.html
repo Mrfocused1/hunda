@@ -17,7 +17,7 @@
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
             rel="stylesheet" />
         <script src="https://unpkg.com/lucide@latest"></script>
-        <script src="https://js.stripe.com/v3/" async></script>
+        <script src="https://js.stripe.com/v3/" defer></script>
         <link rel="stylesheet" href="styles.css" />
         <style>
             .checkout-step-content {
@@ -220,17 +220,35 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label class="form-label" for="checkout-firstname">First Name *</label>
-                                        <input type="text" class="form-input" id="checkout-firstname" required />
+                                        <input
+                                            type="text"
+                                            class="form-input"
+                                            id="checkout-firstname"
+                                            name="firstname"
+                                            autocomplete="given-name"
+                                            required />
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" for="checkout-lastname">Last Name *</label>
-                                        <input type="text" class="form-input" id="checkout-lastname" required />
+                                        <input
+                                            type="text"
+                                            class="form-input"
+                                            id="checkout-lastname"
+                                            name="lastname"
+                                            autocomplete="family-name"
+                                            required />
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label" for="checkout-email">Email *</label>
-                                    <input type="email" class="form-input" id="checkout-email" required />
+                                    <input
+                                        type="email"
+                                        class="form-input"
+                                        id="checkout-email"
+                                        name="email"
+                                        autocomplete="email"
+                                        required />
                                 </div>
 
                                 <div class="form-group">
@@ -239,6 +257,8 @@
                                         type="tel"
                                         class="form-input"
                                         id="checkout-phone"
+                                        name="phone"
+                                        autocomplete="tel"
                                         required
                                         pattern="[0-9\s\-\+\(\)]{10,}"
                                         title="Please enter a valid phone number" />
@@ -246,18 +266,35 @@
 
                                 <div class="form-group">
                                     <label class="form-label" for="checkout-address1">Address Line 1 *</label>
-                                    <input type="text" class="form-input" id="checkout-address1" required />
+                                    <input
+                                        type="text"
+                                        class="form-input"
+                                        id="checkout-address1"
+                                        name="address1"
+                                        autocomplete="address-line1"
+                                        required />
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label" for="checkout-address2">Address Line 2</label>
-                                    <input type="text" class="form-input" id="checkout-address2" />
+                                    <input
+                                        type="text"
+                                        class="form-input"
+                                        id="checkout-address2"
+                                        name="address2"
+                                        autocomplete="address-line2" />
                                 </div>
 
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label class="form-label" for="checkout-city">City *</label>
-                                        <input type="text" class="form-input" id="checkout-city" required />
+                                        <input
+                                            type="text"
+                                            class="form-input"
+                                            id="checkout-city"
+                                            name="city"
+                                            autocomplete="address-level2"
+                                            required />
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" for="checkout-postcode">Postcode *</label>
@@ -265,6 +302,8 @@
                                             type="text"
                                             class="form-input"
                                             id="checkout-postcode"
+                                            name="postcode"
+                                            autocomplete="postal-code"
                                             required
                                             pattern="[A-Za-z0-9\s\-]{3,10}"
                                             title="Please enter a valid postcode" />
@@ -273,7 +312,11 @@
 
                                 <div class="form-group">
                                     <label class="form-label" for="checkout-country">Country *</label>
-                                    <select class="form-input" id="checkout-country">
+                                    <select
+                                        class="form-input"
+                                        id="checkout-country"
+                                        name="country"
+                                        autocomplete="country">
                                         <option value="GB">United Kingdom</option>
                                         <option value="US">United States</option>
                                         <option value="CA">Canada</option>
@@ -409,7 +452,7 @@
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <i data-lucide="credit-card" class="w-6 h-6"></i>
-                                    <span class="text-sm">Visa ending in 4242</span>
+                                    <span class="text-sm" id="review-payment-method">Card payment</span>
                                 </div>
                             </div>
 
@@ -776,7 +819,7 @@
                                 line1: address1,
                                 city: city,
                                 postal_code: postcode,
-                                country: 'GB'
+                                country: document.getElementById('checkout-country')?.value || 'GB'
                             }
                         });
 
@@ -870,9 +913,6 @@
 
                 // Initialize with error handling
                 try {
-                    renderCheckoutSummary();
-                    if (typeof lucide !== 'undefined') lucide.createIcons();
-
                     // Initialize Stripe - fetch key from server
                     try {
                         const configResponse = await fetch('/api/stripe-config');
@@ -932,10 +972,12 @@
                                 firstName: document.getElementById('checkout-firstname')?.value?.trim(),
                                 lastName: document.getElementById('checkout-lastname')?.value?.trim(),
                                 email: email,
+                                phone: document.getElementById('checkout-phone')?.value?.trim(),
                                 address1: document.getElementById('checkout-address1')?.value?.trim(),
                                 address2: document.getElementById('checkout-address2')?.value?.trim(),
                                 city: document.getElementById('checkout-city')?.value?.trim(),
-                                postcode: document.getElementById('checkout-postcode')?.value?.trim()
+                                postcode: document.getElementById('checkout-postcode')?.value?.trim(),
+                                country: document.getElementById('checkout-country')?.value || 'GB'
                             };
                             goToStep(2);
                         });

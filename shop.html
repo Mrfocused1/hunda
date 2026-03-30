@@ -159,16 +159,16 @@
                 <h4 class="filter-title">Price Range</h4>
                 <div class="space-y-2">
                     <label class="filter-option">
-                        <input type="checkbox" name="price" value="0-25" />
-                        <span>Under £25</span>
+                        <input type="checkbox" name="price" value="0-35" />
+                        <span>Under £35</span>
                     </label>
                     <label class="filter-option">
-                        <input type="checkbox" name="price" value="25-50" />
-                        <span>£25 - £50</span>
+                        <input type="checkbox" name="price" value="35-50" />
+                        <span>£35 - £50</span>
                     </label>
                     <label class="filter-option">
-                        <input type="checkbox" name="price" value="50-100" />
-                        <span>£50 - £100</span>
+                        <input type="checkbox" name="price" value="50+" />
+                        <span>£50+</span>
                     </label>
                 </div>
             </div>
@@ -422,7 +422,7 @@
                                 </div>
                             </div>
 
-                            <button id="clear-filters-btn" class="text-sm underline hover:no-underline mt-4">
+                            <button id="clear-filters-link" class="text-sm underline hover:no-underline mt-4">
                                 Clear all filters
                             </button>
                         </div>
@@ -434,15 +434,7 @@
                             <!-- Products rendered by JS -->
                         </div>
 
-                        <!-- Pagination -->
-                        <div class="pagination" id="pagination">
-                            <button class="page-btn active">1</button>
-                            <button class="page-btn">2</button>
-                            <button class="page-btn">3</button>
-                            <button class="page-btn">
-                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                            </button>
-                        </div>
+                        <!-- Pagination removed - all products shown at once -->
                     </div>
                 </div>
             </div>
@@ -597,7 +589,10 @@
                                 slug: productSlugs[p.id] || `product-${p.id}`,
                                 sizes: p.sizes || ['S', 'M', 'L', 'XL'],
                                 colors: p.colors || ['Default'],
-                                isNew: p.id > 5 // Simple heuristic for demo
+                                isNew:
+                                    p.is_new || p.created_at
+                                        ? Date.now() - new Date(p.created_at).getTime() < 30 * 24 * 60 * 60 * 1000
+                                        : p.id >= 6
                             }));
                             useSupabaseProducts = true;
                             // Sync with global products array for addToCart
@@ -747,7 +742,7 @@
                         <i data-lucide="search-x" class="empty-state-icon mx-auto"></i>
                         <h3 class="empty-state-title">No products found</h3>
                         <p class="empty-state-text">Try adjusting your filters</p>
-                        <button id="clear-filters-btn" class="btn btn-primary mt-4">Clear Filters</button>
+                        <button id="clear-filters-empty" class="btn btn-primary mt-4">Clear Filters</button>
                     </div>
                 `;
                 } else {
@@ -796,7 +791,7 @@
                             const productUrl = product.slug ? `/${product.slug}` : `/product?id=${product.id}`;
                             const isHoodie = product.category === 'hoodies';
                             return `
-                    <div class="product-card" data-product-id="${product.id}" ${isHoodie ? 'style="pointer-events: none;"' : ''}>
+                    <div class="product-card" data-product-id="${product.id}">
                         <div class="product-image-wrapper ${hasMultipleImages ? 'has-multiple-images' : ''}" ${!isHoodie ? `data-quick-view="${product.id}"` : ''} data-images='${JSON.stringify(imageUrls)}' data-current-index="0">
                             <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
                             ${product.isNew && !isHoodie ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
@@ -946,6 +941,7 @@
             }
 
             function applyFilters() {
+                renderProducts();
                 document.getElementById('filter-sidebar').classList.remove('active');
                 document.getElementById('filter-overlay').classList.remove('active');
                 document.body.style.overflow = '';
@@ -1011,7 +1007,8 @@
 
                         // Add to cart using global function
                         if (typeof addToCart !== 'undefined') {
-                            addToCart(productId, size, 'Black', 1);
+                            const color = product?.colors?.[0] || 'Black';
+                            addToCart(productId, size, color, 1);
 
                             // Close quick view
                             if (typeof closeQuickView !== 'undefined') {

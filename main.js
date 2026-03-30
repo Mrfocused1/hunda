@@ -42,7 +42,7 @@ const FALLBACK_PRODUCTS =
                   id: 3,
                   title: '1H Star Cap',
                   price: 30,
-                  category: 'Hats',
+                  category: 'hats',
                   images: ['product-3.png'],
                   sizes: ['One Size'],
                   colors: ['White/Black']
@@ -51,7 +51,7 @@ const FALLBACK_PRODUCTS =
                   id: 4,
                   title: 'The No Half Measures Hoodie',
                   price: 85,
-                  category: 'Hoodies',
+                  category: 'hoodies',
                   images: ['product-4.jpeg'],
                   sizes: ['S', 'M', 'L', 'XL'],
                   colors: ['Black']
@@ -60,7 +60,7 @@ const FALLBACK_PRODUCTS =
                   id: 5,
                   title: 'Endless Possibilities Hoodie',
                   price: 85,
-                  category: 'Hoodies',
+                  category: 'hoodies',
                   images: ['product-5.jpeg'],
                   sizes: ['S', 'M', 'L', 'XL'],
                   colors: ['Blue']
@@ -69,7 +69,7 @@ const FALLBACK_PRODUCTS =
                   id: 6,
                   title: '1H Multi Colour Cap',
                   price: 30,
-                  category: 'Hats',
+                  category: 'hats',
                   images: ['product-6.jpeg'],
                   sizes: ['One Size'],
                   colors: ['White/Black']
@@ -78,7 +78,7 @@ const FALLBACK_PRODUCTS =
                   id: 7,
                   title: 'Relentless Trophy Tee',
                   price: 40,
-                  category: 'T-Shirts',
+                  category: 't-shirts',
                   images: ['product-relentless-front.png', 'product-relentless-back.png'],
                   sizes: ['S', 'M', 'L', 'XL'],
                   colors: ['Grey']
@@ -104,9 +104,9 @@ async function initProducts() {
                     id: p.id,
                     title: p.title,
                     price: p.price,
-                    category: p.category,
+                    category: p.category?.toLowerCase() || '',
                     images: p.images || [p.image],
-                    sizes: p.sizes || (p.category === 'Hats' ? ['One Size'] : ['S', 'M', 'L', 'XL']),
+                    sizes: p.sizes || (p.category?.toLowerCase() === 'hats' ? ['One Size'] : ['S', 'M', 'L', 'XL']),
                     colors: p.colors || ['Default'],
                     stock: p.stock != null ? p.stock : undefined
                 }));
@@ -365,8 +365,9 @@ function updateCartQuantity(productId, size, color, quantity) {
 }
 
 function saveCart() {
-    const success = U.setStorageItem('cart', state.cart);
-    if (!success) {
+    try {
+        U.setStorageItem('cart', state.cart);
+    } catch (e) {
         showToast('Cart is full. Please remove some items.', 'error');
     }
 }
@@ -514,9 +515,10 @@ function openQuickView(productId) {
     // Get primary image (support both old single image and new images array)
     let primaryImage = 'product-1.png';
     if (product.images && Array.isArray(product.images)) {
-        primaryImage = product.images[0];
+        primaryImage =
+            typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(product.images[0]) : product.images[0];
     } else if (product.image) {
-        primaryImage = product.image;
+        primaryImage = typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(product.image) : product.image;
     }
 
     // Populate modal with null checks
@@ -739,13 +741,18 @@ function showToast(message, type = 'success', duration = 3000) {
     const iconName = iconMap[type] || 'check-circle';
 
     toast.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i><span id="toast-msg">${U.sanitizeHTML(message)}</span>`;
-    toast.className = `toast ${type}`;
     toast.style.display = 'flex';
+    // Force reflow then add .show for CSS transition
+    toast.offsetHeight;
+    toast.classList.add('show');
 
     if (typeof lucide !== 'undefined') lucide.createIcons();
 
     setTimeout(() => {
-        toast.style.display = 'none';
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 300);
     }, duration);
 }
 
@@ -761,6 +768,8 @@ function initSearch() {
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
+                // Don't navigate if already on shop page (shop.html handles filtering inline)
+                if (window.location.pathname === '/shop') return;
                 const query = searchInput.value.trim();
                 if (query) {
                     window.location.href = `/shop?q=${encodeURIComponent(query)}`;

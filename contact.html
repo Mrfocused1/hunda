@@ -463,8 +463,8 @@
                     const toastMsg = document.getElementById('toast-msg');
                     if (toast && toastMsg) {
                         toastMsg.textContent = 'Please fill in all required fields';
-                        toast.classList.add('visible');
-                        setTimeout(() => toast.classList.remove('visible'), 5000);
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 5000);
                     }
                     return;
                 }
@@ -479,8 +479,8 @@
                     const toastMsg = document.getElementById('toast-msg');
                     if (toast && toastMsg) {
                         toastMsg.textContent = 'Please enter a valid email address';
-                        toast.classList.add('visible');
-                        setTimeout(() => toast.classList.remove('visible'), 5000);
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 5000);
                     }
                     return;
                 }
@@ -520,8 +520,8 @@
                     const toastMsg = document.getElementById('toast-msg');
                     if (toast && toastMsg) {
                         toastMsg.textContent = 'Failed to send. Please try email instead.';
-                        toast.classList.add('visible');
-                        setTimeout(() => toast.classList.remove('visible'), 5000);
+                        toast.classList.add('show');
+                        setTimeout(() => toast.classList.remove('show'), 5000);
                     }
 
                     btn.textContent = originalText;

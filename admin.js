@@ -738,7 +738,7 @@ async function saveProduct(event) {
         stock: parseInt(document.getElementById('product-stock').value) || 0,
         description: document.getElementById('product-description').value,
         sizes: sizes,
-        colors: ['Default']
+        colors: (id ? adminProducts.find((p) => p.id === parseInt(id))?.colors : null) || ['Default']
     };
 
     if (useSupabase && typeof ProductAPI !== 'undefined') {

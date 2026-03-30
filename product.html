@@ -467,12 +467,10 @@
                 if (productPrice) productPrice.textContent = `£${currentProduct.price.toFixed(2)}`;
                 if (productDescription) productDescription.textContent = currentProduct.description;
 
-                // Render thumbnails - use all available images if array exists
-                let thumbnails = [primaryImage, primaryImage, primaryImage];
+                // Render thumbnails - only show if multiple images exist
+                let thumbnails = [];
                 if (currentProduct.images && Array.isArray(currentProduct.images) && currentProduct.images.length > 1) {
                     thumbnails = currentProduct.images;
-                } else if (currentProduct.image) {
-                    thumbnails = [currentProduct.image, currentProduct.image, currentProduct.image];
                 }
                 if (thumbnailsContainer) {
                     thumbnailsContainer.innerHTML = thumbnails

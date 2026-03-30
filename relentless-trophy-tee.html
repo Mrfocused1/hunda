@@ -193,11 +193,11 @@
                         </div>
 
                         <div class="pdp-thumbnails hide-scrollbar" id="thumbnails">
-                            <div class="pdp-thumb active" data-index="0">
+                            <div class="pdp-thumbnail active" data-index="0">
                                 <img src="product-relentless-front.png" alt="Relentless Trophy Tee - view 1" />
                             </div>
 
-                            <div class="pdp-thumb" data-index="1">
+                            <div class="pdp-thumbnail" data-index="1">
                                 <img src="product-relentless-back.png" alt="Relentless Trophy Tee - view 2" />
                             </div>
                         </div>
@@ -314,7 +314,26 @@
             <section class="bg-gray-50 py-16">
                 <div class="container-main">
                     <h2 class="text-2xl md:text-3xl font-display font-bold uppercase mb-8">You May Also Like</h2>
-                    <div class="product-scroll"></div>
+                    <div class="product-scroll">
+                        <div class="product-card" data-product-id="3">
+                            <a href="/1h-star-cap" class="product-image-wrapper">
+                                <img src="product-3.png" alt="1H Star Cap" class="product-image" />
+                            </a>
+                            <div class="product-info">
+                                <h3 class="product-title">1H Star Cap</h3>
+                                <div class="product-price">£30.00</div>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product-id="6">
+                            <a href="/1h-multi-colour-cap" class="product-image-wrapper">
+                                <img src="product-6.jpeg" alt="1H Multi Colour Cap" class="product-image" />
+                            </a>
+                            <div class="product-info">
+                                <h3 class="product-title">1H Multi Colour Cap</h3>
+                                <div class="product-price">£30.00</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -434,13 +453,13 @@
 
                 // Thumbnail clicks
                 document.getElementById('thumbnails')?.addEventListener('click', function (e) {
-                    const thumb = e.target.closest('.pdp-thumb');
+                    const thumb = e.target.closest('.pdp-thumbnail');
                     if (!thumb) return;
 
                     const index = parseInt(thumb.dataset.index);
                     document.getElementById('main-image').src = productImages[index];
 
-                    document.querySelectorAll('.pdp-thumb').forEach((el) => el.classList.remove('active'));
+                    document.querySelectorAll('.pdp-thumbnail').forEach((el) => el.classList.remove('active'));
                     thumb.classList.add('active');
                 });
 

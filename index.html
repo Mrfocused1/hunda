@@ -84,10 +84,6 @@
         <!-- Icons -->
         <script src="https://unpkg.com/lucide@latest" defer></script>
 
-        <!-- GSAP -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
-
         <!-- Custom Styles -->
         <link rel="stylesheet" href="styles.css" />
     </head>
@@ -297,7 +293,7 @@
                 <div class="absolute inset-0" style="padding-top: 60px">
                     <img
                         src="hero-image.png"
-                        alt="1 HUNDREL Relentless Trophy Tee and 1H Star Cap - Premium Streetwear Collection"
+                        alt="1 HUNDRED Relentless Trophy Tee and 1H Star Cap - Premium Streetwear Collection"
                         class="w-full h-full object-cover object-top opacity-90" />
                 </div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
@@ -694,7 +690,7 @@
                         <h4 class="footer-title">Shop</h4>
                         <div class="footer-links">
                             <a href="/shop" class="footer-link">Shop All</a>
-                            <a href="/shop" class="footer-link">New Arrivals</a>
+                            <a href="/shop?new=true" class="footer-link">New Arrivals</a>
                         </div>
                     </div>
                     <div>
@@ -836,7 +832,7 @@
                         const productUrl = getProductUrl(product);
                         const isHoodie = product.category?.toLowerCase() === 'hoodies';
                         return `
-                <div class="product-card" data-product-id="${product.id}" ${isHoodie ? 'style="pointer-events: none;"' : ''}>
+                <div class="product-card" data-product-id="${product.id}">
                     <div class="product-image-wrapper ${hasMultipleImages ? 'has-multiple-images' : ''}" ${!isHoodie ? `data-quick-view="${product.id}"` : ''} data-images='${JSON.stringify(imageUrls)}' data-current-index="0">
                         <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy">
                         ${isHoodie ? '<span class="absolute top-2 right-2 bg-black text-white text-xs font-bold uppercase px-3 py-1.5 rounded z-10">Coming Soon</span>' : ''}
@@ -957,7 +953,8 @@
 
                         // Add to cart using global function
                         if (typeof addToCart !== 'undefined') {
-                            addToCart(productId, size, 'Black', 1);
+                            const color = product?.colors?.[0] || 'Black';
+                            addToCart(productId, size, color, 1);
 
                             // Close quick view
                             if (typeof closeQuickView !== 'undefined') {
