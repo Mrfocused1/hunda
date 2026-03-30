@@ -108,7 +108,7 @@ async function initProducts() {
                     images: p.images || [p.image],
                     sizes: p.sizes || (p.category === 'Hats' ? ['One Size'] : ['S', 'M', 'L', 'XL']),
                     colors: p.colors || ['Default'],
-                    stock: p.stock ?? 0
+                    stock: p.stock != null ? p.stock : undefined
                 }));
                 // Products loaded from Supabase
             } else {
@@ -275,8 +275,8 @@ function addToCart(productId, size, color, quantity = 1) {
         return;
     }
 
-    // Check stock availability
-    const currentStock = product.stock || 0;
+    // Check stock availability (undefined/null stock means unlimited)
+    const currentStock = product.stock != null ? product.stock : Infinity;
     const existingItem = state.cart.find((item) => item.id === productId && item.size === size && item.color === color);
     const currentInCart = existingItem ? existingItem.quantity : 0;
     const totalRequested = currentInCart + quantity;
@@ -286,7 +286,7 @@ function addToCart(productId, size, color, quantity = 1) {
         return;
     }
 
-    if (totalRequested > currentStock) {
+    if (currentStock !== Infinity && totalRequested > currentStock) {
         const availableToAdd = currentStock - currentInCart;
         if (availableToAdd <= 0) {
             showToast(`Maximum ${currentStock} items allowed in cart`, 'error');
