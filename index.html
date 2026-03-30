@@ -252,8 +252,23 @@
                 id="quick-view-modal"
                 class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl transform scale-95 opacity-0 transition-all duration-300">
                 <div class="grid md:grid-cols-2">
-                    <div class="aspect-square bg-gray-100">
+                    <div class="aspect-square bg-gray-100 relative" id="qv-image-wrapper">
                         <img id="qv-image" src="" alt="Product image" class="w-full h-full object-cover" />
+                        <button
+                            class="qv-nav-arrow qv-nav-prev"
+                            id="qv-prev"
+                            aria-label="Previous image"
+                            style="display: none">
+                            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                        </button>
+                        <button
+                            class="qv-nav-arrow qv-nav-next"
+                            id="qv-next"
+                            aria-label="Next image"
+                            style="display: none">
+                            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                        </button>
+                        <div class="qv-nav-dots" id="qv-dots" style="display: none"></div>
                     </div>
                     <div class="p-8 relative">
                         <button
@@ -707,7 +722,7 @@
                     <div>
                         <img src="logo.svg" alt="1 HUNDRED" class="h-10 mb-6" style="filter: brightness(0) invert(1)" />
                         <p class="text-gray-400 text-sm max-w-xs">
-                            Premium streetwear for the modern individual. Designed in London, worn worldwide.
+                            1HundredOrNothing Designed in London, worn worldwide.
                         </p>
                     </div>
                     <div>
