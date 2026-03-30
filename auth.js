@@ -84,7 +84,14 @@ const Auth = (function () {
     // Get current user
     function getCurrentUser() {
         const stored = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) : null;
+        if (!stored) return null;
+        try {
+            return JSON.parse(stored);
+        } catch (e) {
+            sessionStorage.removeItem(SESSION_KEY);
+            localStorage.removeItem(STORAGE_KEY);
+            return null;
+        }
     }
 
     // Set current user

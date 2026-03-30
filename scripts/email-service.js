@@ -1,14 +1,16 @@
 // Email Service - Integrates with Resend API for transactional emails
 // Supports: order-confirmation, shipping, welcome, abandoned-cart, contact
 
-// Debug utility
+// Debug utility — use window.debugLog if available, otherwise local fallback
 const EMAIL_DEBUG = window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app');
-const debugLog = (...args) => {
-    if (EMAIL_DEBUG) console.log(...args);
-};
-const debugError = (...args) => {
-    if (EMAIL_DEBUG) console.error(...args);
-};
+if (typeof window.debugLog !== 'function')
+    window.debugLog = (...args) => {
+        if (EMAIL_DEBUG) console.log(...args);
+    };
+if (typeof window.debugError !== 'function')
+    window.debugError = (...args) => {
+        if (EMAIL_DEBUG) console.error(...args);
+    };
 
 const EmailService = {
     // API endpoint base URL

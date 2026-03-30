@@ -83,7 +83,7 @@ const Utils = {
             const item = localStorage.getItem(this.getStorageKey(key));
             return item ? JSON.parse(item) : defaultValue;
         } catch (e) {
-            debugError('Error reading from localStorage:', e);
+            if (typeof debugError === 'function') debugError('Error reading from localStorage:', e);
             return defaultValue;
         }
     },
@@ -100,9 +100,9 @@ const Utils = {
             return true;
         } catch (e) {
             if (e.name === 'QuotaExceededError') {
-                showToast('Storage full. Please clear some data.', 'error');
+                if (typeof showToast === 'function') showToast('Storage full. Please clear some data.', 'error');
             }
-            debugError('Error writing to localStorage:', e);
+            if (typeof debugError === 'function') debugError('Error writing to localStorage:', e);
             return false;
         }
     },
@@ -115,7 +115,7 @@ const Utils = {
         try {
             localStorage.removeItem(this.getStorageKey(key));
         } catch (e) {
-            debugError('Error removing from localStorage:', e);
+            if (typeof debugError === 'function') debugError('Error removing from localStorage:', e);
         }
     },
 

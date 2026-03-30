@@ -260,7 +260,7 @@ function loadDashboard() {
     const customers = AdminData.getCustomers();
 
     // Calculate stats
-    const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
+    const totalSales = orders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
 
     const statSales = document.getElementById('stat-sales');
     const statOrders = document.getElementById('stat-orders');
@@ -298,7 +298,8 @@ function loadDashboard() {
 
     // Low stock alerts
     const lowStockEl = document.getElementById('low-stock-list');
-    const lowStock = products.filter((p) => p.stock < 10);
+    if (!lowStockEl) return;
+    const lowStock = products.filter((p) => p.stock != null && p.stock < 10);
 
     if (lowStock.length === 0) {
         lowStockEl.innerHTML = '<p class="text-gray-500 text-sm">No low stock items</p>';
@@ -1186,10 +1187,9 @@ function renderCustomers() {
                 month: 'short',
                 year: 'numeric'
             });
-            const lastOrderDate = new Date(customer.lastOrder).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'short'
-            });
+            const lastOrderDate = customer.lastOrder
+                ? new Date(customer.lastOrder).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+                : 'No orders';
 
             const statusBadges = [];
             if (customer.status === 'vip') statusBadges.push('<span class="customer-badge vip">VIP</span>');
