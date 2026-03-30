@@ -1343,6 +1343,12 @@ body {
     gap: 1rem;
 }
 
+@media (width < 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Payment Methods */
 .payment-method {
     display: flex;

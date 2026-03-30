@@ -532,7 +532,9 @@
 
             // Load account details
             function loadAccountDetails() {
-                const user = JSON.parse(localStorage.getItem('1hundred_user') || '{}');
+                const user = JSON.parse(
+                    localStorage.getItem('1hundred_user') || sessionStorage.getItem('1hundred_user') || '{}'
+                );
 
                 document.getElementById('user-firstname').value = user.firstName || '';
                 document.getElementById('user-lastname').value = user.lastName || '';
