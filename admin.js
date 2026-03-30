@@ -16,7 +16,7 @@ let adminProducts = [
         title: '1H Star Cap',
         price: 30,
         images: ['product-3.png'],
-        category: 'Hats',
+        category: 'hats',
         sizes: ['One Size'],
         stock: 12,
         description: `1H Star Cap (Black & White)\n\nA refined essential, the 1H Star Cap is defined by contrast, structure, and intent. Rendered in a distressed black and white finish, the design carries a worn-in character that speaks to experience, not excess.\n\nThe front is anchored by the signature 1H star emblem, a symbol of commitment at the highest level. Clean yet commanding, it reflects a mindset built on discipline and consistency.\n\nAt the back, the statement "No Half Measures" is subtly placed—reinforcing the philosophy behind the piece. Every detail is deliberate, from the curved brim to the structured crown, balancing durability with a sharp, elevated silhouette.\n\nUnderstated. Focused. Uncompromising.\n\nAll or nothing.`
@@ -26,7 +26,7 @@ let adminProducts = [
         title: 'The No Half Measures Hoodie',
         price: 85,
         images: ['product-4.jpeg'],
-        category: 'Hoodies',
+        category: 'hoodies',
         stock: 8,
         description: `The No Half Measures Hoodie
 
@@ -45,7 +45,7 @@ All in. Always.`
         title: 'Endless Possibilities Hoodie',
         price: 85,
         images: ['product-5.jpeg'],
-        category: 'Hoodies',
+        category: 'hoodies',
         stock: 15,
         description: `Endless Possibilities Hoodie\n\nA refined expression of intent, the Endless Possibilities Hoodie is defined by its balance of structure and ease. Crafted in a washed blue finish, the silhouette is relaxed yet precise, offering a quiet sense of presence.\n\nThe signature 1H mark anchors the piece, while subtle text detailing speaks to a mindset of limitless direction. Studded accents introduce a restrained edge, complementing the garment's considered construction and tactile depth.\n\nUnderstated yet deliberate, this piece moves beyond trend—designed for those who operate with clarity and purpose.\n\nWithout limits.`
     },
@@ -54,7 +54,7 @@ All in. Always.`
         title: '1H Multi Colour Cap',
         price: 30,
         images: ['product-6.jpeg'],
-        category: 'Hats',
+        category: 'hats',
         sizes: ['One Size'],
         stock: 20,
         description: 'Colorful trucker hat with 1H branding.'
@@ -64,7 +64,7 @@ All in. Always.`
         title: 'Relentless Trophy Tee',
         price: 40,
         images: ['product-relentless-front.png', 'product-relentless-back.png'],
-        category: 'T-Shirts',
+        category: 't-shirts',
         stock: 25,
         description:
             'The Relentless Trophy Tee distills discipline into design. A monochrome composition of a faceless, armored figure holding its reward—symbolizing victory earned through persistence, not chance.\n\nRefined, understated, and intentional, this piece speaks to those who pursue excellence without compromise.\n\nEarned. Never given.'
@@ -337,8 +337,8 @@ function loadProducts() {
 
 function updateProductStats() {
     const products = AdminData.getProducts();
-    const inStock = products.filter((p) => p.stock > 10).length;
-    const lowStock = products.filter((p) => p.stock > 0 && p.stock <= 10).length;
+    const inStock = products.filter((p) => p.stock >= 10).length;
+    const lowStock = products.filter((p) => p.stock > 0 && p.stock < 10).length;
     const outStock = products.filter((p) => p.stock === 0).length;
 
     document.getElementById('product-total-count').textContent = products.length;
@@ -366,8 +366,8 @@ function getFilteredProducts() {
     // Stock filter
     if (productFilterStock !== 'all') {
         products = products.filter((p) => {
-            if (productFilterStock === 'instock') return p.stock > 10;
-            if (productFilterStock === 'low') return p.stock > 0 && p.stock <= 10;
+            if (productFilterStock === 'instock') return p.stock >= 10;
+            if (productFilterStock === 'low') return p.stock > 0 && p.stock < 10;
             if (productFilterStock === 'out') return p.stock === 0;
             return true;
         });
@@ -729,7 +729,7 @@ async function saveProduct(event) {
     const category = document.getElementById('product-category').value;
 
     // Set appropriate sizes based on category
-    const sizes = category === 'Hats' ? ['One Size'] : ['S', 'M', 'L', 'XL'];
+    const sizes = category === 'hats' ? ['One Size'] : ['S', 'M', 'L', 'XL'];
 
     const baseProductData = {
         title: document.getElementById('product-title').value,

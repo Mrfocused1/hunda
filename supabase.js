@@ -6,8 +6,8 @@
 // It is safe to expose in client-side code. Row Level Security (RLS)
 // policies protect your data. Never expose the service_role key here.
 // Ensure debug functions exist (may not be defined yet if main.js loads after)
-if (typeof debugLog === 'undefined') var debugLog = function () {};
-if (typeof debugError === 'undefined') var debugError = function () {};
+if (typeof window.debugLog !== 'function') window.debugLog = function () {};
+if (typeof window.debugError !== 'function') window.debugError = function () {};
 
 const SUPABASE_URL = 'https://wsgbnfoazvdkxpdqwgyo.supabase.co';
 const SUPABASE_ANON_KEY =
