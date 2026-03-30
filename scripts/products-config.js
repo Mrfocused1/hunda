@@ -11,7 +11,8 @@ const PRODUCTS_CONFIG = {
         5: 'endless-possibilities-hoodie',
         6: '1h-multi-colour-cap',
         7: 'relentless-trophy-tee',
-        8: '1hundred-ornothing-hoodie'
+        8: '1hundred-ornothing-hoodie',
+        9: '100mph-tee'
     },
 
     // Get URL for a product
@@ -124,6 +125,18 @@ Earned. Never given.`
             colors: ['Black'],
             stock: 10,
             description: 'Classic 1Hundred OrNothing hoodie with signature branding.'
+        },
+        {
+            id: 9,
+            title: '100MPH Tee',
+            price: 40,
+            category: 't-shirts',
+            images: ['product-100mph-front.jpeg'],
+            sizes: ['S', 'M', 'L', 'XL'],
+            colors: ['Black'],
+            stock: 30,
+            description:
+                "Push the pedal down and don't look back. The 100MPH Tee is built for those who live life at full throttle — where hesitation isn't an option and momentum is everything. Featuring a bold, high-contrast graphic across the chest, this piece captures the raw intensity of speed from a driver's perspective. Crafted from premium heavyweight cotton with an oversized, boxy fit for a contemporary streetwear look."
         }
     ],
 

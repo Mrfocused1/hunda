@@ -82,6 +82,15 @@ const FALLBACK_PRODUCTS =
                   images: ['product-relentless-front.png', 'product-relentless-back.png'],
                   sizes: ['S', 'M', 'L', 'XL'],
                   colors: ['Grey']
+              },
+              {
+                  id: 9,
+                  title: '100MPH Tee',
+                  price: 40,
+                  category: 't-shirts',
+                  images: ['product-100mph-front.jpeg'],
+                  sizes: ['S', 'M', 'L', 'XL'],
+                  colors: ['Black']
               }
           ];
 

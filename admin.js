@@ -68,6 +68,16 @@ All in. Always.`
         stock: 25,
         description:
             'The Relentless Trophy Tee distills discipline into design. A monochrome composition of a faceless, armored figure holding its reward—symbolizing victory earned through persistence, not chance.\n\nRefined, understated, and intentional, this piece speaks to those who pursue excellence without compromise.\n\nEarned. Never given.'
+    },
+    {
+        id: 9,
+        title: '100MPH Tee',
+        price: 40,
+        images: ['product-100mph-front.jpeg'],
+        category: 't-shirts',
+        stock: 30,
+        description:
+            "Push the pedal down and don't look back. The 100MPH Tee is built for those who live life at full throttle—where hesitation isn't an option and momentum is everything.\n\nFeaturing a bold, high-contrast graphic across the chest, this piece captures the raw intensity of speed from a driver's perspective. Crafted from premium heavyweight cotton with an oversized, boxy fit.\n\nAll gas. No brakes."
     }
 ];
 
