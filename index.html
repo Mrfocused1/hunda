@@ -795,18 +795,52 @@
                     .map((product) => {
                         // Get primary image (support both old single image and new images array)
                         let primaryImage = 'product-1.png';
-                        if (product.images && Array.isArray(product.images)) {
-                            primaryImage = product.images[0];
+                        const allImages =
+                            product.images && Array.isArray(product.images) && product.images.length > 0
+                                ? product.images
+                                : product.image
+                                  ? [product.image]
+                                  : ['product-1.png'];
+
+                        if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+                            primaryImage =
+                                typeof getProductImageUrl !== 'undefined'
+                                    ? getProductImageUrl(product.images[0])
+                                    : product.images[0];
                         } else if (product.image) {
-                            primaryImage = product.image;
+                            primaryImage =
+                                typeof getProductImageUrl !== 'undefined'
+                                    ? getProductImageUrl(product.image)
+                                    : product.image;
                         }
+
+                        // Build image URLs array for data attribute
+                        const imageUrls = allImages.map((img) =>
+                            typeof getProductImageUrl !== 'undefined' ? getProductImageUrl(img) : img
+                        );
+
+                        // Show navigation arrows only if more than 1 image
+                        const hasMultipleImages = allImages.length > 1;
+                        const navArrows = hasMultipleImages
+                            ? `
+                            <button class="image-nav-arrow image-nav-prev" data-product-id="${product.id}" title="Previous image">
+                                <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                            </button>
+                            <button class="image-nav-arrow image-nav-next" data-product-id="${product.id}" title="Next image">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </button>
+                            <div class="image-nav-dots">${allImages.map((_, i) => `<span class="image-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}</div>
+                        `
+                            : '';
+
                         const productUrl = getProductUrl(product);
                         const isHoodie = product.category?.toLowerCase() === 'hoodies';
                         return `
                 <div class="product-card" data-product-id="${product.id}" ${isHoodie ? 'style="pointer-events: none;"' : ''}>
-                    <div class="product-image-wrapper" ${!isHoodie ? `data-quick-view="${product.id}"` : ''}>
+                    <div class="product-image-wrapper ${hasMultipleImages ? 'has-multiple-images' : ''}" ${!isHoodie ? `data-quick-view="${product.id}"` : ''} data-images='${JSON.stringify(imageUrls)}' data-current-index="0">
                         <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy">
                         ${isHoodie ? '<span class="absolute top-2 right-2 bg-black text-white text-xs font-bold uppercase px-3 py-1.5 rounded z-10">Coming Soon</span>' : ''}
+                        ${!isHoodie ? navArrows : ''}
                         ${
                             !isHoodie
                                 ? `<div class="product-quick-actions">
@@ -857,6 +891,40 @@
                 // Re-render when products are loaded from Supabase
                 window.addEventListener('productsInitialized', () => {
                     renderNewArrivals();
+                });
+
+                // Image navigation for product cards
+                document.getElementById('new-arrivals-grid')?.addEventListener('click', function (e) {
+                    const arrow = e.target.closest('.image-nav-arrow');
+                    if (!arrow) return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const wrapper = arrow.closest('.product-image-wrapper');
+                    if (!wrapper) return;
+
+                    const images = JSON.parse(wrapper.dataset.images || '[]');
+                    if (images.length <= 1) return;
+
+                    let currentIndex = parseInt(wrapper.dataset.currentIndex || '0');
+                    const isPrev = arrow.classList.contains('image-nav-prev');
+
+                    if (isPrev) {
+                        currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
+                    } else {
+                        currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
+                    }
+
+                    wrapper.dataset.currentIndex = currentIndex;
+
+                    const img = wrapper.querySelector('.product-image');
+                    if (img) img.src = images[currentIndex];
+
+                    const dots = wrapper.querySelectorAll('.image-dot');
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === currentIndex);
+                    });
                 });
 
                 // Add to Bag button handler (CSP-compatible)
