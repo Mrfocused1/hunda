@@ -6,8 +6,8 @@
         <title>100MPH Tee | 1 HUNDRED</title>
         <meta
             name="description"
-            content="The 100MPH Tee celebrates unstoppable determination. Premium heavyweight cotton with detailed trophy graphic print front and back. A testament to tho" />
-        <meta name="keywords" content="tops, 100mph tee, streetwear, 1 hundred, streetwear, 1 hundred" />
+            content="Push the pedal down. The 100MPH Tee is built for those who live life at full throttle. Bold high-contrast graphic, premium heavyweight cotton, oversized boxy fit." />
+        <meta name="keywords" content="100mph tee, t-shirts, streetwear, 1 hundred, urban fashion" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.1hundredornothing.co.uk/100mph-tee" />
         <link rel="icon" type="image/svg+xml" href="logo.svg" />
@@ -17,7 +17,7 @@
         <meta property="og:title" content="100MPH Tee | 1 HUNDRED" />
         <meta
             property="og:description"
-            content="The 100MPH Tee celebrates unstoppable determination. Premium heavyweight cotton with detailed trophy graphic print front and back. A testament to tho" />
+            content="Push the pedal down. The 100MPH Tee is built for those who live life at full throttle. Bold high-contrast graphic, premium heavyweight cotton, oversized boxy fit." />
         <meta property="og:image" content="https://www.1hundredornothing.co.uk/product-100mph-front.jpeg" />
 
         <meta name="theme-color" content="#111111" />
@@ -381,7 +381,7 @@
         <!-- Supabase -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
         <script src="supabase.js"></script>
-        <script src="main.js"></script>
+        <script src="main.js?v=3"></script>
         <script>
             // Product page specific JavaScript - CSP compliant
             (function () {
@@ -469,7 +469,7 @@
 
                 // Size guide (placeholder)
                 document.getElementById('size-guide-btn')?.addEventListener('click', function () {
-                    alert('Size Guide coming soon!');
+                    if (typeof showToast === 'function') showToast('Size Guide coming soon', 'info');
                 });
             })();
         </script>

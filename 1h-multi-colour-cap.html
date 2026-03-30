@@ -360,7 +360,7 @@
         <!-- Supabase -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
         <script src="supabase.js"></script>
-        <script src="main.js"></script>
+        <script src="main.js?v=3"></script>
         <script>
             // Product page specific JavaScript - CSP compliant
             (function () {
@@ -436,7 +436,7 @@
 
                 // Size guide (placeholder)
                 document.getElementById('size-guide-btn')?.addEventListener('click', function () {
-                    alert('Size Guide coming soon!');
+                    if (typeof showToast === 'function') showToast('Size Guide coming soon', 'info');
                 });
             })();
         </script>
