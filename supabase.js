@@ -178,7 +178,7 @@ function getProductImageUrl(imagePath, bucket = 'product-images') {
     }
 
     // If it looks like a Supabase Storage uploaded file (product-*-*.png), get public URL
-    if (imagePath && /^product-[a-z]+-\d+.*\.(png|jpe?g|webp|gif)$/i.test(imagePath)) {
+    if (imagePath && /^product-[a-z0-9]+-\d+.*\.(png|jpe?g|webp|gif)$/i.test(imagePath)) {
         if (typeof StorageAPI !== 'undefined') {
             return StorageAPI.getPublicUrl(bucket, imagePath);
         }
