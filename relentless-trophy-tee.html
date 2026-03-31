@@ -268,6 +268,13 @@
                                 </div>
                                 <button id="add-to-bag-btn" class="btn btn-primary flex-1">Add to Bag</button>
                             </div>
+                            <!-- Apple Pay / Google Pay -->
+                            <div id="apple-pay-btn" class="mt-3"></div>
+                            <p id="more-payment-link" class="text-center mt-2" style="display: none">
+                                <a href="/checkout" class="text-sm text-gray-500 underline hover:text-black"
+                                    >More payment options</a
+                                >
+                            </p>
                         </div>
 
                         <!-- Product Details Accordion -->
@@ -381,6 +388,7 @@
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
         <script src="supabase.js"></script>
         <script src="main.js?v=3"></script>
+        <script src="scripts/stripe-service.js"></script>
         <script>
             // Product page specific JavaScript - CSP compliant
             (function () {
@@ -470,6 +478,30 @@
                 document.getElementById('size-guide-btn')?.addEventListener('click', function () {
                     if (typeof showToast === 'function') showToast('Size Guide coming soon', 'info');
                 });
+                // Initialize Apple Pay / Google Pay
+                async function initApplePay() {
+                    try {
+                        const configResponse = await fetch('/api/stripe-config');
+                        const config = await configResponse.json();
+                        if (config.success && config.data?.publishableKey) {
+                            await StripeService.init(config.data.publishableKey);
+                            const btn = await StripeService.createPaymentRequestButton('apple-pay-btn', {
+                                amount: productPrice * quantity,
+                                label: productTitle,
+                                productId: productId,
+                                size: selectedSize || 'M',
+                                color: selectedColor,
+                                quantity: quantity
+                            });
+                            if (btn) {
+                                document.getElementById('more-payment-link').style.display = 'block';
+                            }
+                        }
+                    } catch (e) {
+                        // Apple Pay not available or Stripe not configured
+                    }
+                }
+                initApplePay();
             })();
         </script>
         <script src="auth.js"></script>
