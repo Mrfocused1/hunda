@@ -604,6 +604,46 @@ function openQuickView(productId) {
             });
         });
     }
+
+    // Initialize Apple Pay / Google Pay in Quick View
+    initQVApplePay(product);
+}
+
+async function initQVApplePay(product) {
+    const container = document.getElementById('qv-apple-pay-btn');
+    const moreLink = document.getElementById('qv-more-payment-link');
+    if (!container) return;
+
+    // Clear previous button
+    container.innerHTML = '';
+    if (moreLink) moreLink.style.display = 'none';
+
+    if (typeof StripeService === 'undefined') return;
+
+    try {
+        if (!StripeService.stripe) {
+            const configResponse = await fetch('/api/stripe-config');
+            const config = await configResponse.json();
+            if (config.success && config.data?.publishableKey) {
+                await StripeService.init(config.data.publishableKey);
+            } else return;
+        }
+
+        const btn = await StripeService.createPaymentRequestButton('qv-apple-pay-btn', {
+            amount: product.price,
+            label: product.title,
+            productId: product.id,
+            size: document.getElementById('quick-view-modal')?.dataset?.selectedSize || product.sizes?.[0] || 'M',
+            color: product.colors?.[0] || 'Black',
+            quantity: 1
+        });
+
+        if (btn && moreLink) {
+            moreLink.style.display = 'block';
+        }
+    } catch (e) {
+        // Apple Pay not available
+    }
 }
 
 function closeQuickView() {
