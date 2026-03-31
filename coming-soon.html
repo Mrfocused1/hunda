@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Coming Soon | 1 HUNDRED</title>
+        <meta
+            name="description"
+            content="1HundredOrNothing is an urban streetwear brand born from the streets of Birmingham, UK. Something big is coming." />
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background: #000;
+                color: #fff;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                position: relative;
+            }
+
+            /* Subtle animated gradient background */
+            body::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(ellipse at 20% 50%, rgba(30, 30, 30, 0.8) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 50%, rgba(20, 20, 20, 0.6) 0%, transparent 60%);
+                animation: pulse 8s ease-in-out infinite alternate;
+            }
+
+            @keyframes pulse {
+                0% {
+                    opacity: 0.5;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+
+            .container {
+                position: relative;
+                z-index: 1;
+                text-align: center;
+                padding: 2rem;
+                max-width: 600px;
+                width: 100%;
+            }
+
+            .logo {
+                width: 80px;
+                height: auto;
+                margin-bottom: 3rem;
+                filter: brightness(0) invert(1);
+                animation: fadeIn 1s ease-out;
+            }
+
+            .tagline {
+                font-family: 'Oswald', sans-serif;
+                font-size: clamp(2.5rem, 8vw, 5rem);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                line-height: 1;
+                margin-bottom: 1.5rem;
+                animation: fadeIn 1s ease-out 0.2s both;
+            }
+
+            .subtitle {
+                font-size: clamp(0.875rem, 2.5vw, 1.125rem);
+                color: rgba(255, 255, 255, 0.5);
+                line-height: 1.6;
+                margin-bottom: 3rem;
+                animation: fadeIn 1s ease-out 0.4s both;
+            }
+
+            /* Email signup */
+            .signup-form {
+                display: flex;
+                gap: 0;
+                max-width: 440px;
+                margin: 0 auto 2rem;
+                animation: fadeIn 1s ease-out 0.6s both;
+            }
+
+            .signup-input {
+                flex: 1;
+                padding: 0.875rem 1.25rem;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-right: none;
+                color: #fff;
+                font-size: 0.875rem;
+                font-family: 'Inter', sans-serif;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+            .signup-input::placeholder {
+                color: rgba(255, 255, 255, 0.3);
+            }
+
+            .signup-input:focus {
+                border-color: rgba(255, 255, 255, 0.4);
+            }
+
+            .signup-btn {
+                padding: 0.875rem 1.75rem;
+                background: #fff;
+                color: #000;
+                border: 1px solid #fff;
+                font-family: 'Oswald', sans-serif;
+                font-size: 0.8125rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                cursor: pointer;
+                transition: all 0.2s;
+                white-space: nowrap;
+            }
+
+            .signup-btn:hover {
+                background: transparent;
+                color: #fff;
+            }
+
+            .signup-message {
+                font-size: 0.8125rem;
+                color: rgba(255, 255, 255, 0.4);
+                margin-top: -1rem;
+                margin-bottom: 2rem;
+                min-height: 1.25rem;
+                animation: fadeIn 1s ease-out 0.6s both;
+            }
+
+            .signup-message.success {
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            /* Social links */
+            .socials {
+                display: flex;
+                gap: 1.5rem;
+                justify-content: center;
+                animation: fadeIn 1s ease-out 0.8s both;
+            }
+
+            .socials a {
+                color: rgba(255, 255, 255, 0.35);
+                text-decoration: none;
+                font-size: 0.75rem;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.15em;
+                transition: color 0.2s;
+            }
+
+            .socials a:hover {
+                color: #fff;
+            }
+
+            /* Footer bar */
+            .footer {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 1.5rem 2rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.6875rem;
+                color: rgba(255, 255, 255, 0.2);
+                z-index: 1;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .signup-form {
+                    flex-direction: column;
+                }
+                .signup-input {
+                    border-right: 1px solid rgba(255, 255, 255, 0.15);
+                    border-bottom: none;
+                }
+                .signup-btn {
+                    padding: 1rem;
+                }
+                .footer {
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    text-align: center;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <img src="/logo.svg" alt="1 HUNDRED" class="logo" />
+
+            <h1 class="tagline">Coming Soon</h1>
+
+            <p class="subtitle">
+                1HundredOrNothing is an urban streetwear brand born from the streets of Birmingham, UK. Something new is
+                on the way. Be the first to know.
+            </p>
+
+            <form class="signup-form" id="notify-form">
+                <input type="email" class="signup-input" id="notify-email" placeholder="Enter your email" required />
+                <button type="submit" class="signup-btn">Notify Me</button>
+            </form>
+            <p class="signup-message" id="notify-message">Get notified when we launch.</p>
+
+            <div class="socials">
+                <a href="https://instagram.com/1hundred.uk" target="_blank" rel="noopener">Instagram</a>
+                <a href="https://tiktok.com/@1hundred.uk" target="_blank" rel="noopener">TikTok</a>
+                <a href="https://twitter.com/1hundreduk" target="_blank" rel="noopener">Twitter</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>&copy; 2026 1hundredornothing. All rights reserved.</span>
+            <span>contact@hundredornothing.co.uk</span>
+        </div>
+
+        <script>
+            document.getElementById('notify-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const email = document.getElementById('notify-email').value;
+                const msg = document.getElementById('notify-message');
+                const btn = this.querySelector('.signup-btn');
+
+                btn.textContent = '...';
+                btn.disabled = true;
+
+                // Store locally (and could send to API)
+                const list = JSON.parse(localStorage.getItem('1hundred_notify_list') || '[]');
+                if (!list.includes(email)) list.push(email);
+                localStorage.setItem('1hundred_notify_list', JSON.stringify(list));
+
+                setTimeout(() => {
+                    msg.textContent = "You're on the list. We'll be in touch.";
+                    msg.classList.add('success');
+                    btn.textContent = 'Notify Me';
+                    btn.disabled = false;
+                    this.reset();
+                }, 600);
+            });
+        </script>
+    </body>
+</html>
