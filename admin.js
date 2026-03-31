@@ -116,6 +116,9 @@ async function initAdminSupabase() {
     }
 }
 
+// Admin email whitelist
+const ADMIN_EMAILS = ['admin@1hundredornothing.co.uk', 'hundredornothing@outlook.com'];
+
 // Check admin authentication
 (function checkAuth() {
     const adminSession = sessionStorage.getItem('1hundred_admin_session');
@@ -123,11 +126,17 @@ async function initAdminSupabase() {
         window.location.href = '/admin-login';
         return;
     }
-    // Validate session structure to prevent trivial bypass
+    // Validate session structure
     if (adminSession && !window.location.href.includes('admin-login')) {
         try {
             const session = JSON.parse(adminSession);
             if (!session || !session.email || !session.timestamp) {
+                sessionStorage.removeItem('1hundred_admin_session');
+                window.location.href = '/admin-login';
+                return;
+            }
+            // Verify email is in admin whitelist
+            if (!ADMIN_EMAILS.includes(session.email.toLowerCase())) {
                 sessionStorage.removeItem('1hundred_admin_session');
                 window.location.href = '/admin-login';
                 return;

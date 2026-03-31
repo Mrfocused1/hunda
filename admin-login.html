@@ -124,7 +124,15 @@
                     <button type="submit" class="btn btn-primary btn-full">Sign In to Admin</button>
                 </form>
 
-                <div class="text-center">
+                <div class="text-center" style="margin-top: 1rem">
+                    <a
+                        href="#"
+                        id="forgot-password"
+                        style="color: #666; font-size: 0.875rem; text-decoration: underline; cursor: pointer"
+                        >Forgot password?</a
+                    >
+                </div>
+                <div class="text-center" style="margin-top: 1rem">
                     <a href="/" class="back-link">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i>
                         Back to Store
@@ -138,29 +146,106 @@
         <script src="supabase.js"></script>
         <script src="main.js?v=3"></script>
         <script>
-            // SECURITY WARNING: This is a demo implementation only.
-            // In production, authentication must be handled by a secure backend server.
-            // Never store credentials in client-side code.
-            const ADMIN_CREDENTIALS = {
-                email: 'admin@1hundredornothing.co.uk',
-                password: 'admin123'
-            };
+            // Admin emails authorized to access the dashboard
+            const ADMIN_EMAILS = ['admin@1hundredornothing.co.uk', 'hundredornothing@outlook.com'];
 
-            // Check if already logged in as admin
-            if (sessionStorage.getItem('1hundred_admin_session')) {
-                window.location.href = '/admin';
-            }
+            // Check if already logged in via Supabase Auth
+            (async function checkExistingSession() {
+                const client = typeof getSupabase === 'function' ? getSupabase() : null;
+                if (client) {
+                    const {
+                        data: { session }
+                    } = await client.auth.getSession();
+                    if (session && ADMIN_EMAILS.includes(session.user.email.toLowerCase())) {
+                        sessionStorage.setItem(
+                            '1hundred_admin_session',
+                            JSON.stringify({
+                                email: session.user.email,
+                                timestamp: Date.now(),
+                                loggedInAt: new Date().toISOString(),
+                                supabaseAuth: true
+                            })
+                        );
+                        window.location.href = '/admin';
+                        return;
+                    }
+                }
+                // Also check sessionStorage fallback
+                const existing = sessionStorage.getItem('1hundred_admin_session');
+                if (existing) {
+                    try {
+                        const s = JSON.parse(existing);
+                        if (s.email && s.timestamp && Date.now() - s.timestamp < 4 * 60 * 60 * 1000) {
+                            window.location.href = '/admin';
+                            return;
+                        }
+                    } catch (e) {}
+                }
+            })();
 
-            document.getElementById('admin-login-form').addEventListener('submit', function (e) {
+            document.getElementById('admin-login-form').addEventListener('submit', async function (e) {
                 e.preventDefault();
 
-                const email = document.getElementById('email').value;
+                const email = document.getElementById('email').value.trim().toLowerCase();
                 const password = document.getElementById('password').value;
                 const errorDiv = document.getElementById('error-message');
+                const submitBtn = this.querySelector('button[type="submit"]');
 
-                // Validate credentials
-                if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-                    // Create admin session
+                // Check if email is in admin whitelist
+                if (!ADMIN_EMAILS.includes(email)) {
+                    errorDiv.textContent = 'This email is not authorized for admin access';
+                    errorDiv.classList.add('show');
+                    return;
+                }
+
+                // Show loading
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Signing in...';
+                }
+                errorDiv.classList.remove('show');
+
+                // Try Supabase Auth first
+                const client = typeof getSupabase === 'function' ? getSupabase() : null;
+                if (client) {
+                    try {
+                        const { data, error } = await client.auth.signInWithPassword({ email, password });
+
+                        if (!error && data.session) {
+                            sessionStorage.setItem(
+                                '1hundred_admin_session',
+                                JSON.stringify({
+                                    email: data.user.email,
+                                    timestamp: Date.now(),
+                                    loggedInAt: new Date().toISOString(),
+                                    supabaseAuth: true,
+                                    userId: data.user.id
+                                })
+                            );
+                            window.location.href = '/admin';
+                            return;
+                        }
+
+                        // If Supabase returns error, show it
+                        if (error) {
+                            errorDiv.textContent =
+                                error.message === 'Invalid login credentials'
+                                    ? 'Invalid email or password'
+                                    : error.message;
+                            errorDiv.classList.add('show');
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Sign In';
+                            }
+                            return;
+                        }
+                    } catch (err) {
+                        // Supabase not available, fall through to legacy check
+                    }
+                }
+
+                // Legacy fallback (hardcoded credentials for demo/offline)
+                if (email === 'admin@1hundredornothing.co.uk' && password === 'admin123') {
                     sessionStorage.setItem(
                         '1hundred_admin_session',
                         JSON.stringify({
@@ -169,12 +254,48 @@
                             loggedInAt: new Date().toISOString()
                         })
                     );
-
-                    // Redirect to admin dashboard
                     window.location.href = '/admin';
                 } else {
-                    errorDiv.textContent = 'Invalid admin credentials';
+                    errorDiv.textContent = 'Invalid email or password';
                     errorDiv.classList.add('show');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Sign In';
+                    }
+                }
+            });
+
+            // Forgot password handler
+            document.getElementById('forgot-password')?.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value.trim().toLowerCase();
+                const errorDiv = document.getElementById('error-message');
+
+                if (!email) {
+                    errorDiv.textContent = 'Please enter your email address first';
+                    errorDiv.classList.add('show');
+                    return;
+                }
+
+                if (!ADMIN_EMAILS.includes(email)) {
+                    errorDiv.textContent = 'This email is not authorized for admin access';
+                    errorDiv.classList.add('show');
+                    return;
+                }
+
+                const client = typeof getSupabase === 'function' ? getSupabase() : null;
+                if (client) {
+                    const { error } = await client.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/admin-login'
+                    });
+                    if (!error) {
+                        if (typeof showToast !== 'undefined')
+                            showToast('Password reset email sent! Check your inbox.', 'success');
+                        else alert('Password reset email sent! Check your inbox.');
+                    } else {
+                        errorDiv.textContent = error.message;
+                        errorDiv.classList.add('show');
+                    }
                 }
             });
         </script>
