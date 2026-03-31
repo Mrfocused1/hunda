@@ -209,10 +209,7 @@
                                     <span class="text-gray-600">Shipping</span>
                                     <span id="summary-shipping" class="font-medium">Free</span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Tax</span>
-                                    <span id="summary-tax" class="font-medium">£0.00</span>
-                                </div>
+                                <!-- Tax removed — prices are VAT inclusive -->
                                 <div id="discount-row" class="flex justify-between text-green-600 hidden">
                                     <span>Discount</span>
                                     <span id="summary-discount">-£0.00</span>
@@ -224,7 +221,7 @@
                                     <span class="font-bold text-lg">Total</span>
                                     <span id="summary-total" class="font-bold text-xl">£0.00</span>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1">Including VAT</p>
+                                <p class="text-xs text-gray-500 mt-1">All prices include VAT</p>
                             </div>
 
                             <a href="/checkout" class="btn btn-primary btn-full mt-6">Proceed to Checkout</a>
@@ -386,24 +383,16 @@
             function updateSummary() {
                 const subtotal = getCartTotal();
                 const shipping = subtotal >= 50 ? 0 : 4.99;
-                const countryCode = document.getElementById('checkout-country')?.value || 'GB';
-                const taxableAmount = subtotal - discount;
-                const tax =
-                    typeof Pricing !== 'undefined'
-                        ? Pricing.calculateTax(taxableAmount, countryCode)
-                        : taxableAmount * 0.2;
-                const total = Math.max(0, subtotal + shipping + tax - discount);
+                const total = Math.max(0, subtotal + shipping - discount);
 
                 const summarySubtotal = document.getElementById('summary-subtotal');
                 const summaryShipping = document.getElementById('summary-shipping');
-                const summaryTax = document.getElementById('summary-tax');
                 const summaryTotal = document.getElementById('summary-total');
                 const discountRow = document.getElementById('discount-row');
                 const summaryDiscount = document.getElementById('summary-discount');
 
                 if (summarySubtotal) summarySubtotal.textContent = `£${subtotal.toFixed(2)}`;
                 if (summaryShipping) summaryShipping.textContent = shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`;
-                if (summaryTax) summaryTax.textContent = `£${tax.toFixed(2)}`;
                 if (summaryTotal) summaryTotal.textContent = `£${total.toFixed(2)}`;
 
                 if (discount > 0) {

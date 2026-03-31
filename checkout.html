@@ -540,10 +540,7 @@
                                 <span class="text-gray-600">Shipping</span>
                                 <span id="checkout-shipping" class="font-medium">Free</span>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Tax</span>
-                                <span id="checkout-tax" class="font-medium">£0.00</span>
-                            </div>
+                            <!-- Tax removed — prices are VAT inclusive -->
                             <div id="checkout-discount-row" class="flex justify-between text-green-600 hidden">
                                 <span>Discount</span>
                                 <span id="checkout-discount">-£0.00</span>
@@ -747,21 +744,14 @@
                             : subtotal >= 50
                               ? 0
                               : 4.99;
-                    const taxableAmount = subtotal - discount;
-                    const tax =
-                        typeof Pricing !== 'undefined'
-                            ? Pricing.calculateTax(taxableAmount, countryCode)
-                            : taxableAmount * 0.2;
-                    const total = Math.max(0, subtotal + shipping + tax - discount);
+                    const total = Math.max(0, subtotal + shipping - discount);
 
                     const subtotalEl = document.getElementById('checkout-subtotal');
                     const shippingEl = document.getElementById('checkout-shipping');
-                    const taxEl = document.getElementById('checkout-tax');
                     const totalEl = document.getElementById('checkout-total');
 
                     if (subtotalEl) subtotalEl.textContent = `£${subtotal.toFixed(2)}`;
                     if (shippingEl) shippingEl.textContent = shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`;
-                    if (taxEl) taxEl.textContent = `£${tax.toFixed(2)}`;
                     if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
 
                     const discountRow = document.getElementById('checkout-discount-row');
@@ -807,12 +797,7 @@
                         : subtotal >= 50
                           ? 0
                           : 4.99;
-                const taxableAmount = subtotal - discount;
-                const tax =
-                    typeof Pricing !== 'undefined'
-                        ? Pricing.calculateTax(taxableAmount, countryCode)
-                        : taxableAmount * 0.2;
-                const total = Math.max(0, subtotal + shipping + tax - discount);
+                const total = Math.max(0, subtotal + shipping - discount);
 
                 // Get selected payment method
                 const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
