@@ -131,7 +131,7 @@ Earned. Never given.`
             title: '100MPH Tee',
             price: 40,
             category: 't-shirts',
-            images: ['product-100mph-front.jpeg'],
+            images: ['product-100mph-front.png'],
             sizes: ['S', 'M', 'L', 'XL'],
             colors: ['Black'],
             stock: 30,

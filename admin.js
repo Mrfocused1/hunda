@@ -73,7 +73,7 @@ All in. Always.`
         id: 9,
         title: '100MPH Tee',
         price: 40,
-        images: ['product-100mph-front.jpeg'],
+        images: ['product-100mph-front.png'],
         category: 't-shirts',
         stock: 30,
         description:
