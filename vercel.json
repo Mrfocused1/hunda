@@ -22,9 +22,11 @@
             ]
         }
     ],
+    "redirects": [{ "source": "/", "destination": "/coming-soon.html", "statusCode": 302 }],
     "rewrites": [
         { "source": "/admin", "destination": "/admin.html" },
         { "source": "/admin-login", "destination": "/admin-login.html" },
-        { "source": "/(.*)", "destination": "/coming-soon.html" }
+        { "source": "/coming-soon", "destination": "/coming-soon.html" },
+        { "source": "/((?!coming-soon|admin|logo\\.svg|_).*)", "destination": "/coming-soon.html" }
     ]
 }
