@@ -22,29 +22,11 @@
             ]
         }
     ],
+    "redirects": [{ "source": "/", "destination": "/coming-soon.html", "statusCode": 302 }],
     "rewrites": [
-        { "source": "/1h-star-cap", "destination": "/1h-star-cap.html" },
-        { "source": "/no-half-measures-hoodie", "destination": "/no-half-measures-hoodie.html" },
-        { "source": "/endless-possibilities-hoodie", "destination": "/endless-possibilities-hoodie.html" },
-        { "source": "/1h-multi-colour-cap", "destination": "/1h-multi-colour-cap.html" },
-        { "source": "/relentless-trophy-tee", "destination": "/relentless-trophy-tee.html" },
-        { "source": "/100mph-tee", "destination": "/100mph-tee.html" },
-        { "source": "/shop", "destination": "/shop.html" },
-        { "source": "/shop/:path*", "destination": "/shop.html" },
-        { "source": "/product", "destination": "/product.html" },
-        { "source": "/product/:path*", "destination": "/product.html" },
-        { "source": "/cart", "destination": "/cart.html" },
-        { "source": "/checkout", "destination": "/checkout.html" },
-        { "source": "/account", "destination": "/account.html" },
-        { "source": "/about", "destination": "/about.html" },
-        { "source": "/contact", "destination": "/contact.html" },
-        { "source": "/login", "destination": "/login.html" },
-        { "source": "/signup", "destination": "/signup.html" },
         { "source": "/admin", "destination": "/admin.html" },
         { "source": "/admin-login", "destination": "/admin-login.html" },
-        { "source": "/terms", "destination": "/terms.html" },
-        { "source": "/privacy", "destination": "/privacy.html" },
-        { "source": "/help", "destination": "/help.html" },
-        { "source": "/delivery", "destination": "/delivery.html" }
+        { "source": "/coming-soon", "destination": "/coming-soon.html" },
+        { "source": "/((?!coming-soon|admin|logo\\.svg|_).*)", "destination": "/coming-soon.html" }
     ]
 }
