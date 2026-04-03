@@ -279,11 +279,6 @@ function addToCart(productId, size, color, quantity = 1) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
 
-    if (product.category?.toLowerCase() === 'hoodies') {
-        showToast('Coming Soon', 'info');
-        return;
-    }
-
     // Check stock availability (undefined/null stock means unlimited)
     const currentStock = product.stock != null ? product.stock : Infinity;
     const existingItem = state.cart.find((item) => item.id === productId && item.size === size && item.color === color);
@@ -509,12 +504,6 @@ function renderMiniCart() {
 function openQuickView(productId) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
-
-    // Block hoodies - show coming soon
-    if (product.category?.toLowerCase() === 'hoodies') {
-        showToast('Coming Soon', 'info');
-        return;
-    }
 
     const modal = document.getElementById('quick-view-modal');
     const overlay = document.getElementById('quick-view-overlay');

@@ -812,44 +812,28 @@
                                 : '';
 
                             const productUrl = product.slug ? `/${product.slug}` : `/product?id=${product.id}`;
-                            const isHoodie = product.category === 'hoodies';
                             return `
                     <div class="product-card" data-product-id="${product.id}">
-                        <div class="product-image-wrapper ${hasMultipleImages ? 'has-multiple-images' : ''}" ${!isHoodie ? `data-quick-view="${product.id}"` : ''} data-images='${JSON.stringify(imageUrls)}' data-current-index="0">
+                        <div class="product-image-wrapper ${hasMultipleImages ? 'has-multiple-images' : ''}" data-quick-view="${product.id}" data-images='${JSON.stringify(imageUrls)}' data-current-index="0">
                             <img src="${primaryImage}" alt="${product.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
-                            ${product.isNew && !isHoodie ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
-                            ${isHoodie ? '<span class="absolute top-2 right-2 bg-black text-white text-xs font-bold uppercase px-3 py-1.5 rounded z-10">Coming Soon</span>' : ''}
-                            ${!isHoodie ? navArrows : ''}
-                            ${
-                                !isHoodie
-                                    ? `<div class="product-quick-actions">
+                            ${product.isNew ? '<span class="absolute top-2 left-2 bg-black text-white text-xs font-bold uppercase px-2 py-1">New</span>' : ''}
+                            ${navArrows}
+                            <div class="product-quick-actions">
                                 <button class="quick-action-btn" title="Quick View" data-quick-view="${product.id}">
                                     <i data-lucide="eye" class="w-5 h-5"></i>
                                 </button>
                                 <button class="quick-action-btn" title="Add to Bag" data-add-cart="${product.id}">
                                     <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                                 </button>
-                            </div>`
-                                    : ''
-                            }
-                        </div>
-                        ${
-                            isHoodie
-                                ? `<div class="block">
-                            <div class="product-info">
-                                <h3 class="product-title">${product.title}</h3>
-                                <span class="product-price">£${product.price.toFixed(2)}</span>
                             </div>
-                            <p class="product-category text-gray-400">Coming Soon</p>
-                        </div>`
-                                : `<a href="${productUrl}" class="block">
+                        </div>
+                        <a href="${productUrl}" class="block">
                             <div class="product-info">
                                 <h3 class="product-title">${product.title}</h3>
                                 <span class="product-price">£${product.price.toFixed(2)}</span>
                             </div>
                             <p class="product-category">${product.category}</p>
-                        </a>`
-                        }
+                        </a>
                     </div>
                 `;
                         })
@@ -1092,11 +1076,6 @@
                             e.preventDefault();
                             e.stopPropagation();
                             const productId = parseInt(quickViewBtn.dataset.quickView);
-                            const product = allProducts.find((p) => p.id === productId);
-                            if (product && product.category === 'hoodies') {
-                                showToast('Coming Soon', 'info');
-                                return;
-                            }
                             if (typeof openQuickView === 'function') {
                                 openQuickView(productId);
                             }
@@ -1110,10 +1089,6 @@
                             e.stopPropagation();
                             const productId = parseInt(addCartBtn.dataset.addCart);
                             const product = allProducts.find((p) => p.id === productId);
-                            if (product && product.category === 'hoodies') {
-                                showToast('Coming Soon', 'info');
-                                return;
-                            }
                             if (product && typeof addToCart === 'function') {
                                 // Auto-select size if only one option
                                 const size = product.sizes.length === 1 ? product.sizes[0] : 'M';
@@ -1129,17 +1104,6 @@
                             return;
                         }
 
-                        // Intercept product link clicks for Hoodies
-                        const productCard = e.target.closest('.product-card');
-                        if (productCard) {
-                            const productId = parseInt(productCard.dataset.productId);
-                            const product = allProducts.find((p) => p.id === productId);
-                            if (product && product.category === 'hoodies') {
-                                e.preventDefault();
-                                showToast('Coming Soon', 'info');
-                                return;
-                            }
-                        }
                     });
                 }
 
