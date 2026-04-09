@@ -145,15 +145,6 @@
                 </div>
             </div>
 
-            <div class="filter-section">
-                <h4 class="filter-title">Color</h4>
-                <div class="flex flex-wrap gap-2">
-                    <button class="color-swatch bg-black" style="background: #111" data-color="Black"></button>
-                    <button class="color-swatch bg-white border" style="background: #fff" data-color="White"></button>
-                    <button class="color-swatch" style="background: #f5f5dc" data-color="Cream"></button>
-                    <button class="color-swatch" style="background: #808080" data-color="Grey"></button>
-                </div>
-            </div>
 
             <div class="filter-section">
                 <h4 class="filter-title">Price Range</h4>
@@ -394,21 +385,6 @@
                                 </div>
                             </div>
 
-                            <div class="filter-section">
-                                <h4 class="filter-title">Color</h4>
-                                <div class="flex flex-wrap gap-2" id="color-filters">
-                                    <button class="color-swatch" style="background: #111" data-color="Black"></button>
-                                    <button
-                                        class="color-swatch"
-                                        style="background: #fff; border: 1px solid #ddd"
-                                        data-color="White"></button>
-                                    <button
-                                        class="color-swatch"
-                                        style="background: #f5f5dc"
-                                        data-color="Cream"></button>
-                                    <button class="color-swatch" style="background: #808080" data-color="Grey"></button>
-                                </div>
-                            </div>
 
                             <div class="filter-section">
                                 <h4 class="filter-title">Price</h4>
@@ -515,7 +491,7 @@
                     image: 'product-3.png',
                     images: ['product-3.png'],
                     sizes: ['One Size'],
-                    colors: ['White/Black'],
+
                     isNew: true,
                     slug: '1h-star-cap'
                 },
@@ -527,7 +503,7 @@
                     image: 'product-4.jpeg',
                     images: ['product-4.jpeg'],
                     sizes: ['S', 'M', 'L', 'XL'],
-                    colors: ['Black'],
+
                     isNew: false,
                     slug: 'no-half-measures-hoodie'
                 },
@@ -539,7 +515,7 @@
                     image: 'product-5.jpeg',
                     images: ['product-5.jpeg'],
                     sizes: ['S', 'M', 'L', 'XL'],
-                    colors: ['Blue'],
+
                     isNew: true,
                     slug: 'endless-possibilities-hoodie'
                 },
@@ -551,7 +527,7 @@
                     image: 'product-6.jpeg',
                     images: ['product-6.jpeg'],
                     sizes: ['One Size'],
-                    colors: ['White/Black'],
+
                     isNew: false,
                     slug: '1h-multi-colour-cap'
                 },
@@ -563,7 +539,7 @@
                     image: 'product-relentless-front.png',
                     images: ['product-relentless-front.png', 'product-relentless-back.png'],
                     sizes: ['S', 'M', 'L', 'XL'],
-                    colors: ['Grey'],
+
                     isNew: true,
                     slug: 'relentless-trophy-tee'
                 },
@@ -575,7 +551,7 @@
                     image: 'product-100mph-front.png',
                     images: ['product-100mph-front.png'],
                     sizes: ['S', 'M', 'L', 'XL'],
-                    colors: ['Black'],
+
                     isNew: true,
                     slug: '100mph-tee'
                 }
@@ -611,7 +587,6 @@
                                 images: p.images || [p.image],
                                 slug: productSlugs[p.id] || `product-${p.id}`,
                                 sizes: p.sizes || ['S', 'M', 'L', 'XL'],
-                                colors: p.colors || ['Default'],
                                 isNew:
                                     p.is_new || p.created_at
                                         ? Date.now() - new Date(p.created_at).getTime() < 30 * 24 * 60 * 60 * 1000
@@ -652,7 +627,6 @@
             let currentFilters = {
                 categories: [],
                 sizes: [],
-                colors: [],
                 priceRanges: [],
                 sort: 'recommended',
                 search: ''
@@ -719,10 +693,6 @@
                     }
                     // Size filter
                     if (currentFilters.sizes.length > 0 && !currentFilters.sizes.some((s) => p.sizes.includes(s))) {
-                        return false;
-                    }
-                    // Color filter
-                    if (currentFilters.colors.length > 0 && !currentFilters.colors.some((c) => p.colors.includes(c))) {
                         return false;
                     }
                     // Price filter
@@ -891,17 +861,6 @@
                     });
                 });
 
-                // Color swatches
-                document.querySelectorAll('.color-swatch').forEach((btn) => {
-                    btn.addEventListener('click', () => {
-                        btn.classList.toggle('active');
-                        currentFilters.colors = Array.from(document.querySelectorAll('.color-swatch.active')).map(
-                            (btn) => btn.dataset.color
-                        );
-                        renderProducts();
-                    });
-                });
-
                 // Price checkboxes
                 document.querySelectorAll('input[name="price"]').forEach((cb) => {
                     cb.addEventListener('change', () => {
@@ -942,7 +901,6 @@
                 currentFilters = {
                     categories: [],
                     sizes: [],
-                    colors: [],
                     priceRanges: [],
                     sort: 'recommended',
                     search: ''
@@ -950,7 +908,7 @@
 
                 document.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
                 document
-                    .querySelectorAll('.size-option, .color-swatch')
+                    .querySelectorAll('.size-option')
                     .forEach((btn) => btn.classList.remove('active'));
                 document.getElementById('sort-select').value = 'recommended';
                 document.getElementById('search-input').value = '';
@@ -1036,8 +994,7 @@
 
                         // Add to cart using global function
                         if (typeof addToCart !== 'undefined') {
-                            const color = product?.colors?.[0] || 'Black';
-                            addToCart(productId, size, color, 1);
+                            addToCart(productId, size, null, 1);
 
                             // Close quick view
                             if (typeof closeQuickView !== 'undefined') {
@@ -1123,8 +1080,7 @@
                             if (product && typeof addToCart === 'function') {
                                 // Auto-select size if only one option
                                 const size = product.sizes.length === 1 ? product.sizes[0] : 'M';
-                                const color = product.colors[0];
-                                addToCart(productId, size, color, 1);
+                                addToCart(productId, size, null, 1);
                                 if (typeof showToast !== 'undefined') {
                                     showToast(product.title + ' added to bag', 'success');
                                 }
