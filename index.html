@@ -1019,8 +1019,7 @@
 
                         // Add to cart using global function
                         if (typeof addToCart !== 'undefined') {
-                            const color = product?.colors?.[0] || 'Black';
-                            addToCart(productId, size, color, 1);
+                            addToCart(productId, size, null, 1);
 
                             // Close quick view
                             if (typeof closeQuickView !== 'undefined') {

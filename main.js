@@ -488,7 +488,7 @@ function renderMiniCart() {
                         <h4 class="font-bold text-sm uppercase truncate">${safeTitle}</h4>
                         <span class="font-bold text-sm">${U.formatPrice(item.price)}</span>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">${safeColor} | ${safeSize}</p>
+                    <p class="text-xs text-gray-500 mt-1">${safeSize}</p>
                     <div class="flex items-center justify-between mt-2">
                         <div class="flex items-center border border-gray-200 rounded">
                             <button class="px-2 py-1 text-xs hover:bg-gray-100 cart-qty-minus" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}" aria-label="Decrease quantity">-</button>
@@ -660,7 +660,7 @@ async function initQVApplePay(product) {
             label: product.title,
             productId: product.id,
             size: document.getElementById('quick-view-modal')?.dataset?.selectedSize || product.sizes?.[0] || 'M',
-            color: product.colors?.[0] || 'Black',
+            color: null,
             quantity: 1
         });
 
@@ -731,9 +731,7 @@ function addToCartFromQV(btn) {
     const productTitle = product ? product.title : 'Item';
 
     // Add to cart
-    const productForColor = products.find((p) => p.id === productId);
-    const color = productForColor?.colors?.[0] || 'Black';
-    addToCart(productId, size, color, 1);
+    addToCart(productId, size, null, 1);
 
     // Close quick view and open cart drawer
     closeQuickView();
