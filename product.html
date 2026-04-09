@@ -206,19 +206,6 @@
 
                         <p id="product-description" class="pdp-description">Product description goes here.</p>
 
-                        <!-- Color Selection -->
-                        <div class="pdp-section">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="font-bold text-sm uppercase"
-                                    >Color:
-                                    <span id="selected-color" class="font-normal text-gray-500">Black</span></span
-                                >
-                            </div>
-                            <div class="flex gap-3" id="color-options">
-                                <!-- Color options rendered by JS -->
-                            </div>
-                        </div>
-
                         <!-- Size Selection -->
                         <div class="pdp-section">
                             <div class="flex justify-between items-center mb-4">
@@ -422,7 +409,6 @@
 
             let currentProduct = null;
             let selectedSize = null;
-            let selectedColor = null;
             let quantity = 1;
 
             function loadProduct() {
@@ -476,7 +462,6 @@
                 const productPrice = document.getElementById('product-price');
                 const productDescription = document.getElementById('product-description');
                 const thumbnailsContainer = document.getElementById('thumbnails');
-                const colorOptions = document.getElementById('color-options');
                 const sizeOptions = document.getElementById('size-options');
 
                 if (mainImage) {
@@ -504,21 +489,6 @@
                         .join('');
                 }
 
-                // Render color options
-                if (colorOptions) {
-                    colorOptions.innerHTML = currentProduct.colors
-                        .map(
-                            (color) => `
-                <button class="color-swatch ${color === 'White' ? 'border' : ''}"
-                        style="background: ${getColorCode(color)};"
-                        data-color="${color}"
-                        data-select-color="${color}">
-                </button>
-            `
-                        )
-                        .join('');
-                }
-
                 // Render size options
                 if (sizeOptions) {
                     sizeOptions.innerHTML = currentProduct.sizes
@@ -529,9 +499,6 @@
                         )
                         .join('');
                 }
-
-                // Select defaults
-                selectColor(currentProduct.colors[0], document.querySelector('.color-swatch'));
 
                 // Auto-select size if only one option
                 if (currentProduct.sizes && currentProduct.sizes.length === 1) {
@@ -572,24 +539,11 @@
                 lucide.createIcons();
             }
 
-            function getColorCode(color) {
-                const codes = { Black: '#111', White: '#fff', Cream: '#f5f5dc', Grey: '#808080' };
-                return codes[color] || color;
-            }
-
             function setMainImage(src, thumb) {
                 const mainImage = document.getElementById('main-image');
                 if (mainImage) mainImage.src = src;
                 document.querySelectorAll('.pdp-thumbnail').forEach((t) => t.classList.remove('active'));
                 if (thumb) thumb.classList.add('active');
-            }
-
-            function selectColor(color, btn) {
-                selectedColor = color;
-                const selectedColorEl = document.getElementById('selected-color');
-                if (selectedColorEl) selectedColorEl.textContent = color;
-                document.querySelectorAll('.color-swatch').forEach((b) => b.classList.remove('active'));
-                if (btn) btn.classList.add('active');
             }
 
             function selectSize(size, btn) {
@@ -611,7 +565,7 @@
                     document.getElementById('size-error').classList.remove('hidden');
                     return;
                 }
-                addToCart(currentProduct.id, selectedSize, selectedColor, quantity);
+                addToCart(currentProduct.id, selectedSize, null, quantity);
             }
 
             function toggleAccordion(id) {
@@ -673,11 +627,6 @@
                 // Thumbnail clicks
                 document.querySelectorAll('[data-set-image]').forEach((thumb) => {
                     thumb.addEventListener('click', () => setMainImage(thumb.dataset.setImage, thumb));
-                });
-
-                // Color selection
-                document.querySelectorAll('[data-select-color]').forEach((btn) => {
-                    btn.addEventListener('click', () => selectColor(btn.dataset.selectColor, btn));
                 });
 
                 // Size selection
