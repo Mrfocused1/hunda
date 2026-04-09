@@ -16,7 +16,7 @@
         <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
             rel="stylesheet" />
-        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://unpkg.com/lucide@0.469.0"></script>
         <script src="https://js.stripe.com/v3/" defer></script>
         <link rel="stylesheet" href="styles.css" />
         <style>
@@ -736,7 +736,9 @@
 
                     // Update totals
                     const subtotal = getCartTotal();
-                    const discount = parseFloat(localStorage.getItem('1hundred_checkout_discount') || '0');
+                    // Cap discount: cannot exceed subtotal, max 50% of subtotal as safety limit
+                    const rawDiscount = parseFloat(localStorage.getItem('1hundred_checkout_discount') || '0');
+                    const discount = Math.max(0, Math.min(rawDiscount, subtotal * 0.5));
                     const countryCode = document.getElementById('checkout-country')?.value || 'United Kingdom';
                     const shipping =
                         typeof Pricing !== 'undefined'
@@ -765,11 +767,17 @@
                 }
             }
 
+            let isPlacingOrder = false;
             async function placeOrder() {
+                // Prevent double submission
+                if (isPlacingOrder) return;
+
                 if (!document.getElementById('terms').checked) {
                     showToast('Please agree to the terms');
                     return;
                 }
+
+                isPlacingOrder = true;
 
                 // Get customer details from state or form
                 const shippingDetails = state.shipping || {};
@@ -786,10 +794,13 @@
                 // Get order total with defensive check
                 const subtotal = typeof getCartTotal === 'function' ? getCartTotal() : 0;
                 if (subtotal === 0) {
+                    isPlacingOrder = false;
                     showToast('Your cart is empty', 'error');
                     return;
                 }
-                const discount = parseFloat(localStorage.getItem('1hundred_checkout_discount') || '0');
+                // Cap discount: cannot exceed subtotal, max 50% of subtotal as safety limit
+                const rawOrderDiscount = parseFloat(localStorage.getItem('1hundred_checkout_discount') || '0');
+                const discount = Math.max(0, Math.min(rawOrderDiscount, subtotal * 0.5));
                 const countryCode = document.getElementById('checkout-country')?.value || 'United Kingdom';
                 const shipping =
                     typeof Pricing !== 'undefined'
@@ -804,6 +815,7 @@
 
                 // Validate required fields
                 if (!email || !firstName || !lastName) {
+                    isPlacingOrder = false;
                     showToast('Please fill in all required fields', 'error');
                     return;
                 }
@@ -824,12 +836,18 @@
                             throw new Error('Payment system not ready. Please refresh and try again.');
                         }
 
-                        // Create payment intent
+                        // Create payment intent with cart items for server-side price validation
+                        const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
+                        const cartItemsForValidation = cart.map((item) => ({
+                            id: item.id,
+                            price: item.price,
+                            quantity: item.quantity
+                        }));
                         const { clientSecret } = await StripeService.createPaymentIntent(total, {
                             orderNumber: orderNumber,
                             customerEmail: email,
                             customerName: `${firstName} ${lastName}`
-                        });
+                        }, cartItemsForValidation);
 
                         // Confirm payment with Stripe
                         await StripeService.confirmPayment(clientSecret, {
@@ -851,7 +869,8 @@
                         if (errorEl) errorEl.textContent = error.message;
                         showToast(error.message || 'Payment failed. Please try again.', 'error');
 
-                        // Reset button
+                        // Reset button and order lock
+                        isPlacingOrder = false;
                         if (placeOrderBtn) {
                             placeOrderBtn.disabled = false;
                             placeOrderBtn.textContent = 'Place Order';
@@ -861,6 +880,7 @@
                     }
                 } else if (paymentMethod === 'paypal') {
                     // PayPal - redirect to PayPal (not implemented yet)
+                    isPlacingOrder = false;
                     showToast('PayPal integration coming soon', 'warning');
                     if (placeOrderBtn) {
                         placeOrderBtn.disabled = false;
@@ -870,6 +890,7 @@
                     return;
                 } else if (paymentMethod === 'apple') {
                     // Apple Pay - not implemented yet
+                    isPlacingOrder = false;
                     showToast('Apple Pay integration coming soon', 'warning');
                     if (placeOrderBtn) {
                         placeOrderBtn.disabled = false;
@@ -879,6 +900,7 @@
                     return;
                 } else {
                     // No payment method selected
+                    isPlacingOrder = false;
                     showToast('Please select a payment method', 'error');
                     if (placeOrderBtn) {
                         placeOrderBtn.disabled = false;
@@ -900,7 +922,7 @@
                             month: 'long',
                             day: 'numeric'
                         }),
-                        status: 'Processing',
+                        status: 'processing',
                         items: cart.map((item) => ({
                             title: item.title,
                             image: item.image || 'product-1.png',

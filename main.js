@@ -2,6 +2,16 @@
 // 1 HUNDRED - Main JavaScript
 // ========================================
 
+// Debug utility - only logs in development (defined early so all code can use it)
+const DEBUG = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app'));
+window.debugLog = function (...args) {
+    if (DEBUG) console.log(...args);
+};
+window.debugError = function (...args) {
+    if (DEBUG) console.error(...args);
+};
+
 // Use shared utilities if available
 const U =
     typeof Utils !== 'undefined'
@@ -275,7 +285,13 @@ function toggleCart(open) {
 // ========================================
 
 function addToCart(productId, size, color, quantity = 1) {
+    // Validate inputs
+    productId = Number(productId);
+    if (!Number.isFinite(productId)) return;
     quantity = Math.max(1, Math.floor(Number(quantity) || 1));
+    size = String(size || '').slice(0, 20);
+    color = String(color || '').slice(0, 30);
+
     const product = products.find((p) => p.id === productId);
     if (!product) return;
 
@@ -408,12 +424,43 @@ function updateBadges() {
     });
 }
 
+// Set up event delegation for mini cart once (avoids duplicate listeners)
+let miniCartDelegationSetup = false;
+function setupMiniCartDelegation() {
+    if (miniCartDelegationSetup) return;
+    const container = document.getElementById('mini-cart-items');
+    if (!container) return;
+    miniCartDelegationSetup = true;
+
+    container.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-id]');
+        if (!btn) return;
+
+        const id = parseInt(btn.dataset.id);
+        const size = btn.dataset.size;
+        const color = btn.dataset.color;
+
+        if (btn.classList.contains('cart-qty-minus')) {
+            const item = state.cart.find((i) => i.id === id && i.size === size && i.color === color);
+            if (item) updateCartQuantity(id, size, color, item.quantity - 1);
+        } else if (btn.classList.contains('cart-qty-plus')) {
+            const item = state.cart.find((i) => i.id === id && i.size === size && i.color === color);
+            if (item) updateCartQuantity(id, size, color, item.quantity + 1);
+        } else if (btn.classList.contains('cart-remove')) {
+            removeFromCart(id, size, color);
+        }
+    });
+}
+
 function renderMiniCart() {
     const container = document.getElementById('mini-cart-items');
     const subtotalEl = document.getElementById('mini-cart-subtotal');
     const countEl = document.getElementById('mini-cart-count');
 
     if (!container) return;
+
+    // Set up event delegation once
+    setupMiniCartDelegation();
 
     if (!state.cart || state.cart.length === 0) {
         container.innerHTML = `
@@ -439,52 +486,22 @@ function renderMiniCart() {
                 <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-start gap-2">
                         <h4 class="font-bold text-sm uppercase truncate">${safeTitle}</h4>
-                        <span class="font-bold text-sm">£${item.price.toFixed(2)}</span>
+                        <span class="font-bold text-sm">${U.formatPrice(item.price)}</span>
                     </div>
                     <p class="text-xs text-gray-500 mt-1">${safeColor} | ${safeSize}</p>
                     <div class="flex items-center justify-between mt-2">
                         <div class="flex items-center border border-gray-200 rounded">
-                            <button class="px-2 py-1 text-xs hover:bg-gray-100 cart-qty-minus" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}">-</button>
+                            <button class="px-2 py-1 text-xs hover:bg-gray-100 cart-qty-minus" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}" aria-label="Decrease quantity">-</button>
                             <span class="px-2 text-xs font-bold">${item.quantity}</span>
-                            <button class="px-2 py-1 text-xs hover:bg-gray-100 cart-qty-plus" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}">+</button>
+                            <button class="px-2 py-1 text-xs hover:bg-gray-100 cart-qty-plus" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}" aria-label="Increase quantity">+</button>
                         </div>
-                        <button class="text-xs text-gray-400 underline hover:text-red-500 cart-remove" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}">Remove</button>
+                        <button class="text-xs text-gray-400 underline hover:text-red-500 cart-remove" data-id="${item.id}" data-size="${safeSize}" data-color="${safeColor}" aria-label="Remove ${safeTitle}">Remove</button>
                     </div>
                 </div>
             </div>
         `;
             })
             .join('');
-
-        // Add event listeners for cart actions (CSP-compatible)
-        container.querySelectorAll('.cart-qty-minus').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const id = parseInt(btn.dataset.id);
-                const size = btn.dataset.size;
-                const color = btn.dataset.color;
-                const item = state.cart.find((i) => i.id === id && i.size === size && i.color === color);
-                if (item) updateCartQuantity(id, size, color, item.quantity - 1);
-            });
-        });
-
-        container.querySelectorAll('.cart-qty-plus').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const id = parseInt(btn.dataset.id);
-                const size = btn.dataset.size;
-                const color = btn.dataset.color;
-                const item = state.cart.find((i) => i.id === id && i.size === size && i.color === color);
-                if (item) updateCartQuantity(id, size, color, item.quantity + 1);
-            });
-        });
-
-        container.querySelectorAll('.cart-remove').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const id = parseInt(btn.dataset.id);
-                const size = btn.dataset.size;
-                const color = btn.dataset.color;
-                removeFromCart(id, size, color);
-            });
-        });
     }
 
     if (subtotalEl) subtotalEl.textContent = `£${getCartTotal().toFixed(2)}`;
@@ -536,7 +553,10 @@ function openQuickView(productId) {
     const qvPrice = document.getElementById('qv-price');
     const qvCategory = document.getElementById('qv-category');
 
-    if (qvImage) qvImage.src = primaryImage;
+    if (qvImage) {
+        qvImage.src = primaryImage;
+        qvImage.alt = product.title;
+    }
     if (qvTitle) qvTitle.textContent = product.title;
     if (qvPrice) qvPrice.textContent = U.formatPrice(product.price);
     if (qvCategory) qvCategory.textContent = product.category;
@@ -622,7 +642,13 @@ async function initQVApplePay(product) {
 
     try {
         if (!StripeService.stripe) {
-            const configResponse = await fetch('/api/stripe-config');
+            let configResponse;
+            try {
+                configResponse = await fetch('/api/stripe-config');
+            } catch (fetchErr) {
+                return; // Network error — silently skip Apple Pay
+            }
+            if (!configResponse.ok) return;
             const config = await configResponse.json();
             if (config.success && config.data?.publishableKey) {
                 await StripeService.init(config.data.publishableKey);
@@ -765,10 +791,12 @@ function showError(elementId, message = 'Something went wrong. Please try again.
         element.innerHTML = `
             <div class="flex flex-col items-center justify-center py-12 text-center">
                 <i data-lucide="alert-circle" class="w-12 h-12 text-red-500 mb-4"></i>
-                <p class="text-gray-600 mb-4">${message}</p>
-                <button onclick="location.reload()" class="btn btn-primary">Retry</button>
+                <p class="text-gray-600 mb-4">${U.sanitizeHTML(message)}</p>
+                <button class="btn btn-primary" id="error-retry-btn">Retry</button>
             </div>
         `;
+        const retryBtn = element.querySelector('#error-retry-btn');
+        if (retryBtn) retryBtn.addEventListener('click', () => location.reload());
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 }
@@ -930,15 +958,6 @@ window.addEventListener('unhandledrejection', (e) => {
     console.error('Unhandled promise rejection:', e.reason);
     showToast('Network error. Please check your connection.', 'error', 5000);
 });
-
-// Debug utility - only logs in development
-const DEBUG = window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app');
-window.debugLog = function (...args) {
-    if (DEBUG) console.log(...args);
-};
-window.debugError = function (...args) {
-    if (DEBUG) console.error(...args);
-};
 
 // Expose functions globally
 window.addToCart = addToCart;

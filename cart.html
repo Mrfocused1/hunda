@@ -16,7 +16,7 @@
         <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
             rel="stylesheet" />
-        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://unpkg.com/lucide@0.469.0"></script>
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body class="antialiased">
@@ -311,18 +311,19 @@
         <script src="auth.js"></script>
         <script>
             const recommendedProducts = [
-                { id: 3, title: '1H Star Cap', price: 30, image: 'product-3.png', category: 'Hats' },
-                { id: 6, title: '1H Multi Colour Cap', price: 30, image: 'product-6.jpeg', category: 'Hats' },
+                { id: 3, title: '1H Star Cap', price: 30, image: 'product-3.png', category: 'hats' },
+                { id: 6, title: '1H Multi Colour Cap', price: 30, image: 'product-6.jpeg', category: 'hats' },
                 {
                     id: 7,
                     title: 'Relentless Trophy Tee',
                     price: 40,
                     image: 'product-relentless-front.png',
-                    category: 'T-Shirts'
+                    category: 't-shirts'
                 }
             ];
 
-            let discount = 0;
+            // Restore discount from localStorage if previously applied
+            let discount = parseFloat(localStorage.getItem('1hundred_checkout_discount') || '0');
 
             function renderCartPage() {
                 const container = document.getElementById('cart-items-container');
@@ -382,7 +383,9 @@
 
             function updateSummary() {
                 const subtotal = getCartTotal();
-                const shipping = subtotal >= 50 ? 0 : 4.99;
+                const shippingThreshold = (typeof Utils !== 'undefined' && Utils.config) ? Utils.config.FREE_SHIPPING_THRESHOLD : 50;
+                const shippingCost = (typeof Utils !== 'undefined' && Utils.config) ? Utils.config.SHIPPING_COST : 4.99;
+                const shipping = subtotal >= shippingThreshold ? 0 : shippingCost;
                 const total = Math.max(0, subtotal + shipping - discount);
 
                 const summarySubtotal = document.getElementById('summary-subtotal');
@@ -401,9 +404,28 @@
                 }
             }
 
+            let promoAttempts = 0;
+            let promoLockoutUntil = 0;
+            const maxPromoAttempts = 5;
+            const promoLockoutMs = 60000; // 1 minute cooldown
             function applyPromo() {
                 const input = document.getElementById('promo-input');
                 const message = document.getElementById('promo-message');
+
+                // Check if in cooldown period
+                if (promoAttempts >= maxPromoAttempts) {
+                    const now = Date.now();
+                    if (now < promoLockoutUntil) {
+                        const secsLeft = Math.ceil((promoLockoutUntil - now) / 1000);
+                        message.textContent = `Too many attempts. Try again in ${secsLeft}s.`;
+                        message.className = 'text-sm mt-2 text-red-500';
+                        message.classList.remove('hidden');
+                        return;
+                    }
+                    // Cooldown expired — reset attempts
+                    promoAttempts = 0;
+                }
+
                 const code = input.value.trim().toUpperCase();
                 const subtotal = getCartTotal();
 
@@ -423,6 +445,10 @@
                     discountAmount = Math.min(20, subtotal);
                     discountMsg = '£20 discount applied!';
                 } else {
+                    promoAttempts++;
+                    if (promoAttempts >= maxPromoAttempts) {
+                        promoLockoutUntil = Date.now() + promoLockoutMs;
+                    }
                     message.textContent = 'Invalid promo code';
                     message.className = 'text-sm mt-2 text-red-500';
                     message.classList.remove('hidden');
@@ -438,7 +464,9 @@
             }
 
             function renderRecommended() {
-                document.getElementById('recommended-products').innerHTML = recommendedProducts
+                const recContainer = document.getElementById('recommended-products');
+                if (!recContainer) return;
+                recContainer.innerHTML = recommendedProducts
                     .map((p) => {
                         // Get primary image (support both old single image and new images array)
                         let pImage = 'product-1.png';

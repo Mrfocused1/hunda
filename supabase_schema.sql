@@ -28,13 +28,23 @@ ON products FOR SELECT
 TO anon, authenticated 
 USING (true);
 
--- Create policy to allow all operations (for development)
--- In production, you should restrict this to authenticated admin users only
-CREATE POLICY "Allow public write access" 
-ON products FOR ALL 
-TO anon, authenticated 
-USING (true) 
-WITH CHECK (true);
+-- Write access restricted to authenticated users with admin role
+-- To grant admin: UPDATE auth.users SET raw_app_meta_data = raw_app_meta_data || '{"role": "admin"}' WHERE email = 'your-admin@email.com';
+CREATE POLICY "Allow admin write access"
+ON products FOR INSERT
+TO authenticated
+WITH CHECK ((auth.jwt()->'app_metadata'->>'role') = 'admin');
+
+CREATE POLICY "Allow admin update access"
+ON products FOR UPDATE
+TO authenticated
+USING ((auth.jwt()->'app_metadata'->>'role') = 'admin')
+WITH CHECK ((auth.jwt()->'app_metadata'->>'role') = 'admin');
+
+CREATE POLICY "Allow admin delete access"
+ON products FOR DELETE
+TO authenticated
+USING ((auth.jwt()->'app_metadata'->>'role') = 'admin');
 
 -- Insert sample products (matches your current hardcoded products)
 INSERT INTO products (id, title, price, category, images, image, stock, description, sizes, colors) 

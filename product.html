@@ -28,7 +28,7 @@
         <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
             rel="stylesheet" />
-        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://unpkg.com/lucide@0.469.0"></script>
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body class="antialiased">
@@ -355,6 +355,7 @@
                     price: 30,
                     category: 'hats',
                     image: 'product-3.png',
+                    images: ['product-3.png'],
                     sizes: ['One Size'],
                     colors: ['White/Black'],
                     description: `1H Star Cap (Black & White)\n\nA refined essential, the 1H Star Cap is defined by contrast, structure, and intent. Rendered in a distressed black and white finish, the design carries a worn-in character that speaks to experience, not excess.\n\nThe front is anchored by the signature 1H star emblem, a symbol of commitment at the highest level. Clean yet commanding, it reflects a mindset built on discipline and consistency.\n\nAt the back, the statement "No Half Measures" is subtly placed—reinforcing the philosophy behind the piece. Every detail is deliberate, from the curved brim to the structured crown, balancing durability with a sharp, elevated silhouette.\n\nUnderstated. Focused. Uncompromising.\n\nAll or nothing.`
@@ -365,6 +366,7 @@
                     price: 85,
                     category: 'hoodies',
                     image: 'product-4.jpeg',
+                    images: ['product-4.jpeg'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Black'],
                     description: `The No Half Measures Hoodie\n\nThe No Half Measures Hoodie is a study in precision and intent. Rendered in deep black with a subtle tonal pattern, the piece is defined by its layered composition—balancing restraint with quiet complexity.\n\nA collage of monochrome portrait graphics introduces a raw, expressive edge, contrasted by the structured 1H insignia, a symbol of total commitment. Minimal text detailing reinforces the philosophy: nothing partial, nothing diluted.\n\nRefined embellishments are placed with purpose, adding texture without excess. The silhouette remains clean and controlled, offering a relaxed fit that moves effortlessly between statement and staple.\n\nEvery element is considered. Nothing is accidental.\n\nAll in. Always.`
@@ -375,6 +377,7 @@
                     price: 85,
                     category: 'hoodies',
                     image: 'product-5.jpeg',
+                    images: ['product-5.jpeg'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Blue'],
                     description: `A refined expression of intent, the Endless Possibilities Hoodie is defined by its balance of structure and ease. Crafted in a washed blue finish, the silhouette is relaxed yet precise, offering a quiet sense of presence.\n\nThe signature 1H mark anchors the piece, while subtle text detailing speaks to a mindset of limitless direction. Studded accents introduce a restrained edge, complementing the garment's considered construction and tactile depth.\n\nUnderstated yet deliberate, this piece moves beyond trend—designed for those who operate with clarity and purpose.\n\nWithout limits.`
@@ -385,6 +388,7 @@
                     price: 30,
                     category: 'hats',
                     image: 'product-6.jpeg',
+                    images: ['product-6.jpeg'],
                     sizes: ['One Size'],
                     colors: ['White/Black'],
                     description:
@@ -394,12 +398,25 @@
                     id: 7,
                     title: 'Relentless Trophy Tee',
                     price: 40,
-                    category: 'T-Shirts',
+                    category: 't-shirts',
                     image: 'product-relentless-front.png',
+                    images: ['product-relentless-front.png', 'product-relentless-back.png'],
                     sizes: ['S', 'M', 'L', 'XL'],
                     colors: ['Grey'],
                     description:
                         'The Relentless Trophy Tee distills discipline into design. A monochrome composition of a faceless, armored figure holding its reward—symbolizing victory earned through persistence, not chance.\n\nRefined, understated, and intentional, this piece speaks to those who pursue excellence without compromise.\n\nEarned. Never given.'
+                },
+                {
+                    id: 9,
+                    title: '100MPH Tee',
+                    price: 40,
+                    category: 't-shirts',
+                    image: 'product-100mph-front.png',
+                    images: ['product-100mph-front.png'],
+                    sizes: ['S', 'M', 'L', 'XL'],
+                    colors: ['Black'],
+                    stock: 30,
+                    description: "Push the pedal down and don't look back. The 100MPH Tee is built for those who live life at full throttle — where hesitation isn't an option and momentum is everything. Featuring a bold, high-contrast graphic across the chest, this piece captures the raw intensity of speed from a driver's perspective."
                 }
             ];
 
@@ -516,6 +533,39 @@
                 // Select defaults
                 selectColor(currentProduct.colors[0], document.querySelector('.color-swatch'));
 
+                // Auto-select size if only one option
+                if (currentProduct.sizes && currentProduct.sizes.length === 1) {
+                    const sizeBtn = document.querySelector('#size-options .size-option');
+                    if (sizeBtn) selectSize(currentProduct.sizes[0], sizeBtn);
+                }
+
+                // Inject JSON-LD structured data for SEO
+                const jsonLd = {
+                    '@context': 'https://schema.org',
+                    '@type': 'Product',
+                    name: currentProduct.title,
+                    description: (currentProduct.description || '').substring(0, 500),
+                    image: `${window.location.origin}/${primaryImage}`,
+                    brand: { '@type': 'Brand', name: '1 HUNDRED' },
+                    offers: {
+                        '@type': 'Offer',
+                        priceCurrency: 'GBP',
+                        price: currentProduct.price.toFixed(2),
+                        availability: (currentProduct.stock == null || currentProduct.stock > 0)
+                            ? 'https://schema.org/InStock'
+                            : 'https://schema.org/OutOfStock',
+                        url: window.location.href
+                    }
+                };
+                let ldScript = document.getElementById('product-jsonld');
+                if (!ldScript) {
+                    ldScript = document.createElement('script');
+                    ldScript.type = 'application/ld+json';
+                    ldScript.id = 'product-jsonld';
+                    document.head.appendChild(ldScript);
+                }
+                ldScript.textContent = JSON.stringify(jsonLd);
+
                 // Render related products
                 renderRelatedProducts();
 
@@ -544,13 +594,15 @@
 
             function selectSize(size, btn) {
                 selectedSize = size;
-                document.getElementById('size-error').classList.add('hidden');
+                const sizeError = document.getElementById('size-error');
+                if (sizeError) sizeError.classList.add('hidden');
                 document.querySelectorAll('#size-options .size-option').forEach((b) => b.classList.remove('active'));
-                btn.classList.add('active');
+                if (btn) btn.classList.add('active');
             }
 
             function updateQuantity(change) {
-                quantity = Math.max(1, Math.min(10, quantity + change));
+                const maxStock = currentProduct?.stock != null ? Math.min(currentProduct.stock, 10) : 10;
+                quantity = Math.max(1, Math.min(maxStock, quantity + change));
                 document.getElementById('quantity').value = quantity;
             }
 
@@ -570,8 +622,10 @@
             }
 
             function renderRelatedProducts() {
+                const relatedContainer = document.getElementById('related-products');
+                if (!relatedContainer) return;
                 const related = allProducts.filter((p) => p.id !== currentProduct.id).slice(0, 4);
-                document.getElementById('related-products').innerHTML = related
+                relatedContainer.innerHTML = related
                     .map((p) => {
                         // Get primary image (support both old single image and new images array)
                         let pImage = 'product-1.png';

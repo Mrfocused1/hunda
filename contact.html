@@ -19,7 +19,7 @@
         <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
             rel="stylesheet" />
-        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://unpkg.com/lucide@0.469.0"></script>
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body class="antialiased">
@@ -502,8 +502,12 @@
                         const toastMsg = document.getElementById('toast-msg');
                         if (toast && toastMsg) {
                             toastMsg.textContent = 'Message sent successfully!';
-                            toast.classList.add('visible');
-                            setTimeout(() => toast.classList.remove('visible'), 5000);
+                            toast.style.display = 'flex';
+                            toast.classList.add('show');
+                            setTimeout(() => {
+                                toast.classList.remove('show');
+                                setTimeout(() => { toast.style.display = 'none'; }, 300);
+                            }, 5000);
                         }
 
                         // Reset form

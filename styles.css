@@ -8,9 +8,11 @@
     --brand-grey: #f8f8f8;
     --brand-mid-grey: #999;
     --brand-light-grey: #e5e7eb;
-    --electric-blue: #111;
     --white: #fff;
     --red: #ef4444;
+    --border-light: #f3f4f6;
+    --surface-light: #f1f1f1;
+    --text-dark: #333;
 }
 
 /* Skip Navigation Link for Accessibility */
@@ -18,8 +20,8 @@
     position: absolute;
     top: -40px;
     left: 0;
-    background: #000;
-    color: #fff;
+    background: var(--brand-black);
+    color: var(--white);
     padding: 8px 16px;
     z-index: 9999;
     text-decoration: none;
@@ -34,7 +36,7 @@
 
 /* Focus Visible Styles for Accessibility */
 :focus-visible {
-    outline: 2px solid #000;
+    outline: 2px solid var(--brand-black);
     outline-offset: 2px;
 }
 
@@ -43,7 +45,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 2px solid #000;
+    outline: 2px solid var(--brand-black);
     outline-offset: 2px;
     box-shadow: 0 0 0 4px rgb(0 0 0 / 10%);
 }
@@ -227,7 +229,7 @@ body {
     left: 0;
     width: 800px;
     background: var(--white);
-    border: 1px solid #f3f4f6;
+    border: 1px solid var(--border-light);
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 15%);
     padding: 2rem;
     opacity: 0;
@@ -287,7 +289,7 @@ body {
     max-width: 360px;
     height: 100vh;
     background: var(--white);
-    z-index: 50;
+    z-index: 55;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     overflow-y: auto;
@@ -656,11 +658,11 @@ body {
     z-index: 10;
     cursor: pointer;
     border: none;
-    color: #111;
+    color: var(--brand-black);
 }
 
 .image-nav-arrow:hover {
-    background: #fff;
+    background: var(--white);
     transform: translateY(-50%) scale(1.1);
 }
 
@@ -701,7 +703,7 @@ body {
 }
 
 .image-dot.active {
-    background: #fff;
+    background: var(--white);
     transform: scale(1.2);
 }
 
@@ -723,11 +725,11 @@ body {
     z-index: 10;
     cursor: pointer;
     border: none;
-    color: #111;
+    color: var(--brand-black);
 }
 
 .featured-nav-arrow:hover {
-    background: #fff;
+    background: var(--white);
     transform: translateY(-50%) scale(1.1);
 }
 
@@ -763,7 +765,7 @@ body {
 }
 
 .featured-dot.active {
-    background: #111;
+    background: var(--brand-black);
     transform: scale(1.25);
 }
 
@@ -1797,7 +1799,7 @@ body {
 }
 
 .size-error .size-option {
-    border-color: #dc2626 !important;
+    border-color: var(--red) !important;
     background-color: rgb(254 226 226) !important;
     box-shadow: 0 0 0 2px rgb(220 38 38 / 30%);
 }

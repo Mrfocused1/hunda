@@ -42,7 +42,7 @@ const StripeService = {
     },
 
     // Create payment intent on server
-    async createPaymentIntent(amount, metadata = {}) {
+    async createPaymentIntent(amount, metadata = {}, cartItems = []) {
         try {
             const response = await fetch('/api/create-payment-intent', {
                 method: 'POST',
@@ -52,11 +52,17 @@ const StripeService = {
                 body: JSON.stringify({
                     amount: amount,
                     currency: 'gbp',
-                    metadata: metadata
+                    metadata: metadata,
+                    items: cartItems
                 })
             });
 
-            const data = await response.json();
+            let data;
+            try {
+                data = await response.json();
+            } catch (parseErr) {
+                throw new Error('Invalid response from payment server');
+            }
 
             if (!response.ok) {
                 throw new Error(data.error || 'Failed to create payment intent');
@@ -242,11 +248,11 @@ const StripeService = {
                 orders.unshift({
                     id: orderNumber,
                     date: new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }),
-                    status: 'Processing',
+                    status: 'processing',
                     items: [{ title: label, price: amount, quantity: quantity, size: size, color: color }],
-                    total: amount * quantity,
+                    total: amount,
                     email: ev.payerEmail,
-                    customer: ev.payerName
+                    customer: ev.payerName || 'Customer'
                 });
                 localStorage.setItem('1hundred_orders', JSON.stringify(orders));
             } catch (err) {

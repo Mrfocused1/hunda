@@ -53,7 +53,15 @@ const Auth = (function () {
     function getStoredUsers() {
         const stored = localStorage.getItem(USERS_KEY);
         if (stored) {
-            const users = JSON.parse(stored);
+            let users;
+            try {
+                users = JSON.parse(stored);
+            } catch (e) {
+                debugError('Corrupted user data in localStorage, resetting');
+                localStorage.removeItem(USERS_KEY);
+                return [...demoUsers];
+            }
+            if (!Array.isArray(users)) return [...demoUsers];
             // Check if users have hashed passwords (migration)
             return users.map((u) => {
                 // Detect if password is hashed (64 hex chars for SHA-256) or base64 encoded

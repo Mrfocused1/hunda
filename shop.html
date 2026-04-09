@@ -33,7 +33,7 @@
         <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
             rel="stylesheet" />
-        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://unpkg.com/lucide@0.469.0"></script>
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body class="antialiased">
@@ -689,7 +689,8 @@
 
                 if (search) {
                     currentFilters.search = search;
-                    document.getElementById('search-input').value = search;
+                    const searchInput = document.getElementById('search-input');
+                    if (searchInput) searchInput.value = search;
                 }
 
                 updateSearchIndicator();
@@ -712,8 +713,8 @@
             // Render products
             function renderProducts() {
                 let filtered = allProducts.filter((p) => {
-                    // Category filter
-                    if (currentFilters.categories.length > 0 && !currentFilters.categories.includes(p.category)) {
+                    // Category filter (case-insensitive)
+                    if (currentFilters.categories.length > 0 && !currentFilters.categories.some((c) => c.toLowerCase() === (p.category || '').toLowerCase())) {
                         return false;
                     }
                     // Size filter
@@ -730,7 +731,7 @@
                         const inRange = currentFilters.priceRanges.some((range) => {
                             if (range === '0-35') return price < 35;
                             if (range === '35-50') return price >= 35 && price <= 50;
-                            if (range === '50+') return price > 50;
+                            if (range === '50+') return price >= 50;
                             return true;
                         });
                         if (!inRange) return false;
@@ -756,7 +757,8 @@
                     filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
                 }
 
-                document.getElementById('product-count').textContent = filtered.length;
+                const productCountEl = document.getElementById('product-count');
+                if (productCountEl) productCountEl.textContent = filtered.length;
 
                 const container = document.getElementById('product-grid');
                 if (filtered.length === 0) {
@@ -801,10 +803,10 @@
                             const hasMultipleImages = allImages.length > 1;
                             const navArrows = hasMultipleImages
                                 ? `
-                                <button class="image-nav-arrow image-nav-prev" data-product-id="${product.id}" title="Previous image">
+                                <button class="image-nav-arrow image-nav-prev" data-product-id="${product.id}" title="Previous image" aria-label="Previous image for ${product.title}">
                                     <i data-lucide="chevron-left" class="w-5 h-5"></i>
                                 </button>
-                                <button class="image-nav-arrow image-nav-next" data-product-id="${product.id}" title="Next image">
+                                <button class="image-nav-arrow image-nav-next" data-product-id="${product.id}" title="Next image" aria-label="Next image for ${product.title}">
                                     <i data-lucide="chevron-right" class="w-5 h-5"></i>
                                 </button>
                                 <div class="image-nav-dots">${allImages.map((_, i) => `<span class="image-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}</div>
@@ -916,19 +918,23 @@
                     renderProducts();
                 });
 
-                // Search input
+                // Search input (debounced to avoid excessive re-renders)
+                let searchDebounceTimer = null;
                 document.getElementById('search-input')?.addEventListener('input', (e) => {
-                    currentFilters.search = e.target.value;
-                    updateSearchIndicator();
-                    renderProducts();
-                    // Update URL
-                    const url = new URL(window.location);
-                    if (e.target.value) {
-                        url.searchParams.set('q', e.target.value);
-                    } else {
-                        url.searchParams.delete('q');
-                    }
-                    window.history.replaceState({}, '', url);
+                    clearTimeout(searchDebounceTimer);
+                    searchDebounceTimer = setTimeout(() => {
+                        currentFilters.search = e.target.value;
+                        updateSearchIndicator();
+                        renderProducts();
+                        // Update URL
+                        const url = new URL(window.location);
+                        if (e.target.value) {
+                            url.searchParams.set('q', e.target.value);
+                        } else {
+                            url.searchParams.delete('q');
+                        }
+                        window.history.replaceState({}, '', url);
+                    }, 300);
                 });
             }
 
@@ -1212,6 +1218,9 @@
                         modal.classList.remove('scale-100', 'opacity-100');
                         overlay.classList.add('invisible', 'opacity-0');
                         document.body.style.overflow = '';
+                        // Reset size selection so it doesn't persist to next product
+                        modal.dataset.selectedSize = '';
+                        modal.dataset.productId = '';
                     }
                 };
 

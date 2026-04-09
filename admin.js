@@ -9,6 +9,27 @@
  * - Data export/import
  */
 
+// Ensure showToast is available (may not be if main.js isn't loaded on admin page)
+if (typeof showToast === 'undefined') {
+    window.showToast = function (message, type = 'info') {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        if (toast && toastMsg) {
+            toastMsg.textContent = message;
+            toast.style.display = 'flex';
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { toast.style.display = 'none'; }, 300);
+            }, 3000);
+        }
+    };
+}
+
+// Ensure debug functions exist
+if (typeof window.debugLog !== 'function') window.debugLog = function () {};
+if (typeof window.debugError !== 'function') window.debugError = function () {};
+
 // Fallback products (used when Supabase is not available)
 let adminProducts = [
     {
@@ -162,15 +183,50 @@ const AdminData = {
         return adminProducts;
     },
 
+    // Validate product data before saving
+    validateProduct: function (product) {
+        if (!product.title || typeof product.title !== 'string' || product.title.trim().length === 0) {
+            return 'Product title is required';
+        }
+        if (product.title.length > 200) {
+            return 'Product title is too long (max 200 characters)';
+        }
+        const price = parseFloat(product.price);
+        if (!Number.isFinite(price) || price < 0 || price > 10000) {
+            return 'Price must be between 0 and 10,000';
+        }
+        if (product.stock !== undefined && product.stock !== null) {
+            const stock = parseInt(product.stock);
+            if (!Number.isFinite(stock) || stock < 0) {
+                return 'Stock must be a non-negative number';
+            }
+        }
+        if (product.description && product.description.length > 5000) {
+            return 'Description is too long (max 5000 characters)';
+        }
+        return null;
+    },
+
     // Save products - saves to Supabase if available
     saveProducts: async function (products) {
+        // Validate all products before saving
+        for (const product of products) {
+            const validationError = this.validateProduct(product);
+            if (validationError) {
+                if (typeof showToast === 'function') {
+                    showToast(`${product.title || 'Product'}: ${validationError}`, 'error');
+                }
+                return;
+            }
+        }
+
         if (useSupabase && typeof ProductAPI !== 'undefined') {
             // Sync each product to Supabase
             for (const product of products) {
                 if (product.id) {
                     const { error } = await ProductAPI.update(product.id, product);
                     if (error) {
-                        // Failed to save product
+                        debugError('Failed to save product:', product.title, error);
                     }
                 }
             }
@@ -179,7 +235,6 @@ const AdminData = {
         } else {
             // Fallback: just update local cache
             adminProducts = [...products];
-            // Products saved locally (Supabase not available)
         }
     },
 
@@ -958,11 +1013,11 @@ function renderOrders() {
 
     grid.innerHTML = orders
         .map((order) => {
-            const initials = order.customer
+            const initials = (order.customer || 'U')
                 .split(' ')
-                .map((n) => n[0])
+                .map((n) => n[0] || '')
                 .join('')
-                .toUpperCase();
+                .toUpperCase() || 'U';
             const date = new Date(order.date).toLocaleDateString('en-GB', {
                 day: 'numeric',
                 month: 'short',
@@ -993,13 +1048,13 @@ function renderOrders() {
                     <div class="order-card-avatar">${initials}</div>
                     <div class="order-card-customer-info">
                         <div class="order-card-customer-name">${order.customer}</div>
-                        <div class="order-card-customer-email">${order.email || order.customer.toLowerCase().replace(' ', '.') + '@email.com'}</div>
+                        <div class="order-card-customer-email">${order.email || (order.customer || 'unknown').toLowerCase().replace(' ', '.') + '@email.com'}</div>
                     </div>
                 </div>
                 
                 <div class="order-card-footer">
-                    <span class="order-card-total">£${order.total.toFixed(2)}</span>
-                    <span style="font-size: 0.8125rem; color: #6b7280;">${order.items} items</span>
+                    <span class="order-card-total">£${(order.total || 0).toFixed(2)}</span>
+                    <span style="font-size: 0.8125rem; color: #6b7280;">${Array.isArray(order.items) ? order.items.length : (order.items || 0)} items</span>
                 </div>
             </div>
         `;
@@ -1071,8 +1126,11 @@ function viewOrder(orderId) {
     const orders = AdminData.getOrders();
     const order = orders.find((o) => o.id === orderId);
     if (order) {
+        const itemsList = Array.isArray(order.items)
+            ? order.items.map((i) => `${i.title || 'Item'} x${i.quantity || 1} - £${(i.price || 0).toFixed ? i.price.toFixed(2) : i.price}`).join('\n')
+            : 'N/A';
         alert(
-            `Order Details:\n\nID: ${order.id}\nCustomer: ${order.customer}\nEmail: ${order.email || 'N/A'}\nTotal: £${order.total.toFixed(2)}\nStatus: ${order.status}\n\nItems:\n${order.itemsList?.join('\n') || 'N/A'}`
+            `Order Details:\n\nID: ${order.id}\nCustomer: ${order.customer || 'N/A'}\nEmail: ${order.email || 'N/A'}\nTotal: £${(order.total || 0).toFixed(2)}\nStatus: ${order.status || 'N/A'}\n\nItems:\n${itemsList}`
         );
     }
 }
@@ -1084,12 +1142,12 @@ function exportOrders() {
         ...orders.map((o) =>
             [
                 o.id,
-                o.customer,
+                `"${(o.customer || '').replace(/"/g, '""')}"`,
                 o.email || '',
-                new Date(o.date).toISOString().split('T')[0],
-                o.total.toFixed(2),
-                o.items,
-                o.status
+                o.date ? new Date(o.date).toISOString().split('T')[0] : '',
+                (o.total || 0).toFixed(2),
+                Array.isArray(o.items) ? o.items.length : (o.items || 0),
+                o.status || ''
             ].join(',')
         )
     ].join('\n');
@@ -1146,9 +1204,9 @@ function getFilteredCustomers() {
         const term = customerSearchTerm.toLowerCase();
         filtered = filtered.filter(
             (c) =>
-                c.firstName.toLowerCase().includes(term) ||
-                c.lastName.toLowerCase().includes(term) ||
-                c.email.toLowerCase().includes(term)
+                (c.firstName || '').toLowerCase().includes(term) ||
+                (c.lastName || '').toLowerCase().includes(term) ||
+                (c.email || '').toLowerCase().includes(term)
         );
     }
 
@@ -1225,11 +1283,11 @@ function renderCustomers() {
                         <div class="customer-stat-label">Orders</div>
                     </div>
                     <div class="customer-stat">
-                        <div class="customer-stat-value">£${customer.totalSpent.toFixed(0)}</div>
+                        <div class="customer-stat-value">£${(customer.totalSpent || 0).toFixed(0)}</div>
                         <div class="customer-stat-label">Spent</div>
                     </div>
                     <div class="customer-stat">
-                        <div class="customer-stat-value">£${(customer.orders > 0 ? customer.totalSpent / customer.orders : 0).toFixed(0)}</div>
+                        <div class="customer-stat-value">£${(customer.orders > 0 ? (customer.totalSpent || 0) / customer.orders : 0).toFixed(0)}</div>
                         <div class="customer-stat-label">AOV</div>
                     </div>
                 </div>

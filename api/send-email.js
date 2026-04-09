@@ -12,6 +12,19 @@ function createResponse(success, data = null, error = null, statusCode = 200) {
     return { response, statusCode };
 }
 
+// Simple in-memory rate limiter (per serverless instance)
+const rateLimitMap = new Map();
+function checkRateLimit(ip, maxRequests = 10, windowMs = 60000) {
+    const now = Date.now();
+    const entry = rateLimitMap.get(ip);
+    if (!entry || now - entry.start > windowMs) {
+        rateLimitMap.set(ip, { start: now, count: 1 });
+        return true;
+    }
+    entry.count++;
+    return entry.count <= maxRequests;
+}
+
 // Escape HTML to prevent XSS in email templates
 function escapeHtml(text) {
     if (typeof text !== 'string') return '';
@@ -23,9 +36,33 @@ function escapeHtml(text) {
         .replace(/'/g, '&#039;');
 }
 
+// CSRF protection: verify request origin
+function validateOrigin(req) {
+    const origin = req.headers['origin'];
+    const referer = req.headers['referer'];
+    const allowed = ['https://www.1hundredornothing.co.uk', 'https://1hundredornothing.co.uk', 'http://localhost:3000'];
+    if (origin && allowed.some((a) => origin.startsWith(a))) return true;
+    if (referer && allowed.some((a) => referer.startsWith(a))) return true;
+    if (!origin && !referer) return true;
+    return false;
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         const { response, statusCode } = createResponse(false, null, 'Method not allowed', 405);
+        return res.status(statusCode).json(response);
+    }
+
+    // CSRF: reject cross-origin requests
+    if (!validateOrigin(req)) {
+        const { response, statusCode } = createResponse(false, null, 'Forbidden', 403);
+        return res.status(statusCode).json(response);
+    }
+
+    // Rate limiting
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    if (!checkRateLimit(clientIp)) {
+        const { response, statusCode } = createResponse(false, null, 'Too many requests. Please try again later.', 429);
         return res.status(statusCode).json(response);
     }
 
@@ -53,11 +90,12 @@ export default async function handler(req, res) {
     // Get email template based on type (with sanitized data)
     const template = getEmailTemplate(type, data);
     if (!template) {
-        return res.status(400).json(createResponse(false, null, 'Invalid email type'));
+        const { response, statusCode } = createResponse(false, null, 'Invalid email type', 400);
+        return res.status(statusCode).json(response);
     }
 
     try {
-        const response = await fetch('https://api.resend.com/emails', {
+        const fetchResponse = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -72,9 +110,20 @@ export default async function handler(req, res) {
             })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await fetchResponse.json();
+        } catch (parseError) {
+            const { response: errorResponse, statusCode } = createResponse(
+                false,
+                null,
+                'Invalid response from email service',
+                502
+            );
+            return res.status(statusCode).json(errorResponse);
+        }
 
-        if (!response.ok) {
+        if (!fetchResponse.ok) {
             const { response: errorResponse, statusCode } = createResponse(
                 false,
                 null,
@@ -129,7 +178,7 @@ function getEmailTemplate(type, rawData) {
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Thank you for your order!</h2>
                         <p>Hi ${data.firstName},</p>
                         <p>We've received your order and are preparing it for shipment.</p>
-                        
+
                         <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px;">
                             <h3 style="margin-top: 0;">Order #${data.orderNumber}</h3>
                             <p><strong>Total:</strong> £${data.total}</p>
@@ -138,7 +187,7 @@ function getEmailTemplate(type, rawData) {
                                 ${data.items.map((item) => `<li>${item.name} - £${item.price} x ${item.quantity}</li>`).join('')}
                             </ul>
                         </div>
-                        
+
                         <p>We'll send you another email when your order ships.</p>
                         <p>Thanks for shopping with us!</p>
                     </div>
@@ -159,16 +208,16 @@ function getEmailTemplate(type, rawData) {
                         <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED</h1>
                     </div>
                     <div style="padding: 30px 20px;">
-                        <h2 style="font-size: 20px; margin-bottom: 20px;">Your order is on the way! 🚚</h2>
+                        <h2 style="font-size: 20px; margin-bottom: 20px;">Your order is on the way!</h2>
                         <p>Hi ${data.firstName},</p>
                         <p>Great news! Your order has been shipped and is on its way to you.</p>
-                        
+
                         <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px;">
                             <h3 style="margin-top: 0;">Order #${data.orderNumber}</h3>
                             ${data.trackingNumber ? `<p><strong>Tracking Number:</strong> ${data.trackingNumber}</p>` : ''}
                             ${data.carrier ? `<p><strong>Carrier:</strong> ${data.carrier}</p>` : ''}
                         </div>
-                        
+
                         <p>Thanks for your patience!</p>
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
@@ -181,7 +230,7 @@ function getEmailTemplate(type, rawData) {
         },
 
         welcome: {
-            subject: 'Welcome to 1 HUNDRED! 👋',
+            subject: 'Welcome to 1 HUNDRED!',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
                     <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
@@ -192,11 +241,11 @@ function getEmailTemplate(type, rawData) {
                         <p>Hi ${data.firstName},</p>
                         <p>Welcome to 1 HUNDRED! We're excited to have you on board.</p>
                         <p>Start exploring our latest collection and find your new favorite pieces.</p>
-                        
+
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="https://www.1hundredornothing.co.uk/shop" style="background: #000; color: #fff; padding: 15px 30px; text-decoration: none; display: inline-block; text-transform: uppercase; font-weight: bold;">Shop Now</a>
                         </div>
-                        
+
                         <p>Follow us on social media for exclusive drops and behind-the-scenes content.</p>
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
@@ -219,7 +268,7 @@ function getEmailTemplate(type, rawData) {
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Your cart is waiting...</h2>
                         <p>Hi ${data.firstName},</p>
                         <p>Looks like you left some items in your cart. Complete your order now and don't miss out!</p>
-                        
+
                         <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px;">
                             <h3 style="margin-top: 0;">Your Cart</h3>
                             <ul>
@@ -227,7 +276,7 @@ function getEmailTemplate(type, rawData) {
                             </ul>
                             <p style="font-weight: bold;">Total: £${data.total}</p>
                         </div>
-                        
+
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="https://www.1hundredornothing.co.uk/cart" style="background: #000; color: #fff; padding: 15px 30px; text-decoration: none; display: inline-block; text-transform: uppercase; font-weight: bold;">Complete Order</a>
                         </div>

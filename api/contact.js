@@ -12,10 +12,47 @@ function createResponse(success, data = null, error = null, statusCode = 200) {
     return { response, statusCode };
 }
 
+// Simple in-memory rate limiter (per serverless instance)
+const rateLimitMap = new Map();
+function checkRateLimit(ip, maxRequests = 5, windowMs = 60000) {
+    const now = Date.now();
+    const entry = rateLimitMap.get(ip);
+    if (!entry || now - entry.start > windowMs) {
+        rateLimitMap.set(ip, { start: now, count: 1 });
+        return true;
+    }
+    entry.count++;
+    return entry.count <= maxRequests;
+}
+
+// CSRF protection: verify request origin
+function validateOrigin(req) {
+    const origin = req.headers['origin'];
+    const referer = req.headers['referer'];
+    const allowed = ['https://www.1hundredornothing.co.uk', 'https://1hundredornothing.co.uk', 'http://localhost:3000'];
+    if (origin && allowed.some((a) => origin.startsWith(a))) return true;
+    if (referer && allowed.some((a) => referer.startsWith(a))) return true;
+    if (!origin && !referer) return true;
+    return false;
+}
+
 export default async function handler(req, res) {
     // Only allow POST requests
     if (req.method !== 'POST') {
         const { response, statusCode } = createResponse(false, null, 'Method not allowed', 405);
+        return res.status(statusCode).json(response);
+    }
+
+    // CSRF: reject cross-origin requests
+    if (!validateOrigin(req)) {
+        const { response, statusCode } = createResponse(false, null, 'Forbidden', 403);
+        return res.status(statusCode).json(response);
+    }
+
+    // Rate limiting
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    if (!checkRateLimit(clientIp)) {
+        const { response, statusCode } = createResponse(false, null, 'Too many requests. Please try again later.', 429);
         return res.status(statusCode).json(response);
     }
 
@@ -63,12 +100,12 @@ export default async function handler(req, res) {
     `;
 
     const emailText = `
-Name: ${name}
-Email: ${email}
-Subject: ${subject}
-${orderNumber ? `Order Number: ${orderNumber}\n` : ''}
+Name: ${escapeHtml(name)}
+Email: ${escapeHtml(email)}
+Subject: ${escapeHtml(subject)}
+${orderNumber ? `Order Number: ${escapeHtml(orderNumber)}\n` : ''}
 Message:
-${message}
+${escapeHtml(message)}
 
 ---
 Sent from 1hundredornothing.co.uk/contact
@@ -76,7 +113,7 @@ Sent from 1hundredornothing.co.uk/contact
 
     try {
         // Send email via Resend API
-        const response = await fetch('https://api.resend.com/emails', {
+        const fetchResponse = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -92,9 +129,20 @@ Sent from 1hundredornothing.co.uk/contact
             })
         });
 
-        const data = await response.json();
+        let data;
+        try {
+            data = await fetchResponse.json();
+        } catch (parseError) {
+            const { response: errorResponse, statusCode } = createResponse(
+                false,
+                null,
+                'Invalid response from email service',
+                502
+            );
+            return res.status(statusCode).json(errorResponse);
+        }
 
-        if (!response.ok) {
+        if (!fetchResponse.ok) {
             const { response: errorResponse, statusCode } = createResponse(
                 false,
                 null,
@@ -124,8 +172,7 @@ Sent from 1hundredornothing.co.uk/contact
 
 // Helper function to escape HTML
 function escapeHtml(text) {
-    const div = { toString: () => text };
-    if (typeof text !== 'string') return text;
+    if (typeof text !== 'string') return '';
     return text
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
