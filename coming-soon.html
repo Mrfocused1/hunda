@@ -152,6 +152,85 @@
                 color: rgba(255, 255, 255, 0.7);
             }
 
+            /* Staff login */
+            .login-toggle {
+                background: none;
+                border: none;
+                color: rgba(255, 255, 255, 0.25);
+                font-size: 0.6875rem;
+                font-family: 'Inter', sans-serif;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                cursor: pointer;
+                transition: color 0.2s;
+                margin-bottom: 2rem;
+                animation: fadeIn 1s ease-out 0.7s both;
+            }
+
+            .login-toggle:hover {
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+            .login-form {
+                display: none;
+                max-width: 320px;
+                margin: 0 auto 2rem;
+                animation: fadeIn 0.3s ease-out;
+            }
+
+            .login-form.visible {
+                display: block;
+            }
+
+            .login-input {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                color: #fff;
+                font-size: 0.875rem;
+                font-family: 'Inter', sans-serif;
+                outline: none;
+                transition: border-color 0.2s;
+                margin-bottom: 0.5rem;
+            }
+
+            .login-input::placeholder {
+                color: rgba(255, 255, 255, 0.3);
+            }
+
+            .login-input:focus {
+                border-color: rgba(255, 255, 255, 0.4);
+            }
+
+            .login-submit {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                background: #fff;
+                color: #000;
+                border: 1px solid #fff;
+                font-family: 'Oswald', sans-serif;
+                font-size: 0.8125rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                cursor: pointer;
+                transition: all 0.2s;
+                margin-top: 0.25rem;
+            }
+
+            .login-submit:hover {
+                background: transparent;
+                color: #fff;
+            }
+
+            .login-error {
+                font-size: 0.75rem;
+                color: #ef4444;
+                margin-top: 0.5rem;
+                min-height: 1rem;
+            }
+
             /* Social links */
             .socials {
                 display: flex;
@@ -236,6 +315,15 @@
             </form>
             <p class="signup-message" id="notify-message">Get notified when we launch.</p>
 
+            <button class="login-toggle" id="login-toggle">Staff Access</button>
+
+            <div class="login-form" id="login-form">
+                <input type="text" class="login-input" id="login-user" placeholder="Username" autocomplete="off" />
+                <input type="password" class="login-input" id="login-pass" placeholder="Password" />
+                <button type="button" class="login-submit" id="login-submit">Enter Site</button>
+                <p class="login-error" id="login-error"></p>
+            </div>
+
             <div class="socials">
                 <a href="https://instagram.com/1hundredornothing" target="_blank" rel="noopener">Instagram</a>
                 <a href="https://tiktok.com/@1hundredornothing" target="_blank" rel="noopener">TikTok</a>
@@ -249,6 +337,37 @@
         </div>
 
         <script>
+            // Staff login
+            document.getElementById('login-toggle').addEventListener('click', function () {
+                var form = document.getElementById('login-form');
+                form.classList.toggle('visible');
+                if (form.classList.contains('visible')) {
+                    document.getElementById('login-user').focus();
+                }
+            });
+
+            document.getElementById('login-submit').addEventListener('click', function () {
+                var user = document.getElementById('login-user').value;
+                var pass = document.getElementById('login-pass').value;
+                var err = document.getElementById('login-error');
+
+                if (user === 'Grimsta' && pass === 'Password') {
+                    sessionStorage.setItem('1hundred_gate_auth', 'granted');
+                    window.location.href = '/';
+                } else {
+                    err.textContent = 'Invalid credentials. Please try again.';
+                    document.getElementById('login-pass').value = '';
+                }
+            });
+
+            document.getElementById('login-pass').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') document.getElementById('login-submit').click();
+            });
+
+            document.getElementById('login-user').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') document.getElementById('login-pass').focus();
+            });
+
             document.getElementById('notify-form').addEventListener('submit', function (e) {
                 e.preventDefault();
                 const email = document.getElementById('notify-email').value;
