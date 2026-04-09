@@ -225,22 +225,6 @@
                             with detailed trophy graphic print front and back. A testament to those who never give up.
                         </p>
 
-                        <!-- Color Selection -->
-                        <div class="pdp-section">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="font-bold text-sm uppercase"
-                                    >Color:
-                                    <span id="selected-color" class="font-normal text-gray-500">Grey</span></span
-                                >
-                            </div>
-                            <div class="flex gap-3" id="color-options">
-                                <button class="color-option active" data-color="Grey">
-                                    <span class="color-swatch" style="background: #6b7280"></span>
-                                    <span class="color-label">Grey</span>
-                                </button>
-                            </div>
-                        </div>
-
                         <!-- Size Selection -->
                         <div class="pdp-section">
                             <div class="flex justify-between items-center mb-4">
@@ -397,7 +381,6 @@
                 const productPrice = 40;
                 const productImages = ['product-relentless-front.png', 'product-relentless-back.png'];
                 let selectedSize = '';
-                let selectedColor = 'Grey';
                 let quantity = 1;
 
                 // Quantity buttons
@@ -426,17 +409,6 @@
                     document.getElementById('size-error')?.classList.add('hidden');
                 });
 
-                // Color selection
-                document.getElementById('color-options')?.addEventListener('click', function (e) {
-                    const option = e.target.closest('.color-option');
-                    if (!option) return;
-
-                    document.querySelectorAll('.color-option').forEach((el) => el.classList.remove('active'));
-                    option.classList.add('active');
-                    selectedColor = option.dataset.color;
-                    document.getElementById('selected-color').textContent = selectedColor;
-                });
-
                 // Add to bag
                 document.getElementById('add-to-bag-btn')?.addEventListener('click', function () {
                     if (!selectedSize) {
@@ -445,7 +417,7 @@
                     }
 
                     if (typeof addToCart === 'function') {
-                        addToCart(productId, selectedSize, selectedColor, quantity);
+                        addToCart(productId, selectedSize, null, quantity);
                         toggleCart(true);
                     }
                 });
@@ -490,7 +462,7 @@
                                 label: productTitle,
                                 productId: productId,
                                 size: selectedSize || 'M',
-                                color: selectedColor,
+                                color: null,
                                 quantity: quantity
                             });
                             if (btn) {

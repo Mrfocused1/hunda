@@ -216,22 +216,6 @@
                             no limits.
                         </p>
 
-                        <!-- Color Selection -->
-                        <div class="pdp-section">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="font-bold text-sm uppercase"
-                                    >Color:
-                                    <span id="selected-color" class="font-normal text-gray-500">Blue</span></span
-                                >
-                            </div>
-                            <div class="flex gap-3" id="color-options">
-                                <button class="color-option active" data-color="Blue">
-                                    <span class="color-swatch" style="background: #3b82f6"></span>
-                                    <span class="color-label">Blue</span>
-                                </button>
-                            </div>
-                        </div>
-
                         <!-- Size Selection (hidden - coming soon) -->
                         <div class="pdp-section">
                             <span class="font-bold text-sm uppercase">Sizes: S, M, L, XL</span>
@@ -354,7 +338,6 @@
                 const productPrice = 85;
                 const productImages = ['product-5.jpeg'];
                 let selectedSize = '';
-                let selectedColor = 'Blue';
                 let quantity = 1;
 
                 // Quantity buttons
@@ -383,17 +366,6 @@
                     document.getElementById('size-error')?.classList.add('hidden');
                 });
 
-                // Color selection
-                document.getElementById('color-options')?.addEventListener('click', function (e) {
-                    const option = e.target.closest('.color-option');
-                    if (!option) return;
-
-                    document.querySelectorAll('.color-option').forEach((el) => el.classList.remove('active'));
-                    option.classList.add('active');
-                    selectedColor = option.dataset.color;
-                    document.getElementById('selected-color').textContent = selectedColor;
-                });
-
                 // Add to bag
                 document.getElementById('add-to-bag-btn')?.addEventListener('click', function () {
                     if (!selectedSize) {
@@ -402,7 +374,7 @@
                     }
 
                     if (typeof addToCart === 'function') {
-                        addToCart(productId, selectedSize, selectedColor, quantity);
+                        addToCart(productId, selectedSize, null, quantity);
                         toggleCart(true);
                     }
                 });
