@@ -445,8 +445,8 @@
                             </div>
 
                             <div id="apple-pay-form" style="display: none;">
-                                <div id="apple-pay-button-container" class="mb-4" style="min-height: 56px;">
-                                    <!-- Stripe Payment Request Button mounts here -->
+                                <div id="express-checkout-element" class="mb-4" style="min-height: 48px;">
+                                    <!-- Stripe Express Checkout Element mounts here -->
                                 </div>
                                 <p id="apple-pay-unavailable" style="display: none;" class="text-sm text-red-500 p-4 border border-red-200 rounded">
                                     Apple Pay is not available on this device or browser. Make sure you have Apple Pay set up with a card in your Wallet, and that you're using Safari. Otherwise, please select another payment method.
@@ -657,7 +657,8 @@
 
             let applePayInitialized = false;
             let applePayAvailable = false;
-            let applePayRequest = null;
+            let expressCheckoutElements = null;
+            let expressCheckoutElement = null;
 
             async function initApplePayButton() {
                 if (applePayInitialized) return;
@@ -684,49 +685,76 @@
                     return;
                 }
 
-                console.log('[Apple Pay] Creating payment request, amount:', amountInPence, 'pence');
+                console.log('[Apple Pay] Initializing Express Checkout, amount:', amountInPence, 'pence');
 
-                applePayRequest = stripe.paymentRequest({
-                    country: 'GB',
+                // Create a fresh Elements group in deferred mode for the Express Checkout Element
+                expressCheckoutElements = stripe.elements({
+                    mode: 'payment',
+                    amount: amountInPence,
                     currency: 'gbp',
-                    total: {
-                        label: '1HundredOrNothing',
-                        amount: amountInPence
-                    },
-                    requestPayerName: true,
-                    requestPayerEmail: true
+                    paymentMethodTypes: ['card'],
+                    appearance: { theme: 'stripe' }
                 });
 
-                const result = await applePayRequest.canMakePayment();
-                console.log('[Apple Pay] canMakePayment result:', JSON.stringify(result));
-                if (!result) {
-                    document.getElementById('apple-pay-button-container').style.display = 'none';
-                    document.getElementById('apple-pay-unavailable').style.display = '';
-                    applePayAvailable = false;
-                    return;
-                }
-
-                applePayAvailable = true;
-                const elements = stripe.elements();
-                const prButton = elements.create('paymentRequestButton', {
-                    paymentRequest: applePayRequest,
-                    style: {
-                        paymentRequestButton: {
-                            type: 'buy',
-                            theme: 'dark',
-                            height: '56px'
-                        }
+                expressCheckoutElement = expressCheckoutElements.create('expressCheckout', {
+                    buttonType: {
+                        applePay: 'buy',
+                        googlePay: 'buy'
+                    },
+                    buttonHeight: 48,
+                    paymentMethods: {
+                        applePay: 'always',
+                        googlePay: 'always',
+                        link: 'never',
+                        paypal: 'never'
                     }
                 });
 
-                prButton.mount('#apple-pay-button-container');
+                expressCheckoutElement.on('ready', (event) => {
+                    console.log('[Apple Pay] Express Checkout ready:', event);
+                    if (!event.availablePaymentMethods || Object.keys(event.availablePaymentMethods).length === 0) {
+                        document.getElementById('express-checkout-element').style.display = 'none';
+                        document.getElementById('apple-pay-unavailable').style.display = '';
+                        applePayAvailable = false;
+                    } else {
+                        console.log('[Apple Pay] Available methods:', JSON.stringify(event.availablePaymentMethods));
+                        applePayAvailable = true;
+                    }
+                });
 
-                applePayRequest.on('paymentmethod', async (ev) => {
+                expressCheckoutElement.on('loaderror', (event) => {
+                    console.error('[Apple Pay] Express Checkout load error:', event);
+                    document.getElementById('express-checkout-element').style.display = 'none';
+                    document.getElementById('apple-pay-unavailable').style.display = '';
+                    applePayAvailable = false;
+                });
+
+                expressCheckoutElement.on('click', (event) => {
+                    event.resolve({
+                        emailRequired: true,
+                        phoneNumberRequired: false,
+                        shippingAddressRequired: true,
+                        shippingRates: [
+                            {
+                                id: 'standard',
+                                displayName: subtotal >= 50 ? 'Free Standard Shipping' : 'Standard Shipping',
+                                amount: Math.round(shipping * 100),
+                                deliveryEstimate: {
+                                    maximum: { unit: 'business_day', value: 5 },
+                                    minimum: { unit: 'business_day', value: 3 }
+                                }
+                            }
+                        ],
+                        allowedShippingCountries: ['GB']
+                    });
+                });
+
+                expressCheckoutElement.on('confirm', async (event) => {
                     try {
                         const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
-                        const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-                        const shipping = subtotal >= 50 ? 0 : 4.99;
-                        const total = Math.round((subtotal + shipping) * 100);
+                        const sub = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                        const ship = sub >= 50 ? 0 : 4.99;
+                        const totalPounds = sub + ship;
 
                         const cartItemsForValidation = cart.map((item) => ({
                             id: item.id,
@@ -735,47 +763,53 @@
                         }));
 
                         const orderNumber = `1H-${Date.now().toString(36).toUpperCase()}`;
-                        const email = ev.payerEmail || document.getElementById('checkout-email')?.value || '';
-                        const name = ev.payerName || '';
-                        const nameParts = name.split(' ');
+                        const email = event.billingDetails?.email || document.getElementById('checkout-email')?.value || '';
+                        const fullName = event.billingDetails?.name || '';
+                        const nameParts = fullName.split(' ');
                         const firstName = nameParts[0] || '';
                         const lastName = nameParts.slice(1).join(' ') || '';
 
-                        const { clientSecret } = await StripeService.createPaymentIntent(total, {
+                        // Create payment intent on server (amount in pounds)
+                        const intentData = await StripeService.createPaymentIntent(totalPounds, {
                             orderNumber: orderNumber,
                             customerEmail: email,
-                            customerName: name
+                            customerName: fullName
                         }, cartItemsForValidation);
 
-                        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
-                            clientSecret,
-                            { payment_method: ev.paymentMethod.id },
-                            { handleActions: false }
-                        );
+                        const clientSecret = intentData.clientSecret;
 
-                        if (confirmError) {
-                            ev.complete('fail');
-                            showToast(confirmError.message, 'error');
+                        // Submit the elements group
+                        const { error: submitError } = await expressCheckoutElements.submit();
+                        if (submitError) {
+                            console.error('[Apple Pay] Submit error:', submitError);
+                            showToast(submitError.message, 'error');
                             return;
                         }
 
-                        if (paymentIntent.status === 'requires_action') {
-                            const { error } = await stripe.confirmCardPayment(clientSecret);
-                            if (error) {
-                                ev.complete('fail');
-                                showToast(error.message, 'error');
-                                return;
-                            }
+                        // Confirm the payment
+                        const { error } = await stripe.confirmPayment({
+                            elements: expressCheckoutElements,
+                            clientSecret: clientSecret,
+                            confirmParams: {
+                                return_url: window.location.origin + '/checkout?success=true'
+                            },
+                            redirect: 'if_required'
+                        });
+
+                        if (error) {
+                            console.error('[Apple Pay] Confirm error:', error);
+                            showToast(error.message || 'Payment failed. Please try again.', 'error');
+                            return;
                         }
 
-                        ev.complete('success');
-                        showOrderSuccess(orderNumber, email, firstName, lastName, subtotal + shipping);
+                        showOrderSuccess(orderNumber, email, firstName, lastName, sub + ship);
                     } catch (err) {
-                        ev.complete('fail');
+                        console.error('[Apple Pay] Unexpected error:', err);
                         showToast('Payment failed. Please try again.', 'error');
-                        console.error('Apple Pay error:', err);
                     }
                 });
+
+                expressCheckoutElement.mount('#express-checkout-element');
             }
 
             function goToStep(step) {
