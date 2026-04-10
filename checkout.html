@@ -666,6 +666,7 @@
                 if (!window.StripeService || !window.StripeService.stripe) {
                     document.getElementById('apple-pay-unavailable').style.display = '';
                     document.getElementById('apple-pay-unavailable').textContent = 'Payment system not ready. Please refresh the page.';
+                    console.error('[Apple Pay] StripeService not initialized');
                     return;
                 }
 
@@ -674,19 +675,30 @@
                 const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
                 const shipping = subtotal >= 50 ? 0 : 4.99;
                 const total = subtotal + shipping;
+                const amountInPence = Math.round(total * 100);
+
+                if (!amountInPence || amountInPence <= 0 || isNaN(amountInPence)) {
+                    document.getElementById('apple-pay-unavailable').style.display = '';
+                    document.getElementById('apple-pay-unavailable').textContent = 'Your cart is empty.';
+                    console.error('[Apple Pay] Invalid amount:', amountInPence);
+                    return;
+                }
+
+                console.log('[Apple Pay] Creating payment request, amount:', amountInPence, 'pence');
 
                 applePayRequest = stripe.paymentRequest({
                     country: 'GB',
                     currency: 'gbp',
                     total: {
                         label: '1HundredOrNothing',
-                        amount: Math.round(total * 100)
+                        amount: amountInPence
                     },
                     requestPayerName: true,
                     requestPayerEmail: true
                 });
 
                 const result = await applePayRequest.canMakePayment();
+                console.log('[Apple Pay] canMakePayment result:', JSON.stringify(result));
                 if (!result) {
                     document.getElementById('apple-pay-button-container').style.display = 'none';
                     document.getElementById('apple-pay-unavailable').style.display = '';
