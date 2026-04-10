@@ -53,6 +53,7 @@
         { "source": "/terms", "destination": "/terms.html" },
         { "source": "/privacy", "destination": "/privacy.html" },
         { "source": "/help", "destination": "/help.html" },
-        { "source": "/delivery", "destination": "/delivery.html" }
+        { "source": "/delivery", "destination": "/delivery.html" },
+        { "source": "/coming-soon", "destination": "/coming-soon.html" }
     ]
 }
