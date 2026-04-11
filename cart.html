@@ -430,22 +430,11 @@
                 const code = input.value.trim().toUpperCase();
                 const subtotal = getCartTotal();
 
-                let discountAmount = 0;
-                let discountMsg = '';
+                // Valid codes mirror the server whitelist in api/create-payment-intent.js
+                const codeRates = { SAVE15: 0.15, SAVE10: 0.1, WELCOME10: 0.1 };
+                const rate = codeRates[code];
 
-                if (code === 'SAVE15') {
-                    discountAmount = subtotal * 0.15;
-                    discountMsg = '15% discount applied!';
-                } else if (code === 'SAVE10') {
-                    discountAmount = subtotal * 0.1;
-                    discountMsg = '10% discount applied!';
-                } else if (code === 'WELCOME10') {
-                    discountAmount = Math.min(10, subtotal);
-                    discountMsg = '£10 discount applied!';
-                } else if (code === 'WELCOME20') {
-                    discountAmount = Math.min(20, subtotal);
-                    discountMsg = '£20 discount applied!';
-                } else {
+                if (!rate) {
                     promoAttempts++;
                     if (promoAttempts >= maxPromoAttempts) {
                         promoLockoutUntil = Date.now() + promoLockoutMs;
@@ -456,9 +445,11 @@
                     return;
                 }
 
+                const discountAmount = subtotal * rate;
                 discount = Math.min(discountAmount, subtotal);
                 localStorage.setItem('1hundred_checkout_discount', discount.toString());
-                message.textContent = discountMsg;
+                localStorage.setItem('1hundred_discount_code', code);
+                message.textContent = `${Math.round(rate * 100)}% discount applied!`;
                 message.className = 'text-sm mt-2 text-green-600';
                 message.classList.remove('hidden');
                 updateSummary();

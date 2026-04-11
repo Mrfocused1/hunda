@@ -42,8 +42,9 @@ const StripeService = {
     },
 
     // Create payment intent on server
-    async createPaymentIntent(amount, metadata = {}, cartItems = []) {
+    async createPaymentIntent(amount, metadata = {}, cartItems = [], discountCode = '') {
         try {
+            const code = discountCode || localStorage.getItem('1hundred_discount_code') || '';
             const response = await fetch('/api/create-payment-intent', {
                 method: 'POST',
                 headers: {
@@ -53,7 +54,8 @@ const StripeService = {
                     amount: amount,
                     currency: 'gbp',
                     metadata: metadata,
-                    items: cartItems
+                    items: cartItems,
+                    discountCode: code
                 })
             });
 

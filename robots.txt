@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin-login
+Disallow: /checkout
+Disallow: /cart
+Disallow: /account
+Disallow: /login
+Disallow: /signup
+Disallow: /api/
+Disallow: /coming-soon
+
+Sitemap: https://www.1hundredornothing.co.uk/sitemap.xml

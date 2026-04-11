@@ -37,6 +37,15 @@ const PRODUCT_PRICES = {
 };
 
 const SHIPPING_COST = 4.99;
+const FREE_SHIPPING_THRESHOLD = 50;
+
+// Known discount codes — single source of truth. Values are percentage rates (0.1 = 10% off).
+// Keep in sync with cart.html applyPromoCode + the intro popup code in main.js.
+const DISCOUNT_CODES = {
+    WELCOME10: 0.1,
+    SAVE10: 0.1,
+    SAVE15: 0.15
+};
 
 // CSRF protection: verify request origin
 function validateOrigin(req) {
@@ -76,7 +85,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { amount, currency = 'gbp', metadata = {}, items = [] } = req.body;
+        const { amount, currency = 'gbp', metadata = {}, items = [], discountCode: rawDiscountCode } = req.body;
 
         // Validate amount
         if (!amount || typeof amount !== 'number' || amount <= 0) {
@@ -88,6 +97,20 @@ export default async function handler(req, res) {
         if (amount > 10000) {
             const { response, statusCode } = createResponse(false, null, 'Amount exceeds maximum', 400);
             return res.status(statusCode).json(response);
+        }
+
+        // Validate the discount code (if any) against the server-side whitelist
+        let discountRate = 0;
+        let appliedDiscountCode = '';
+        if (rawDiscountCode) {
+            const code = String(rawDiscountCode).toUpperCase().slice(0, 32);
+            if (DISCOUNT_CODES[code] !== undefined) {
+                discountRate = DISCOUNT_CODES[code];
+                appliedDiscountCode = code;
+            } else {
+                const { response, statusCode } = createResponse(false, null, 'Invalid discount code', 400);
+                return res.status(statusCode).json(response);
+            }
         }
 
         // Server-side price verification: if cart items are provided, validate total
@@ -105,9 +128,13 @@ export default async function handler(req, res) {
                 }
             }
 
-            // Verify total is within acceptable range (allow for shipping variance)
-            const maxExpected = expectedSubtotal + SHIPPING_COST + 0.01;
-            if (expectedSubtotal > 0 && amount > maxExpected) {
+            // Expected total = subtotal * (1 - discount) + shipping (free over threshold)
+            const expectedShipping = expectedSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+            const expectedTotal = expectedSubtotal * (1 - discountRate) + expectedShipping;
+            // Range-check both directions with a few pence of float tolerance:
+            // - Too high protects the customer from accidental overcharge
+            // - Too low prevents undercharge fraud (user crafting a fake discount in localStorage)
+            if (expectedSubtotal > 0 && (amount > expectedTotal + 0.02 || amount < expectedTotal - 0.02)) {
                 const { response, statusCode } = createResponse(false, null, 'Order total mismatch. Please refresh and try again.', 400);
                 return res.status(statusCode).json(response);
             }
@@ -118,18 +145,27 @@ export default async function handler(req, res) {
             orderNumber: String(metadata.orderNumber || '').slice(0, 50),
             customerEmail: String(metadata.customerEmail || '').slice(0, 100),
             customerName: String(metadata.customerName || '').slice(0, 100),
+            discountCode: appliedDiscountCode,
             site: '1hundredornothing.co.uk'
         };
 
-        // Create payment intent with Stripe
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(amount * 100), // Convert to pence/cents
-            currency: currency.toLowerCase(),
-            automatic_payment_methods: {
-                enabled: true
+        // Build an idempotency key so retries within 24h return the same PaymentIntent
+        // instead of creating a new one. Prefer the client-supplied orderNumber (which the
+        // checkout flow generates fresh per attempt), fall back to a hash-ish composite.
+        const idemKey =
+            safeMetadata.orderNumber ||
+            `pi-${Math.round(amount * 100)}-${safeMetadata.customerEmail || 'anon'}-${Date.now()}`;
+
+        // Create payment intent with Stripe (idempotent)
+        const paymentIntent = await stripe.paymentIntents.create(
+            {
+                amount: Math.round(amount * 100), // Convert to pence/cents
+                currency: currency.toLowerCase(),
+                automatic_payment_methods: { enabled: true },
+                metadata: safeMetadata
             },
-            metadata: safeMetadata
-        });
+            { idempotencyKey: idemKey }
+        );
 
         const { response } = createResponse(
             true,
