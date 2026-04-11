@@ -1,6 +1,7 @@
 {
     "buildCommand": "npm run build",
     "installCommand": "npm install --include=dev",
+    "outputDirectory": ".",
     "headers": [
         {
             "source": "/.well-known/apple-developer-merchantid-domain-association",
