@@ -49,6 +49,40 @@ function getSupabase() {
     return supabaseClient;
 }
 
+// Admin helpers — find the Supabase JWT set by admin-login.html and build auth headers
+// for /api/admin/* calls. Returns null if no valid session exists.
+function getAdminAuthHeaders() {
+    try {
+        const raw = sessionStorage.getItem('1hundred_admin_session');
+        if (!raw) return null;
+        const session = JSON.parse(raw);
+        if (!session || !session.accessToken) return null;
+        // Soft expiry check: expiresAt is Unix seconds
+        if (session.expiresAt && Date.now() / 1000 > session.expiresAt) return null;
+        return {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.accessToken}`
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+async function adminFetch(path, method, body) {
+    const headers = getAdminAuthHeaders();
+    if (!headers) return { ok: false, reason: 'no-session' };
+    try {
+        const init = { method, headers };
+        if (body !== undefined) init.body = JSON.stringify(body);
+        const resp = await fetch(path, init);
+        const json = await resp.json().catch(() => null);
+        if (!resp.ok) return { ok: false, reason: 'http', status: resp.status, error: json?.error || resp.statusText };
+        return { ok: true, data: json?.data ?? null };
+    } catch (e) {
+        return { ok: false, reason: 'network', error: e.message };
+    }
+}
+
 // Storage API for image uploads
 const StorageAPI = {
     // Upload a file to Supabase Storage
@@ -138,33 +172,45 @@ const ProductAPI = {
         return { data, error };
     },
 
-    // Create new product
+    // Create new product — prefers the admin API, falls back to direct anon write
     async create(product) {
+        const admin = await adminFetch('/api/admin/products', 'POST', product);
+        if (admin.ok) return { data: admin.data, error: null };
+        if (admin.reason === 'http' && (admin.status === 401 || admin.status === 403)) {
+            return { data: null, error: new Error(admin.error || 'Admin auth required') };
+        }
+
         const client = getSupabase();
         if (!client) return { data: null, error: new Error('Supabase not initialized') };
-
         const { data, error } = await client.from('products').insert([product]).select().single();
-
         return { data, error };
     },
 
     // Update product
     async update(id, updates) {
+        const admin = await adminFetch('/api/admin/products', 'PUT', { id, ...updates });
+        if (admin.ok) return { data: admin.data, error: null };
+        if (admin.reason === 'http' && (admin.status === 401 || admin.status === 403)) {
+            return { data: null, error: new Error(admin.error || 'Admin auth required') };
+        }
+
         const client = getSupabase();
         if (!client) return { data: null, error: new Error('Supabase not initialized') };
-
         const { data, error } = await client.from('products').update(updates).eq('id', id).select().single();
-
         return { data, error };
     },
 
     // Delete product
     async delete(id) {
+        const admin = await adminFetch(`/api/admin/products?id=${encodeURIComponent(id)}`, 'DELETE');
+        if (admin.ok) return { data: admin.data, error: null };
+        if (admin.reason === 'http' && (admin.status === 401 || admin.status === 403)) {
+            return { data: null, error: new Error(admin.error || 'Admin auth required') };
+        }
+
         const client = getSupabase();
         if (!client) return { data: null, error: new Error('Supabase not initialized') };
-
         const { data, error } = await client.from('products').delete().eq('id', id);
-
         return { data, error };
     }
 };
@@ -183,6 +229,12 @@ const MediaAPI = {
     },
 
     async create(item) {
+        const admin = await adminFetch('/api/admin/media', 'POST', item);
+        if (admin.ok) return { data: admin.data, error: null };
+        if (admin.reason === 'http' && (admin.status === 401 || admin.status === 403)) {
+            return { data: null, error: new Error(admin.error || 'Admin auth required') };
+        }
+
         const client = getSupabase();
         if (!client) return { data: null, error: new Error('Supabase not initialized') };
         const { data, error } = await client.from('media_items').insert([item]).select().single();
@@ -190,6 +242,7 @@ const MediaAPI = {
     },
 
     async update(id, updates) {
+        // No admin endpoint for update yet — go direct. Update is rare (reorder only).
         const client = getSupabase();
         if (!client) return { data: null, error: new Error('Supabase not initialized') };
         const { data, error } = await client.from('media_items').update(updates).eq('id', id).select().single();
@@ -197,6 +250,12 @@ const MediaAPI = {
     },
 
     async delete(id) {
+        const admin = await adminFetch(`/api/admin/media?id=${encodeURIComponent(id)}`, 'DELETE');
+        if (admin.ok) return { data: admin.data, error: null };
+        if (admin.reason === 'http' && (admin.status === 401 || admin.status === 403)) {
+            return { data: null, error: new Error(admin.error || 'Admin auth required') };
+        }
+
         const client = getSupabase();
         if (!client) return { data: null, error: new Error('Supabase not initialized') };
         const { data, error } = await client.from('media_items').delete().eq('id', id);
@@ -244,6 +303,20 @@ const SettingsAPI = {
     },
 
     async set(key, value) {
+        const admin = await adminFetch('/api/admin/settings', 'PUT', { key, value });
+        if (admin.ok) {
+            this._cache.set(key, value);
+            try {
+                sessionStorage.removeItem('_settings_table_missing');
+            } catch (e) {
+                /* ignore */
+            }
+            return { data: admin.data, error: null };
+        }
+        if (admin.reason === 'http' && (admin.status === 401 || admin.status === 403)) {
+            return { data: null, error: new Error(admin.error || 'Admin auth required') };
+        }
+
         const client = getSupabase();
         if (!client) return { data: null, error: new Error('Supabase not initialized') };
         const { data, error } = await client

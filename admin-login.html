@@ -164,9 +164,14 @@
                                 email: session.user.email,
                                 timestamp: Date.now(),
                                 loggedInAt: new Date().toISOString(),
-                                supabaseAuth: true
+                                supabaseAuth: true,
+                                userId: session.user.id,
+                                accessToken: session.access_token,
+                                refreshToken: session.refresh_token,
+                                expiresAt: session.expires_at
                             })
                         );
+                        sessionStorage.setItem('1hundred_gate_auth', 'granted');
                         window.location.href = '/admin';
                         return;
                     }
@@ -206,58 +211,52 @@
                 }
                 errorDiv.classList.remove('show');
 
-                // Try Supabase Auth first
+                // Supabase Auth is the only supported login path — no hardcoded fallback
                 const client = typeof getSupabase === 'function' ? getSupabase() : null;
-                if (client) {
-                    try {
-                        const { data, error } = await client.auth.signInWithPassword({ email, password });
-
-                        if (!error && data.session) {
-                            sessionStorage.setItem(
-                                '1hundred_admin_session',
-                                JSON.stringify({
-                                    email: data.user.email,
-                                    timestamp: Date.now(),
-                                    loggedInAt: new Date().toISOString(),
-                                    supabaseAuth: true,
-                                    userId: data.user.id
-                                })
-                            );
-                            window.location.href = '/admin';
-                            return;
-                        }
-
-                        // If Supabase returns error, show it
-                        if (error) {
-                            errorDiv.textContent =
-                                error.message === 'Invalid login credentials'
-                                    ? 'Invalid email or password'
-                                    : error.message;
-                            errorDiv.classList.add('show');
-                            if (submitBtn) {
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = 'Sign In';
-                            }
-                            return;
-                        }
-                    } catch (err) {
-                        // Supabase not available, fall through to legacy check
+                if (!client) {
+                    errorDiv.textContent = 'Auth system unavailable. Please refresh and try again.';
+                    errorDiv.classList.add('show');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Sign In';
                     }
+                    return;
                 }
 
-                // Legacy fallback (hardcoded credentials for demo/offline)
-                if (email === 'admin@1hundredornothing.co.uk' && password === 'admin123') {
+                try {
+                    const { data, error } = await client.auth.signInWithPassword({ email, password });
+
+                    if (error || !data?.session) {
+                        errorDiv.textContent =
+                            error && error.message === 'Invalid login credentials'
+                                ? 'Invalid email or password'
+                                : (error && error.message) || 'Sign in failed';
+                        errorDiv.classList.add('show');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Sign In';
+                        }
+                        return;
+                    }
+
+                    // Persist the Supabase JWT so admin.js can send it with /api/admin/* calls
                     sessionStorage.setItem(
                         '1hundred_admin_session',
                         JSON.stringify({
-                            email: email,
+                            email: data.user.email,
                             timestamp: Date.now(),
-                            loggedInAt: new Date().toISOString()
+                            loggedInAt: new Date().toISOString(),
+                            supabaseAuth: true,
+                            userId: data.user.id,
+                            accessToken: data.session.access_token,
+                            refreshToken: data.session.refresh_token,
+                            expiresAt: data.session.expires_at
                         })
                     );
+                    sessionStorage.setItem('1hundred_gate_auth', 'granted');
                     window.location.href = '/admin';
-                } else {
-                    errorDiv.textContent = 'Invalid email or password';
+                } catch (err) {
+                    errorDiv.textContent = 'Sign in failed. Please try again.';
                     errorDiv.classList.add('show');
                     if (submitBtn) {
                         submitBtn.disabled = false;
