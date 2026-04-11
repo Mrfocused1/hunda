@@ -160,3 +160,64 @@ CREATE TRIGGER update_products_updated_at
 -- ========================================
 -- Setup Complete!
 -- ========================================
+
+
+-- ========================================
+-- Media gallery + site settings
+-- Run this block once to enable the Media page feature.
+-- ========================================
+
+CREATE TABLE IF NOT EXISTS media_items (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    type TEXT NOT NULL CHECK (type IN ('image', 'video')),
+    url TEXT NOT NULL,
+    thumbnail_url TEXT,
+    title TEXT,
+    position INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE media_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read media" ON media_items;
+CREATE POLICY "Public read media" ON media_items FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public write media" ON media_items;
+CREATE POLICY "Public write media" ON media_items FOR ALL USING (true) WITH CHECK (true);
+
+CREATE TABLE IF NOT EXISTS site_settings (
+    key TEXT PRIMARY KEY,
+    value JSONB,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read settings" ON site_settings;
+CREATE POLICY "Public read settings" ON site_settings FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public write settings" ON site_settings;
+CREATE POLICY "Public write settings" ON site_settings FOR ALL USING (true) WITH CHECK (true);
+
+-- Seed default nav visibility (Media link hidden until admin toggles it on)
+INSERT INTO site_settings (key, value) VALUES ('media_nav_visible', 'false'::jsonb)
+ON CONFLICT (key) DO NOTHING;
+
+-- Create a public storage bucket for media gallery uploads.
+-- If this fails because the bucket exists, it's safe to ignore.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('media', 'media', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Allow public read + anon upload/delete on the media bucket.
+DROP POLICY IF EXISTS "Public read media bucket" ON storage.objects;
+CREATE POLICY "Public read media bucket" ON storage.objects FOR SELECT USING (bucket_id = 'media');
+
+DROP POLICY IF EXISTS "Public write media bucket" ON storage.objects;
+CREATE POLICY "Public write media bucket" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'media');
+
+DROP POLICY IF EXISTS "Public update media bucket" ON storage.objects;
+CREATE POLICY "Public update media bucket" ON storage.objects FOR UPDATE USING (bucket_id = 'media');
+
+DROP POLICY IF EXISTS "Public delete media bucket" ON storage.objects;
+CREATE POLICY "Public delete media bucket" ON storage.objects FOR DELETE USING (bucket_id = 'media');

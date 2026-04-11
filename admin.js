@@ -305,9 +305,10 @@ function showSection(section) {
         orders: 'Orders',
         customers: 'Customers',
         emails: 'Email Automation',
-        content: 'Store Content'
+        content: 'Store Content',
+        media: 'Media Gallery'
     };
-    document.getElementById('page-title').textContent = titles[section];
+    document.getElementById('page-title').textContent = titles[section] || section;
 
     // Refresh data
     if (section === 'dashboard') loadDashboard();
@@ -315,6 +316,10 @@ function showSection(section) {
     if (section === 'orders') loadOrders();
     if (section === 'customers') loadCustomers();
     if (section === 'emails') initEmailToggles();
+    if (section === 'media') {
+        MediaAdmin.load();
+        MediaAdmin.initNavToggle();
+    }
 }
 
 // Dashboard
@@ -1963,12 +1968,161 @@ function closeMobileMenu() {
     overlay.classList.remove('active');
 }
 
+// ========================================
+// Media Gallery Management
+// ========================================
+const MediaAdmin = {
+    async load() {
+        const grid = document.getElementById('admin-media-grid');
+        if (!grid) return;
+
+        if (typeof MediaAPI === 'undefined') {
+            grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 2rem 0; color: #ef4444;">Supabase not loaded — cannot manage media.</div>';
+            return;
+        }
+
+        const { data, error } = await MediaAPI.getAll();
+        if (error) {
+            grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 2rem 0; color: #ef4444;">Error loading media: ${escapeHtml(error.message || 'unknown')}</div>`;
+            return;
+        }
+        if (!data || data.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem 0; color: #9ca3af; font-size: 0.875rem;">No media yet — click Upload to add photos or videos.</div>';
+            return;
+        }
+
+        grid.innerHTML = data
+            .map(
+                (item) => `
+            <div style="position: relative; aspect-ratio: 1/1; background: #f3f4f6; overflow: hidden; border: 1px solid #e5e7eb;">
+                ${
+                    item.type === 'video'
+                        ? `<video src="${escapeHtml(item.url)}" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+                           <div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.7);color:#fff;padding:2px 6px;font-size:10px;border-radius:3px;text-transform:uppercase;letter-spacing:0.05em;">Video</div>`
+                        : `<img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.title || '')}" style="width:100%;height:100%;object-fit:cover;display:block;" />`
+                }
+                <button onclick="MediaAdmin.remove(${item.id})" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.75);color:#fff;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Delete">
+                    <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+                </button>
+            </div>`
+            )
+            .join('');
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    },
+
+    async upload(files) {
+        if (!files || files.length === 0) return;
+        const statusEl = document.getElementById('media-upload-status');
+        if (typeof StorageAPI === 'undefined' || typeof MediaAPI === 'undefined') {
+            showToast('Supabase not available', 'error');
+            return;
+        }
+
+        statusEl.style.display = '';
+        let done = 0;
+        const total = files.length;
+
+        for (const file of Array.from(files)) {
+            const isVideo = file.type.startsWith('video/');
+            const isImage = file.type.startsWith('image/');
+            if (!isVideo && !isImage) continue;
+
+            statusEl.textContent = `Uploading ${file.name} (${done + 1}/${total})…`;
+
+            const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+            const path = `media-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+            const { data: uploadData, error: uploadErr } = await StorageAPI.uploadFile('media', path, file, {
+                contentType: file.type,
+                cacheControl: '3600'
+            });
+
+            if (uploadErr || !uploadData?.publicUrl) {
+                showToast(`Upload failed: ${uploadErr?.message || 'unknown'}`, 'error');
+                continue;
+            }
+
+            const { error: createErr } = await MediaAPI.create({
+                type: isVideo ? 'video' : 'image',
+                url: uploadData.publicUrl,
+                title: file.name.replace(/\.[^.]+$/, ''),
+                position: done
+            });
+
+            if (createErr) {
+                showToast(`Save failed: ${createErr.message || 'unknown'}`, 'error');
+                continue;
+            }
+            done++;
+        }
+
+        statusEl.style.display = 'none';
+        statusEl.textContent = '';
+        showToast(`Uploaded ${done}/${total} item${done === 1 ? '' : 's'}`, 'success');
+        await this.load();
+    },
+
+    async remove(id) {
+        if (!confirm('Remove this media item?')) return;
+        if (typeof MediaAPI === 'undefined') return;
+        const { error } = await MediaAPI.delete(id);
+        if (error) {
+            showToast(`Delete failed: ${error.message}`, 'error');
+            return;
+        }
+        showToast('Media removed', 'success');
+        await this.load();
+    },
+
+    async initNavToggle() {
+        const el = document.getElementById('media-nav-toggle');
+        if (!el || typeof SettingsAPI === 'undefined') return;
+        const value = await SettingsAPI.get('media_nav_visible', false);
+        el.classList.toggle('active', value === true);
+    }
+};
+
+async function toggleMediaNavVisibility(el) {
+    if (typeof SettingsAPI === 'undefined') {
+        showToast('Settings API not available', 'error');
+        return;
+    }
+    const newValue = !el.classList.contains('active');
+    el.classList.toggle('active', newValue);
+    const { error } = await SettingsAPI.set('media_nav_visible', newValue);
+    if (error) {
+        showToast(`Failed to save: ${error.message}`, 'error');
+        el.classList.toggle('active', !newValue);
+        return;
+    }
+    showToast(newValue ? 'Media link visible on site' : 'Media link hidden', 'success');
+}
+
+function escapeHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function () {
     initNavigation();
     initAdminSupabase();
     loadDashboard();
     loadContent();
+
+    // Media upload handler
+    const mediaInput = document.getElementById('media-upload-input');
+    if (mediaInput) {
+        mediaInput.addEventListener('change', (e) => {
+            MediaAdmin.upload(e.target.files);
+            e.target.value = '';
+        });
+    }
 
     // Close modal on overlay click
     const productModal = document.getElementById('product-modal');

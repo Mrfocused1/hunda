@@ -1157,6 +1157,10 @@
                         <i data-lucide="file-text" class="w-5 h-5"></i>
                         Content
                     </div>
+                    <div class="admin-nav-item" data-section="media">
+                        <i data-lucide="image" class="w-5 h-5"></i>
+                        Media
+                    </div>
                     <div class="border-t border-gray-700 mt-4 pt-4">
                         <div class="admin-nav-item" onclick="exportData()">
                             <i data-lucide="download" class="w-5 h-5"></i>
@@ -2510,6 +2514,37 @@
                                         Save Changes
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Media Section -->
+                    <section id="media" class="admin-section">
+                        <div style="background: white; border: 1px solid #e5e7eb; margin-bottom: 1.5rem; padding: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                <div>
+                                    <h3 style="font-size: 1rem; font-weight: 600; color: #111; margin-bottom: 0.25rem;">Show Media link in site menu</h3>
+                                    <p style="font-size: 0.8rem; color: #6b7280;">When on, the "Media" link appears in the main navigation of every public page.</p>
+                                </div>
+                                <div id="media-nav-toggle" class="toggle-switch" onclick="toggleMediaNavVisibility(this)"></div>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border: 1px solid #e5e7eb; padding: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                                <div>
+                                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #111;">Gallery Items</h3>
+                                    <p style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">Upload images or videos to appear on the Media page.</p>
+                                </div>
+                                <label for="media-upload-input" class="btn btn-primary" style="cursor: pointer;">
+                                    <i data-lucide="upload" class="w-4 h-4" style="display: inline-block; vertical-align: -2px; margin-right: 0.375rem;"></i>
+                                    Upload
+                                </label>
+                                <input type="file" id="media-upload-input" accept="image/*,video/*" multiple style="display: none;" />
+                            </div>
+                            <div id="media-upload-status" style="display: none; font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;"></div>
+                            <div id="admin-media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem;">
+                                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 0; color: #9ca3af; font-size: 0.875rem;">Loading media…</div>
                             </div>
                         </div>
                     </section>

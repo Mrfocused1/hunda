@@ -169,6 +169,67 @@ const ProductAPI = {
     }
 };
 
+// Media gallery API (photos + videos managed from the admin Media tab)
+const MediaAPI = {
+    async getAll() {
+        const client = getSupabase();
+        if (!client) return { data: null, error: new Error('Supabase not initialized') };
+        const { data, error } = await client
+            .from('media_items')
+            .select('*')
+            .order('position', { ascending: true })
+            .order('created_at', { ascending: false });
+        return { data, error };
+    },
+
+    async create(item) {
+        const client = getSupabase();
+        if (!client) return { data: null, error: new Error('Supabase not initialized') };
+        const { data, error } = await client.from('media_items').insert([item]).select().single();
+        return { data, error };
+    },
+
+    async update(id, updates) {
+        const client = getSupabase();
+        if (!client) return { data: null, error: new Error('Supabase not initialized') };
+        const { data, error } = await client.from('media_items').update(updates).eq('id', id).select().single();
+        return { data, error };
+    },
+
+    async delete(id) {
+        const client = getSupabase();
+        if (!client) return { data: null, error: new Error('Supabase not initialized') };
+        const { data, error } = await client.from('media_items').delete().eq('id', id);
+        return { data, error };
+    }
+};
+
+// Generic site settings API (JSONB key/value store)
+const SettingsAPI = {
+    _cache: new Map(),
+
+    async get(key, fallback = null) {
+        const client = getSupabase();
+        if (!client) return fallback;
+        const { data, error } = await client.from('site_settings').select('value').eq('key', key).maybeSingle();
+        if (error || !data) return fallback;
+        this._cache.set(key, data.value);
+        return data.value;
+    },
+
+    async set(key, value) {
+        const client = getSupabase();
+        if (!client) return { data: null, error: new Error('Supabase not initialized') };
+        const { data, error } = await client
+            .from('site_settings')
+            .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+            .select()
+            .single();
+        if (!error) this._cache.set(key, value);
+        return { data, error };
+    }
+};
+
 // Helper function to get product image URL
 function getProductImageUrl(imagePath, bucket = 'product-images') {
     // If it's already a full URL, return as-is
@@ -206,5 +267,14 @@ function getProductImageUrl(imagePath, bucket = 'product-images') {
 
 // Export for module usage (if applicable)
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { getSupabase, ProductAPI, StorageAPI, getProductImageUrl, SUPABASE_URL, SUPABASE_ANON_KEY };
+    module.exports = {
+        getSupabase,
+        ProductAPI,
+        StorageAPI,
+        MediaAPI,
+        SettingsAPI,
+        getProductImageUrl,
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    };
 }

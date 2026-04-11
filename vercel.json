@@ -63,6 +63,7 @@
         { "source": "/privacy", "destination": "/privacy.html" },
         { "source": "/help", "destination": "/help.html" },
         { "source": "/delivery", "destination": "/delivery.html" },
+        { "source": "/media", "destination": "/media.html" },
         { "source": "/coming-soon", "destination": "/coming-soon.html" }
     ]
 }

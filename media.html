@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <script src="/gate.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Media | 1HundredOrNothing</title>
+        <meta name="description" content="Photos and videos from 1HundredOrNothing — behind the scenes, drops, and brand moments." />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://www.1hundredornothing.co.uk/media" />
+        <link rel="icon" type="image/svg+xml" href="logo.svg" />
+        <meta name="theme-color" content="#111111" />
+
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <script src="https://unpkg.com/lucide@0.469.0"></script>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body class="antialiased">
+        <div id="page-loader" class="page-loader">
+            <img src="logo.svg" alt="1 HUNDRED" />
+        </div>
+
+        <div id="toast">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span id="toast-msg">Added to bag</span>
+        </div>
+
+        <div id="menu-overlay" class="mobile-menu-overlay"></div>
+
+        <nav id="mobile-menu" class="mobile-menu">
+            <div class="mobile-menu-header">
+                <a href="/">
+                    <img src="logo.svg" alt="1 HUNDRED" class="h-8" />
+                </a>
+                <button id="menu-toggle-close" class="p-2">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <div class="flex flex-col">
+                <a href="/" class="mobile-nav-link">Home</a>
+                <a href="/shop" class="mobile-nav-link">Shop All</a>
+                <a href="/shop?new=true" class="mobile-nav-link">New In</a>
+                <a href="/about" class="mobile-nav-link">About Us</a>
+                <a href="/contact" class="mobile-nav-link">Contact Us</a>
+
+                <div class="border-t border-gray-200 mt-4 pt-4">
+                    <a href="/login" class="mobile-nav-link">
+                        <span>Sign In</span>
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </a>
+                    <a href="/cart" class="mobile-nav-link">
+                        <span>Shopping Bag</span>
+                        <div class="flex items-center gap-2">
+                            <span id="cart-count-mobile" class="badge hidden">0</span>
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div id="cart-overlay" class="mobile-menu-overlay"></div>
+        <aside
+            id="cart-drawer"
+            class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="font-display font-bold uppercase text-xl">Bag (<span id="mini-cart-count">0</span>)</h2>
+                <button id="close-cart" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="mini-cart-items" class="flex-1 overflow-y-auto p-6"></div>
+            <div class="p-6 border-t border-gray-100 bg-gray-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Subtotal</span>
+                    <span id="mini-cart-subtotal">£0.00</span>
+                </div>
+                <a href="/checkout" class="btn btn-primary btn-full mb-3">Checkout</a>
+                <a href="/cart" class="btn btn-secondary btn-full">View Bag</a>
+            </div>
+        </aside>
+
+        <header id="main-header" class="fixed top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+            <div class="container-main">
+                <div class="h-16 hidden lg:flex items-center justify-between">
+                    <a href="/" class="flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+
+                    <nav class="flex items-center gap-8">
+                        <a href="/" class="nav-link">Home</a>
+                        <a href="/shop" class="nav-link">Shop All</a>
+                        <a href="/shop?new=true" class="nav-link">New In</a>
+                        <a href="/about" class="nav-link">About Us</a>
+                        <a href="/contact" class="nav-link">Contact Us</a>
+                    </nav>
+
+                    <div class="flex items-center gap-4">
+                        <a href="/login" class="header-action" aria-label="Sign In">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </a>
+                        <button id="cart-trigger" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="h-16 lg:hidden flex items-center justify-between relative">
+                    <button id="menu-toggle" class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <a href="/" class="absolute left-1/2 -translate-x-1/2 flex items-center">
+                        <img src="logo.svg" alt="1 HUNDRED" class="logo-img" />
+                    </a>
+                    <div class="flex items-center gap-3">
+                        <button id="cart-trigger-mobile" class="header-action" aria-label="Cart">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span id="cart-count-mobile-header" class="badge hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="pt-16">
+            <section class="py-12 md:py-16 px-4 border-b border-gray-100">
+                <div class="container-main max-w-5xl">
+                    <p class="text-gray-500 text-xs font-bold tracking-[0.2em] uppercase mb-3">Gallery</p>
+                    <h1 class="text-4xl md:text-6xl font-display font-bold uppercase leading-none mb-4">Media</h1>
+                    <p class="text-gray-600 max-w-xl">Photos and videos from the world of 1 HUNDRED — drops, behind the scenes, and brand moments.</p>
+                </div>
+            </section>
+
+            <section class="py-10 md:py-14 px-4">
+                <div class="container-main max-w-6xl">
+                    <div id="media-grid" class="media-grid">
+                        <div class="media-grid-loading">
+                            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-black"></div>
+                        </div>
+                    </div>
+                    <div id="media-empty" class="text-center py-16 hidden">
+                        <i data-lucide="image" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i>
+                        <p class="text-gray-500">Nothing here yet. Check back soon.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div id="media-lightbox" class="media-lightbox" aria-hidden="true">
+            <button type="button" class="media-lightbox-close" aria-label="Close">&times;</button>
+            <div class="media-lightbox-content" id="media-lightbox-content"></div>
+        </div>
+
+        <footer class="site-footer">
+            <div class="container-main">
+                <div class="footer-grid">
+                    <div>
+                        <img src="logo.svg" alt="1 HUNDRED" class="h-10 mb-6" style="filter: brightness(0) invert(1)" />
+                        <p class="text-gray-400 text-sm max-w-xs">
+                            1HundredOrNothing is an urban streetwear brand born from the streets of Birmingham, UK and
+                            worn around the world.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Shop</h4>
+                        <div class="footer-links">
+                            <a href="/shop" class="footer-link">Shop All</a>
+                            <a href="/shop?new=true" class="footer-link">New Arrivals</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">About</h4>
+                        <div class="footer-links">
+                            <a href="/about" class="footer-link">Our Story</a>
+                            <a href="/help" class="footer-link">Help Centre</a>
+                            <a href="/delivery" class="footer-link">Delivery & Returns</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="footer-title">Join The List</h4>
+                        <p class="text-gray-400 text-sm mb-4">Get 10% off your first order and exclusive access to drops.</p>
+                        <form id="newsletter-form" class="footer-input-group">
+                            <input type="email" placeholder="Email Address" class="footer-input" required />
+                            <button type="submit" class="footer-submit">Join</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="text-gray-500 text-sm">© 2026 1hundredornothing. All rights reserved.</div>
+                    <div class="flex gap-6 text-sm">
+                        <a href="/privacy" class="footer-link">Privacy Policy</a>
+                        <a href="/terms" class="footer-link">Terms & Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+        <script src="supabase.js"></script>
+        <script src="main.js?v=3"></script>
+        <script src="auth.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', async function () {
+                document.getElementById('newsletter-form')?.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    showToast('Thanks for subscribing!', 'success');
+                    this.reset();
+                });
+
+                const grid = document.getElementById('media-grid');
+                const emptyState = document.getElementById('media-empty');
+
+                const renderEmpty = () => {
+                    grid.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                };
+
+                const escape = (s) =>
+                    String(s || '')
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;');
+
+                try {
+                    if (typeof initSupabase === 'function') initSupabase();
+                    if (typeof MediaAPI === 'undefined') {
+                        renderEmpty();
+                        return;
+                    }
+                    const { data, error } = await MediaAPI.getAll();
+                    if (error || !data || data.length === 0) {
+                        renderEmpty();
+                        return;
+                    }
+
+                    grid.innerHTML = data
+                        .map((item) => {
+                            const title = escape(item.title || '');
+                            if (item.type === 'video') {
+                                const poster = item.thumbnail_url ? `poster="${escape(item.thumbnail_url)}"` : '';
+                                return `
+                                <div class="media-item" data-id="${item.id}" data-type="video" data-url="${escape(item.url)}" data-title="${title}">
+                                    <video src="${escape(item.url)}" ${poster} muted playsinline preload="metadata"></video>
+                                    <div class="media-item-overlay">
+                                        <i data-lucide="play" class="w-10 h-10"></i>
+                                    </div>
+                                </div>`;
+                            }
+                            return `
+                            <div class="media-item" data-id="${item.id}" data-type="image" data-url="${escape(item.url)}" data-title="${title}">
+                                <img src="${escape(item.url)}" alt="${title || '1 HUNDRED media'}" loading="lazy" />
+                            </div>`;
+                        })
+                        .join('');
+
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                    // Lightbox
+                    const lightbox = document.getElementById('media-lightbox');
+                    const lightboxContent = document.getElementById('media-lightbox-content');
+                    const openLightbox = (item) => {
+                        const url = item.dataset.url;
+                        const type = item.dataset.type;
+                        const title = item.dataset.title;
+                        lightboxContent.innerHTML =
+                            type === 'video'
+                                ? `<video src="${escape(url)}" controls autoplay playsinline></video>`
+                                : `<img src="${escape(url)}" alt="${escape(title)}" />`;
+                        lightbox.classList.add('is-open');
+                        lightbox.setAttribute('aria-hidden', 'false');
+                        document.body.style.overflow = 'hidden';
+                    };
+                    const closeLightbox = () => {
+                        lightbox.classList.remove('is-open');
+                        lightbox.setAttribute('aria-hidden', 'true');
+                        lightboxContent.innerHTML = '';
+                        document.body.style.overflow = '';
+                    };
+                    grid.querySelectorAll('.media-item').forEach((el) => el.addEventListener('click', () => openLightbox(el)));
+                    lightbox.querySelector('.media-lightbox-close').addEventListener('click', closeLightbox);
+                    lightbox.addEventListener('click', (e) => {
+                        if (e.target === lightbox) closeLightbox();
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
+                    });
+                } catch (err) {
+                    console.error('Failed to load media:', err);
+                    renderEmpty();
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -949,7 +949,54 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Intro discount popup (once per visitor)
     initIntroPopup();
+
+    // Media link in nav (toggled from admin)
+    initMediaNavLink();
 });
+
+async function initMediaNavLink() {
+    // Idempotent: remove any previously injected link before re-adding
+    document.querySelectorAll('[data-media-nav-link="1"]').forEach((el) => el.remove());
+
+    let visible = false;
+    try {
+        if (typeof initSupabase === 'function') initSupabase();
+        if (typeof SettingsAPI !== 'undefined') {
+            visible = (await SettingsAPI.get('media_nav_visible', false)) === true;
+        }
+    } catch (e) {
+        visible = false;
+    }
+    if (!visible) return;
+
+    // Desktop nav: insert after Contact Us (last nav-link in header)
+    const desktopNav = document.querySelector('header nav.flex.items-center.gap-8');
+    if (desktopNav && !desktopNav.querySelector('[data-media-nav-link="1"]')) {
+        const a = document.createElement('a');
+        a.href = '/media';
+        a.className = 'nav-link';
+        a.textContent = 'Media';
+        a.dataset.mediaNavLink = '1';
+        desktopNav.appendChild(a);
+    }
+
+    // Mobile nav: insert after Contact Us link in the mobile menu
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu && !mobileMenu.querySelector('[data-media-nav-link="1"]')) {
+        const contactLink = mobileMenu.querySelector('a[href="/contact"]');
+        const a = document.createElement('a');
+        a.href = '/media';
+        a.className = 'mobile-nav-link';
+        a.textContent = 'Media';
+        a.dataset.mediaNavLink = '1';
+        if (contactLink && contactLink.parentNode) {
+            contactLink.parentNode.insertBefore(a, contactLink.nextSibling);
+        } else {
+            const container = mobileMenu.querySelector('.flex.flex-col');
+            if (container) container.appendChild(a);
+        }
+    }
+}
 
 function initIntroPopup() {
     // Skip on checkout/admin/coming-soon pages or if already dismissed/claimed
