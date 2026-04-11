@@ -9,3 +9,4 @@ node_modules/
 .vercel
 *.sql
 !supabase_schema.sql
+!migrations/*.sql
