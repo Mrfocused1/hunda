@@ -172,18 +172,19 @@ const StripeService = {
             mode: 'payment',
             amount: totalPence,
             currency: 'gbp',
-            paymentMethodTypes: ['card'],
+            paymentMethodTypes: ['card', 'link', 'paypal'],
             appearance: { theme: 'stripe' }
         });
 
         const expressCheckoutElement = elements.create('expressCheckout', {
-            buttonType: { applePay: 'buy', googlePay: 'buy' },
+            buttonType: { applePay: 'buy', googlePay: 'buy', paypal: 'paypal' },
             buttonHeight: 48,
+            layout: { maxColumns: 3, maxRows: 2 },
             paymentMethods: {
                 applePay: 'always',
                 googlePay: 'always',
-                link: 'never',
-                paypal: 'never'
+                link: 'auto',
+                paypal: 'always'
             }
         });
 
@@ -197,7 +198,8 @@ const StripeService = {
 
             expressCheckoutElement.on('ready', (event) => {
                 const methods = event.availablePaymentMethods || {};
-                if (!methods.applePay && !methods.googlePay) {
+                const hasAny = methods.applePay || methods.googlePay || methods.paypal || methods.link;
+                if (!hasAny) {
                     container.style.display = 'none';
                     settle(null);
                     return;
