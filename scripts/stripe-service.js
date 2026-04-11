@@ -184,7 +184,7 @@ const StripeService = {
                 applePay: 'always',
                 googlePay: 'always',
                 link: 'auto',
-                paypal: 'always'
+                paypal: 'auto'
             }
         });
 
