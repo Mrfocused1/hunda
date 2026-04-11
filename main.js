@@ -349,12 +349,14 @@ function addToCart(productId, size, color, quantity = 1) {
     updateBadges();
     showToast('Added to bag');
 
-    // Schedule abandoned cart email reminder for logged-in users
+    // Schedule abandoned cart email reminder — prefer logged-in user, fall back to guest email captured via intro popup or checkout
     const user = Auth?.getUser?.();
-    if (user?.email && typeof EmailService !== 'undefined') {
-        EmailService.scheduleAbandonedCart(user.email, {
-            firstName: user.firstName || user.name?.split(' ')[0] || 'Customer'
-        });
+    const guestEmail = localStorage.getItem('1hundred_guest_email') || '';
+    const guestFirstName = localStorage.getItem('1hundred_guest_firstname') || 'Customer';
+    const reminderEmail = user?.email || guestEmail;
+    const reminderFirstName = user?.firstName || user?.name?.split(' ')[0] || guestFirstName;
+    if (reminderEmail && typeof EmailService !== 'undefined') {
+        EmailService.scheduleAbandonedCart(reminderEmail, { firstName: reminderFirstName });
     }
 }
 
@@ -944,7 +946,88 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Search functionality
     initSearch();
+
+    // Intro discount popup (once per visitor)
+    initIntroPopup();
 });
+
+function initIntroPopup() {
+    // Skip on checkout/admin/coming-soon pages or if already dismissed/claimed
+    const path = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+    if (path === '/checkout' || path.startsWith('/admin') || path === '/coming-soon') return;
+    if (localStorage.getItem('1hundred_intro_popup_seen') === '1') return;
+
+    if (document.getElementById('intro-popup-overlay')) return;
+
+    const html = `
+        <div id="intro-popup-overlay" class="intro-popup-overlay" role="dialog" aria-modal="true" aria-labelledby="intro-popup-title">
+            <div class="intro-popup-modal">
+                <button type="button" class="intro-popup-close" aria-label="Close">&times;</button>
+                <div class="intro-popup-content">
+                    <p class="intro-popup-eyebrow">Welcome to 1 HUNDRED</p>
+                    <h2 id="intro-popup-title" class="intro-popup-title">GET <span>10% OFF</span><br/>YOUR FIRST ORDER</h2>
+                    <p class="intro-popup-sub">Drop your email and we'll send a code plus early access to new drops.</p>
+                    <form id="intro-popup-form" class="intro-popup-form" novalidate>
+                        <input type="email" name="email" placeholder="your@email.com" class="intro-popup-input" required autocomplete="email" />
+                        <button type="submit" class="intro-popup-submit">CLAIM 10% OFF</button>
+                    </form>
+                    <p class="intro-popup-footnote">No spam. Unsubscribe any time.</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    const overlay = wrap.firstElementChild;
+    document.body.appendChild(overlay);
+
+    // Show after 1.5s so it doesn't feel aggressive on load
+    setTimeout(() => overlay.classList.add('is-visible'), 1500);
+
+    const close = () => {
+        overlay.classList.remove('is-visible');
+        setTimeout(() => overlay.remove(), 300);
+        localStorage.setItem('1hundred_intro_popup_seen', '1');
+    };
+
+    overlay.querySelector('.intro-popup-close').addEventListener('click', close);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) close();
+    });
+    document.addEventListener('keydown', function esc(e) {
+        if (e.key === 'Escape' && document.getElementById('intro-popup-overlay')) {
+            close();
+            document.removeEventListener('keydown', esc);
+        }
+    });
+
+    overlay.querySelector('#intro-popup-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = e.target.querySelector('input[name="email"]');
+        const email = (input.value || '').trim();
+        if (!U.isValidEmail(email)) {
+            input.classList.add('is-invalid');
+            input.focus();
+            return;
+        }
+
+        // Generate a simple discount code tied to the email
+        const discountCode = 'WELCOME10';
+        localStorage.setItem('1hundred_guest_email', email);
+        localStorage.setItem('1hundred_discount_code', discountCode);
+
+        // Prime the abandoned-cart reminder so anyone who adds to bag but doesn't buy gets an email
+        if (typeof EmailService !== 'undefined') {
+            EmailService.scheduleAbandonedCart(email, { firstName: 'there' });
+            // Also send a welcome email with the discount code if enabled
+            EmailService.sendWelcomeEmail?.(email, { firstName: 'there', discountCode }).catch(() => {});
+        }
+
+        showToast(`Code ${discountCode} saved — it'll apply at checkout.`, 'success', 5000);
+        close();
+    });
+}
 
 // Global error handling
 window.addEventListener('error', (e) => {

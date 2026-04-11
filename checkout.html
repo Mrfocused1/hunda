@@ -537,13 +537,14 @@
                                 class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <i data-lucide="check" class="w-10 h-10 text-green-600"></i>
                             </div>
-                            <h2 class="text-3xl font-display font-bold uppercase mb-4">Order Confirmed!</h2>
-                            <p class="text-gray-600 mb-2">Thank you for your order.</p>
+                            <h2 class="text-4xl md:text-5xl font-display font-bold uppercase mb-3 tracking-tight">Thank You!</h2>
+                            <p class="text-lg text-gray-700 mb-2">Your order is confirmed.</p>
+                            <p class="text-gray-600 mb-1">We're on it — your gear will be packed and shipped in 1-2 business days.</p>
                             <p class="text-gray-600 mb-6">Order number: <span class="font-bold">#1H-2026-001</span></p>
                             <p class="text-gray-500 text-sm mb-8">
                                 A confirmation email has been sent to your email address.
                             </p>
-                            <a href="/" class="btn btn-primary">Continue Shopping</a>
+                            <a href="/shop" class="btn btn-primary">Continue Shopping</a>
                         </div>
                     </div>
                 </div>
@@ -1311,6 +1312,23 @@
                             const fields = document.getElementById('account-password-fields');
                             if (fields) fields.style.display = this.checked ? 'block' : 'none';
                         });
+                    }
+
+                    // Guest abandoned-cart capture: once the shopper enters an email in step 1, prime the reminder
+                    const guestEmailInput = document.getElementById('checkout-email');
+                    if (guestEmailInput) {
+                        const primeReminder = () => {
+                            const email = (guestEmailInput.value || '').trim();
+                            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+                            const firstName = document.getElementById('checkout-firstname')?.value?.trim() || 'there';
+                            localStorage.setItem('1hundred_guest_email', email);
+                            localStorage.setItem('1hundred_guest_firstname', firstName);
+                            if (typeof EmailService !== 'undefined') {
+                                EmailService.scheduleAbandonedCart(email, { firstName });
+                            }
+                        };
+                        guestEmailInput.addEventListener('blur', primeReminder);
+                        document.getElementById('checkout-firstname')?.addEventListener('blur', primeReminder);
                     }
 
                     // Shipping form submit handler

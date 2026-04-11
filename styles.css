@@ -1827,3 +1827,158 @@ body {
         transform: translateX(5px);
     }
 }
+
+/* --- Intro discount popup --- */
+.intro-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 1rem;
+}
+
+.intro-popup-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.intro-popup-modal {
+    background: #ffffff;
+    color: #111111;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+
+.intro-popup-overlay.is-visible .intro-popup-modal {
+    transform: scale(1);
+}
+
+.intro-popup-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: transparent;
+    border: none;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: #111111;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.intro-popup-close:hover {
+    opacity: 1;
+}
+
+.intro-popup-content {
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+}
+
+.intro-popup-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.intro-popup-title {
+    font-family: 'Oswald', 'Inter', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.intro-popup-title span {
+    display: inline-block;
+    background: #111111;
+    color: #ffffff;
+    padding: 0 0.5rem;
+}
+
+.intro-popup-sub {
+    font-size: 0.9rem;
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.intro-popup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.intro-popup-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #111111;
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    transition: box-shadow 0.2s ease;
+}
+
+.intro-popup-input:focus {
+    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.15);
+}
+
+.intro-popup-input.is-invalid {
+    border-color: #ef4444;
+    animation: shake 0.3s ease-in-out;
+}
+
+.intro-popup-submit {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: #111111;
+    color: #ffffff;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.intro-popup-submit:hover {
+    background: #000000;
+}
+
+.intro-popup-footnote {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+@media (min-width: 640px) {
+    .intro-popup-title {
+        font-size: 2.5rem;
+    }
+
+    .intro-popup-content {
+        padding: 3rem 3rem 2.5rem;
+    }
+}
