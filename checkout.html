@@ -214,6 +214,18 @@
                 <div class="lg:col-span-2">
                     <!-- Step 1: Shipping -->
                     <div id="step-1" class="checkout-step-content active">
+                        <div class="bg-white rounded-lg shadow-sm p-6 md:p-8 mb-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3 text-center">Express Checkout</h3>
+                            <div id="express-checkout-top" style="min-height: 48px;"></div>
+                            <p id="express-checkout-top-unavailable" style="display: none;" class="text-sm text-gray-500 text-center mt-2">
+                                No express wallets available on this device.
+                            </p>
+                            <div class="flex items-center gap-3 my-5">
+                                <div class="flex-1 h-px bg-gray-200"></div>
+                                <span class="text-xs uppercase tracking-wide text-gray-400">Or pay with card</span>
+                                <div class="flex-1 h-px bg-gray-200"></div>
+                            </div>
+                        </div>
                         <div class="bg-white rounded-lg shadow-sm p-6 md:p-8">
                             <h2 class="text-2xl font-display font-bold uppercase mb-6">Shipping Address</h2>
 
@@ -659,15 +671,23 @@
             let applePayAvailable = false;
             let expressCheckoutElements = null;
             let expressCheckoutElement = null;
+            const mountedWalletContainers = new Set();
 
-            async function initApplePayButton() {
-                if (applePayInitialized) return;
-                applePayInitialized = true;
+            async function initApplePayButton(containerId = 'express-checkout-element', unavailableId = 'apple-pay-unavailable') {
+                if (mountedWalletContainers.has(containerId)) return;
+                mountedWalletContainers.add(containerId);
+                if (containerId === 'express-checkout-element') applePayInitialized = true;
+
+                const unavailableEl = document.getElementById(unavailableId);
+                const setUnavailable = (text) => {
+                    if (!unavailableEl) return;
+                    unavailableEl.style.display = '';
+                    if (text) unavailableEl.textContent = text;
+                };
 
                 if (!window.StripeService || !window.StripeService.stripe) {
-                    document.getElementById('apple-pay-unavailable').style.display = '';
-                    document.getElementById('apple-pay-unavailable').textContent = 'Payment system not ready. Please refresh the page.';
-                    console.error('[Apple Pay] StripeService not initialized');
+                    setUnavailable('Payment system not ready. Please refresh the page.');
+                    console.error('[Wallets] StripeService not initialized');
                     return;
                 }
 
@@ -679,57 +699,66 @@
                 const amountInPence = Math.round(total * 100);
 
                 if (!amountInPence || amountInPence <= 0 || isNaN(amountInPence)) {
-                    document.getElementById('apple-pay-unavailable').style.display = '';
-                    document.getElementById('apple-pay-unavailable').textContent = 'Your cart is empty.';
-                    console.error('[Apple Pay] Invalid amount:', amountInPence);
+                    setUnavailable('Your cart is empty.');
                     return;
                 }
 
-                console.log('[Apple Pay] Initializing Express Checkout, amount:', amountInPence, 'pence');
+                console.log(`[Wallets:${containerId}] Initializing Express Checkout, amount:`, amountInPence, 'pence');
 
-                // Create a fresh Elements group in deferred mode for the Express Checkout Element
-                expressCheckoutElements = stripe.elements({
+                const localElements = stripe.elements({
                     mode: 'payment',
                     amount: amountInPence,
                     currency: 'gbp',
-                    paymentMethodTypes: ['card'],
+                    paymentMethodTypes: ['card', 'link', 'paypal'],
                     appearance: { theme: 'stripe' }
                 });
 
-                expressCheckoutElement = expressCheckoutElements.create('expressCheckout', {
+                const localElement = localElements.create('expressCheckout', {
                     buttonType: {
                         applePay: 'buy',
-                        googlePay: 'buy'
+                        googlePay: 'buy',
+                        paypal: 'paypal'
                     },
                     buttonHeight: 48,
+                    layout: { maxColumns: 3, maxRows: 2 },
                     paymentMethods: {
                         applePay: 'always',
                         googlePay: 'always',
-                        link: 'never',
-                        paypal: 'never'
+                        link: 'auto',
+                        paypal: 'always'
                     }
                 });
 
-                expressCheckoutElement.on('ready', (event) => {
-                    console.log('[Apple Pay] Express Checkout ready:', event);
-                    if (!event.availablePaymentMethods || Object.keys(event.availablePaymentMethods).length === 0) {
-                        document.getElementById('express-checkout-element').style.display = 'none';
-                        document.getElementById('apple-pay-unavailable').style.display = '';
-                        applePayAvailable = false;
+                // Keep legacy refs for the original step-2 mount so existing code paths still work
+                if (containerId === 'express-checkout-element') {
+                    expressCheckoutElements = localElements;
+                    expressCheckoutElement = localElement;
+                }
+
+                localElement.on('ready', (event) => {
+                    console.log(`[Wallets:${containerId}] ready:`, event);
+                    const methods = event.availablePaymentMethods || {};
+                    const hasAny = methods.applePay || methods.googlePay || methods.paypal || methods.link;
+                    if (!hasAny) {
+                        const mountEl = document.getElementById(containerId);
+                        if (mountEl) mountEl.style.display = 'none';
+                        setUnavailable();
+                        if (containerId === 'express-checkout-element') applePayAvailable = false;
                     } else {
-                        console.log('[Apple Pay] Available methods:', JSON.stringify(event.availablePaymentMethods));
-                        applePayAvailable = true;
+                        console.log(`[Wallets:${containerId}] Available methods:`, JSON.stringify(methods));
+                        if (containerId === 'express-checkout-element') applePayAvailable = true;
                     }
                 });
 
-                expressCheckoutElement.on('loaderror', (event) => {
-                    console.error('[Apple Pay] Express Checkout load error:', event);
-                    document.getElementById('express-checkout-element').style.display = 'none';
-                    document.getElementById('apple-pay-unavailable').style.display = '';
-                    applePayAvailable = false;
+                localElement.on('loaderror', (event) => {
+                    console.error(`[Wallets:${containerId}] load error:`, event);
+                    const mountEl = document.getElementById(containerId);
+                    if (mountEl) mountEl.style.display = 'none';
+                    setUnavailable();
+                    if (containerId === 'express-checkout-element') applePayAvailable = false;
                 });
 
-                expressCheckoutElement.on('click', (event) => {
+                localElement.on('click', (event) => {
                     event.resolve({
                         emailRequired: true,
                         phoneNumberRequired: false,
@@ -749,7 +778,7 @@
                     });
                 });
 
-                expressCheckoutElement.on('confirm', async (event) => {
+                localElement.on('confirm', async (event) => {
                     try {
                         const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
                         const sub = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -779,16 +808,16 @@
                         const clientSecret = intentData.clientSecret;
 
                         // Submit the elements group
-                        const { error: submitError } = await expressCheckoutElements.submit();
+                        const { error: submitError } = await localElements.submit();
                         if (submitError) {
-                            console.error('[Apple Pay] Submit error:', submitError);
+                            console.error('[Wallets] Submit error:', submitError);
                             showToast(submitError.message, 'error');
                             return;
                         }
 
                         // Confirm the payment
                         const { error } = await stripe.confirmPayment({
-                            elements: expressCheckoutElements,
+                            elements: localElements,
                             clientSecret: clientSecret,
                             confirmParams: {
                                 return_url: window.location.origin + '/checkout?success=true'
@@ -809,7 +838,7 @@
                     }
                 });
 
-                expressCheckoutElement.mount('#express-checkout-element');
+                localElement.mount(`#${containerId}`);
             }
 
             function goToStep(step) {
@@ -1178,6 +1207,8 @@
                         if (config.success && config.data?.publishableKey) {
                             await StripeService.init(config.data.publishableKey);
                             debugLog('Stripe initialized in', config.data.mode, 'mode');
+                            // Mount the express checkout wallets at the top of step 1
+                            initApplePayButton('express-checkout-top', 'express-checkout-top-unavailable');
                         } else {
                             debugError('Stripe not configured');
                             const errorEl = document.getElementById('stripe-card-errors');
