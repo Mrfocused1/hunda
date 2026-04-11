@@ -278,9 +278,10 @@ const StripeService = {
                         return;
                     }
 
-                    if (typeof addToCart === 'function') {
-                        addToCart(productId, size, color, quantity);
-                    }
+                    // Do NOT addToCart here — the item has already been paid for via the wallet.
+                    // Clear any queued abandoned cart reminder so we don't nag the buyer.
+                    if (typeof EmailService !== 'undefined') EmailService.clearCartReminder?.();
+
                     if (typeof showToast !== 'undefined') {
                         showToast('Payment successful! Order confirmed.', 'success');
                     }

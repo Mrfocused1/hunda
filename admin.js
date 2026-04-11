@@ -389,7 +389,7 @@ function loadDashboard() {
                 return `
             <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
                 <div class="flex items-center gap-3">
-                    <img src="${primaryImage}" alt="${product.title}" class="w-10 h-10 object-cover" onerror="this.src='product-1.png'">
+                    <img src="${primaryImage}" alt="${product.title}" class="w-10 h-10 object-cover" onerror="this.onerror=null;this.src='product-1.png'">
                     <div>
                         <p class="font-medium text-sm">${product.title}</p>
                         <p class="text-xs text-gray-500">${product.category}</p>
@@ -502,7 +502,7 @@ function renderProducts() {
             return `
             <div class="product-card">
                 <div class="product-card-image">
-                    <img src="${primaryImage}" alt="${product.title}" loading="lazy" onerror="this.src='product-1.png'">
+                    <img src="${primaryImage}" alt="${product.title}" loading="lazy" onerror="this.onerror=null;this.src='product-1.png'">
                     <span class="product-card-stock-badge ${stockStatus}">${stockLabel}</span>
                     ${imageCount > 1 ? `<span class="product-card-image-count" style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; padding: 2px 8px; font-size: 0.75rem; border-radius: 4px;">${imageCount} images</span>` : ''}
                     <div class="product-card-actions">

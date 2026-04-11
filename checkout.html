@@ -875,12 +875,19 @@
                     const reviewAddr = document.getElementById('review-address');
                     if (reviewAddr) {
                         const country = document.getElementById('checkout-country')?.value || 'United Kingdom';
-                        reviewAddr.innerHTML =
-                            `${s.firstName} ${s.lastName}<br>` +
-                            `${s.address1}<br>` +
-                            (s.address2 ? `${s.address2}<br>` : '') +
-                            `${s.city}, ${s.postcode}<br>` +
-                            country;
+                        // Use textContent-safe rendering via DOM nodes so user-entered shipping
+                        // fields can never execute HTML if they contain stray < or > characters.
+                        reviewAddr.innerHTML = '';
+                        const append = (text) => {
+                            if (!text) return;
+                            reviewAddr.appendChild(document.createTextNode(text));
+                            reviewAddr.appendChild(document.createElement('br'));
+                        };
+                        append(`${s.firstName || ''} ${s.lastName || ''}`.trim());
+                        append(s.address1);
+                        if (s.address2) append(s.address2);
+                        append(`${s.city || ''}, ${s.postcode || ''}`.replace(/^,\s*|,\s*$/g, ''));
+                        reviewAddr.appendChild(document.createTextNode(country));
                     }
 
                     // Update review payment method text
@@ -1181,7 +1188,7 @@
                     }).catch((err) => debugError('Order confirmation email failed:', err));
 
                     // Clear any pending cart reminder
-                    EmailService.clearCartReminder();
+                    EmailService.clearCartReminder?.();
                 }
 
                 // Clear cart and discount

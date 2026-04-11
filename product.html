@@ -589,7 +589,7 @@
                         return `
                 <div class="product-card">
                     <a href="/product?id=${p.id}" class="product-image-wrapper">
-                        <img src="${pImage}" alt="${p.title}" class="product-image" loading="lazy" onerror="this.src='product-1.png'">
+                        <img src="${pImage}" alt="${p.title}" class="product-image" loading="lazy" onerror="this.onerror=null;this.src='product-1.png'">
                     </a>
                     <a href="/product?id=${p.id}">
                         <div class="product-info">

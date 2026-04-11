@@ -999,9 +999,19 @@ async function initMediaNavLink() {
 }
 
 function initIntroPopup() {
-    // Skip on checkout/admin/coming-soon pages or if already dismissed/claimed
+    // Skip on auth/admin/transactional pages or if already dismissed/claimed
     const path = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
-    if (path === '/checkout' || path.startsWith('/admin') || path === '/coming-soon') return;
+    const excluded = new Set([
+        '/checkout',
+        '/cart',
+        '/login',
+        '/signup',
+        '/admin',
+        '/admin-login',
+        '/coming-soon',
+        '/account'
+    ]);
+    if (excluded.has(path) || path.startsWith('/admin')) return;
     if (localStorage.getItem('1hundred_intro_popup_seen') === '1') return;
 
     if (document.getElementById('intro-popup-overlay')) return;
@@ -1068,7 +1078,8 @@ function initIntroPopup() {
         if (typeof EmailService !== 'undefined') {
             EmailService.scheduleAbandonedCart(email, { firstName: 'there' });
             // Also send a welcome email with the discount code if enabled
-            EmailService.sendWelcomeEmail?.(email, { firstName: 'there', discountCode }).catch(() => {});
+            EmailService.sendWelcomeEmail?.(email, { firstName: 'there', discountCode })
+                .catch((err) => debugError('Welcome email failed:', err));
         }
 
         showToast(`Code ${discountCode} saved — it'll apply at checkout.`, 'success', 5000);
