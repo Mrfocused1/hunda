@@ -131,39 +131,70 @@ const EmailService = {
         }
     },
 
-    // Schedule abandoned cart email (with 1 hour delay)
+    // Abandoned cart sequence: 1h, 24h, 72h — each fired only once per abandonment.
+    // Industry best practice 2026 data: three touches outperform a single reminder
+    // without annoying the shopper (see attribuly 2026 benchmarks).
+    SEQUENCE_STAGES: [
+        { key: 'r1', delayMs: 60 * 60 * 1000 },        // 1 hour
+        { key: 'r2', delayMs: 24 * 60 * 60 * 1000 },   // 24 hours
+        { key: 'r3', delayMs: 72 * 60 * 60 * 1000 }    // 72 hours
+    ],
+
+    // Schedule abandoned cart reminder sequence starting now
     scheduleAbandonedCart(email, cartData) {
-        // Store cart data in localStorage with timestamp
-        const cartReminder = {
-            email,
-            cartData,
-            timestamp: Date.now()
-        };
+        const existing = (window.safeParse && window.safeParse(localStorage.getItem('1hundred_cartReminder'), null)) || null;
+        // If a reminder is already in flight for this email, keep the original timestamp
+        // so earlier stages still fire on their original schedule.
+        const timestamp = existing && existing.email === email ? existing.timestamp : Date.now();
+        const sent = existing && existing.email === email ? existing.sent || {} : {};
+        const cartReminder = { email, cartData, timestamp, sent };
         localStorage.setItem('1hundred_cartReminder', JSON.stringify(cartReminder));
     },
 
     // Check and send abandoned cart emails (call on page load)
     async checkAbandonedCarts() {
-        const reminder = localStorage.getItem('1hundred_cartReminder');
+        const reminder = (window.safeParse && window.safeParse(localStorage.getItem('1hundred_cartReminder'), null)) || null;
         if (!reminder) return;
 
-        const { email, cartData, timestamp } = JSON.parse(reminder);
-        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+        const { email, cartData, timestamp } = reminder;
+        const sent = reminder.sent || {};
+        const cart = (window.safeParse && window.safeParse(localStorage.getItem('1hundred_cart'), [])) || [];
 
-        // Check if 1 hour has passed and cart still has items
-        if (Date.now() - timestamp >= oneHour) {
-            const cart = (window.safeParse && window.safeParse(localStorage.getItem('1hundred_cart'), [])) || [];
-            if (cart.length > 0) {
-                // Calculate total
-                const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
-                await this.sendAbandonedCartEmail(email, {
-                    ...cartData,
-                    items: cart,
-                    total
-                });
+        // No email or empty cart → nothing to do; clean up so we don't keep spinning on this
+        if (!email || !cart.length) {
+            if (!cart.length) localStorage.removeItem('1hundred_cartReminder');
+            return;
+        }
+
+        // Cart data for the email payload
+        const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+        const payload = { ...cartData, items: cart, total };
+
+        let changed = false;
+        const elapsed = Date.now() - timestamp;
+
+        for (const stage of this.SEQUENCE_STAGES) {
+            if (sent[stage.key]) continue;
+            if (elapsed >= stage.delayMs) {
+                const result = await this.sendAbandonedCartEmail(email, { ...payload, stage: stage.key });
+                // Mark as sent regardless — if send failed due to rate limit or network,
+                // we don't want to keep retrying on every page load.
+                sent[stage.key] = Date.now();
+                changed = true;
+                if (!result || result.success === false) {
+                    debugError && debugError(`Abandoned cart ${stage.key} send failed:`, result && result.error);
+                }
             }
-            // Clear the reminder
-            localStorage.removeItem('1hundred_cartReminder');
+        }
+
+        if (changed) {
+            // If all stages have fired, clear the reminder entirely.
+            const allSent = this.SEQUENCE_STAGES.every((s) => sent[s.key]);
+            if (allSent) {
+                localStorage.removeItem('1hundred_cartReminder');
+            } else {
+                localStorage.setItem('1hundred_cartReminder', JSON.stringify({ ...reminder, sent }));
+            }
         }
     },
 

@@ -205,14 +205,40 @@ const MediaAPI = {
 };
 
 // Generic site settings API (JSONB key/value store)
+// Tolerates the table not existing yet — on the first PGRST205 (missing table) response we
+// cache that fact for the rest of the session so every subsequent page load can skip the
+// network call entirely. Self-heals on the next session once the SQL migration is run.
 const SettingsAPI = {
     _cache: new Map(),
 
+    _tableMissing() {
+        try {
+            return sessionStorage.getItem('_settings_table_missing') === '1';
+        } catch (e) {
+            return false;
+        }
+    },
+
+    _markTableMissing() {
+        try {
+            sessionStorage.setItem('_settings_table_missing', '1');
+        } catch (e) {
+            /* ignore */
+        }
+    },
+
     async get(key, fallback = null) {
+        if (this._tableMissing()) return fallback;
         const client = getSupabase();
         if (!client) return fallback;
         const { data, error } = await client.from('site_settings').select('value').eq('key', key).maybeSingle();
-        if (error || !data) return fallback;
+        if (error) {
+            if (error.code === 'PGRST205' || /Could not find the table/i.test(error.message || '')) {
+                this._markTableMissing();
+            }
+            return fallback;
+        }
+        if (!data) return fallback;
         this._cache.set(key, data.value);
         return data.value;
     },
@@ -225,7 +251,14 @@ const SettingsAPI = {
             .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
             .select()
             .single();
-        if (!error) this._cache.set(key, value);
+        if (!error) {
+            this._cache.set(key, value);
+            try {
+                sessionStorage.removeItem('_settings_table_missing');
+            } catch (e) {
+                /* ignore */
+            }
+        }
         return { data, error };
     }
 };

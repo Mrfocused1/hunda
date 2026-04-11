@@ -4,6 +4,8 @@
     "description": "1 HUNDRED - Premium Streetwear E-commerce",
     "scripts": {
         "dev": "npx serve . -p 3000",
+        "build": "tailwindcss -i ./tailwind.input.css -o ./tailwind.css --minify",
+        "build:watch": "tailwindcss -i ./tailwind.input.css -o ./tailwind.css --watch",
         "test": "npm run test:e2e && npm run test:email-admin",
         "test:e2e": "node scripts/comprehensive-e2e-test.js",
         "test:email-admin": "node scripts/email-admin-tests.js",
@@ -27,7 +29,8 @@
         "prettier": "^3.8.1",
         "puppeteer": "^24.40.0",
         "stylelint": "^17.5.0",
-        "stylelint-config-standard": "^40.0.0"
+        "stylelint-config-standard": "^40.0.0",
+        "tailwindcss": "^3.4.19"
     },
     "dependencies": {
         "@stripe/stripe-js": "^9.0.0",
