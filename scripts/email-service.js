@@ -27,7 +27,7 @@ const EmailService = {
      * @returns {boolean}
      */
     isEmailEnabled(emailType) {
-        const settings = JSON.parse(localStorage.getItem('1hundred_email_settings') || '{}');
+        const settings = (window.safeParse && window.safeParse(localStorage.getItem('1hundred_email_settings'), {})) || {};
         // Default to true if not set
         return settings[emailType] !== false;
     },
@@ -152,7 +152,7 @@ const EmailService = {
 
         // Check if 1 hour has passed and cart still has items
         if (Date.now() - timestamp >= oneHour) {
-            const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
+            const cart = (window.safeParse && window.safeParse(localStorage.getItem('1hundred_cart'), [])) || [];
             if (cart.length > 0) {
                 // Calculate total
                 const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);

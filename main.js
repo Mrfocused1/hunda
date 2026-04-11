@@ -12,6 +12,18 @@ window.debugError = function (...args) {
     if (DEBUG) console.error(...args);
 };
 
+// Safe JSON parser — never throws, always returns the fallback on corrupted/missing data.
+// Used wherever we read JSON out of localStorage so a single corrupted key can't crash the page.
+window.safeParse = function (raw, fallback) {
+    if (raw == null || raw === '') return fallback;
+    try {
+        const parsed = JSON.parse(raw);
+        return parsed == null ? fallback : parsed;
+    } catch (e) {
+        return fallback;
+    }
+};
+
 // Use shared utilities if available
 const U =
     typeof Utils !== 'undefined'
@@ -27,8 +39,7 @@ const U =
                       .replace(/'/g, '&#039;') || '',
               formatPrice: (price) => `£${parseFloat(price || 0).toFixed(2)}`,
               calculateShipping: (subtotal) => (subtotal >= 50 ? 0 : 4.99),
-              getStorageItem: (key, defaultVal) =>
-                  JSON.parse(localStorage.getItem(`1hundred_${key}`) || 'null') || defaultVal,
+              getStorageItem: (key, defaultVal) => window.safeParse(localStorage.getItem(`1hundred_${key}`), defaultVal),
               setStorageItem: (key, value) => localStorage.setItem(`1hundred_${key}`, JSON.stringify(value)),
               isValidEmail: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase())
           };
@@ -952,7 +963,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Media link in nav (toggled from admin)
     initMediaNavLink();
+
+    // Accessibility — set labels on shared shell elements that are duplicated across 23 HTML files
+    setGlobalAriaLabels();
 });
+
+function setGlobalAriaLabels() {
+    const pairs = [
+        ['#cart-drawer', { role: 'dialog', 'aria-label': 'Shopping bag', 'aria-modal': 'true' }],
+        ['#mobile-menu', { role: 'dialog', 'aria-label': 'Main menu', 'aria-modal': 'true' }],
+        ['#main-header', { role: 'banner' }],
+        ['#toast', { role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' }]
+    ];
+    for (const [sel, attrs] of pairs) {
+        const el = document.querySelector(sel);
+        if (!el) continue;
+        for (const [k, v] of Object.entries(attrs)) {
+            if (!el.hasAttribute(k)) el.setAttribute(k, v);
+        }
+    }
+}
 
 async function initMediaNavLink() {
     // Idempotent: remove any previously injected link before re-adding

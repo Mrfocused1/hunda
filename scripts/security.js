@@ -82,7 +82,13 @@ const Security = {
     // Rate limiting for form submissions
     checkRateLimit(key, maxAttempts = 5, windowMs = 60000) {
         const now = Date.now();
-        const attempts = JSON.parse(localStorage.getItem(`rate_limit_${key}`) || '[]');
+        let attempts;
+        try {
+            attempts = JSON.parse(localStorage.getItem(`rate_limit_${key}`) || '[]');
+            if (!Array.isArray(attempts)) attempts = [];
+        } catch (e) {
+            attempts = [];
+        }
 
         // Filter out old attempts
         const recentAttempts = attempts.filter((time) => now - time < windowMs);

@@ -1562,7 +1562,7 @@ function updateEmailStats() {
 }
 
 function updateEmailActivityStats() {
-    const activity = JSON.parse(localStorage.getItem('1hundred_email_activity') || '{}');
+    const activity = (window.safeParse ? window.safeParse(localStorage.getItem('1hundred_email_activity'), {}) : {});
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -1875,7 +1875,7 @@ function exportData() {
         orders: AdminData.getOrders(),
         customers: AdminData.getCustomers(),
         emailSettings: AdminData.getEmailSettings(),
-        content: JSON.parse(localStorage.getItem('1hundred_store_content') || '{}'),
+        content: (window.safeParse ? window.safeParse(localStorage.getItem('1hundred_store_content'), {}) : {}),
         exportedAt: new Date().toISOString()
     };
 

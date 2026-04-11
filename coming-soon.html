@@ -378,7 +378,7 @@
                 btn.disabled = true;
 
                 // Store locally (and could send to API)
-                const list = JSON.parse(localStorage.getItem('1hundred_notify_list') || '[]');
+                const list = (window.safeParse ? window.safeParse(localStorage.getItem('1hundred_notify_list'), []) : []);
                 if (!list.includes(email)) list.push(email);
                 localStorage.setItem('1hundred_notify_list', JSON.stringify(list));
 

@@ -670,7 +670,7 @@
                 }
 
                 const stripe = StripeService.stripe;
-                const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
+                const cart = window.safeParse(localStorage.getItem('1hundred_cart'), []);
                 const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
                 const shipping = subtotal >= 50 ? 0 : 4.99;
                 const total = subtotal + shipping;
@@ -758,7 +758,7 @@
 
                 localElement.on('confirm', async (event) => {
                     try {
-                        const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
+                        const cart = window.safeParse(localStorage.getItem('1hundred_cart'), []);
                         const sub = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
                         const ship = sub >= 50 ? 0 : 4.99;
                         const totalPounds = sub + ship;
@@ -1030,7 +1030,7 @@
                         }
 
                         // Create payment intent with cart items for server-side price validation
-                        const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
+                        const cart = window.safeParse(localStorage.getItem('1hundred_cart'), []);
                         const cartItemsForValidation = cart.map((item) => ({
                             id: item.id,
                             price: item.price,
@@ -1097,7 +1097,7 @@
             function showOrderSuccess(orderNumber, email, firstName, lastName, total) {
                 // Save order to localStorage (before cart is cleared)
                 try {
-                    const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
+                    const cart = window.safeParse(localStorage.getItem('1hundred_cart'), []);
                     const order = {
                         id: orderNumber,
                         date: new Date().toLocaleDateString('en-GB', {
@@ -1119,7 +1119,7 @@
                         email: email,
                         customer: `${firstName || ''} ${lastName || ''}`.trim()
                     };
-                    const existingOrders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
+                    const existingOrders = window.safeParse(localStorage.getItem('1hundred_orders'), []);
                     existingOrders.unshift(order);
                     localStorage.setItem('1hundred_orders', JSON.stringify(existingOrders));
                 } catch (e) {
@@ -1136,7 +1136,7 @@
 
                 // Send order confirmation email
                 if (email && typeof EmailService !== 'undefined') {
-                    const cart = JSON.parse(localStorage.getItem('1hundred_cart') || '[]');
+                    const cart = window.safeParse(localStorage.getItem('1hundred_cart'), []);
                     EmailService.sendOrderConfirmation(email, {
                         firstName: firstName || 'Customer',
                         lastName: lastName || '',
@@ -1248,7 +1248,7 @@
                             setIfEmpty('checkout-phone', user.phone);
                         }
                         // Load saved address
-                        const addresses = JSON.parse(localStorage.getItem('1hundred_addresses') || '[]');
+                        const addresses = window.safeParse(localStorage.getItem('1hundred_addresses'), []);
                         const defaultAddr = addresses.find((a) => a.isDefault) || addresses[0];
                         if (defaultAddr) {
                             const setIfEmpty = (id, val) => {
@@ -1321,7 +1321,7 @@
                             // Save address if checkbox is checked
                             const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn();
                             if (document.getElementById('save-address')?.checked && isLoggedIn) {
-                                const addresses = JSON.parse(localStorage.getItem('1hundred_addresses') || '[]');
+                                const addresses = window.safeParse(localStorage.getItem('1hundred_addresses'), []);
                                 const newAddress = {
                                     name: `${state.shipping.firstName} ${state.shipping.lastName}`,
                                     street: state.shipping.address1,

@@ -427,7 +427,7 @@
                 const noOrders = document.getElementById('no-orders');
 
                 // Get orders from localStorage or use empty array
-                const orders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
+                const orders = (window.safeParse ? window.safeParse(localStorage.getItem('1hundred_orders'), []) : []);
 
                 if (orders.length === 0) {
                     ordersList.classList.add('hidden');
@@ -477,7 +477,7 @@
                 const noAddresses = document.getElementById('no-addresses');
 
                 // Get addresses from localStorage or use empty array
-                const addresses = JSON.parse(localStorage.getItem('1hundred_addresses') || '[]');
+                const addresses = (window.safeParse ? window.safeParse(localStorage.getItem('1hundred_addresses'), []) : []);
 
                 if (addresses.length === 0) {
                     addressesList.classList.add('hidden');

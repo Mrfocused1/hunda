@@ -288,7 +288,7 @@ const StripeService = {
                         showToast('Payment successful! Order confirmed.', 'success');
                     }
 
-                    const orders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
+                    const orders = (window.safeParse && window.safeParse(localStorage.getItem('1hundred_orders'), [])) || [];
                     orders.unshift({
                         id: orderNumber,
                         date: new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }),
