@@ -146,7 +146,10 @@ const StripeService = {
         return paymentIntent;
     },
 
-    // Create Apple Pay / Google Pay payment request button
+    // Create Apple Pay / Google Pay button via Express Checkout Element.
+    // Link is explicitly disabled so wallets render as Apple/Google Pay on supported devices.
+    // Resolves with the mounted element once the `ready` event reports a usable wallet,
+    // or null if no wallet is available (caller hides the "More payment options" link in that case).
     async createPaymentRequestButton(containerId, { amount, label, productId, size, color, quantity }) {
         if (!this.stripe) {
             console.error('Stripe not initialized');
@@ -156,113 +159,149 @@ const StripeService = {
         const container = document.getElementById(containerId);
         if (!container) return null;
 
-        const paymentRequest = this.stripe.paymentRequest({
-            country: 'GB',
-            currency: 'gbp',
-            total: {
-                label: label || 'Total',
-                amount: Math.round(amount * 100) // Stripe uses pence
-            },
-            requestPayerName: true,
-            requestPayerEmail: true,
-            requestShipping: true,
-            shippingOptions: [
-                {
-                    id: 'standard',
-                    label: 'Standard Shipping',
-                    detail: '3-5 business days',
-                    amount: amount >= 50 ? 0 : 499
-                }
-            ]
-        });
-
-        // Check if Apple Pay / Google Pay is available
-        const result = await paymentRequest.canMakePayment();
-        if (!result) {
+        const itemPence = Math.round(amount * quantity * 100);
+        if (!itemPence || itemPence <= 0) {
             container.style.display = 'none';
             return null;
         }
 
-        const elements = this.stripe.elements();
-        const prButton = elements.create('paymentRequestButton', {
-            paymentRequest: paymentRequest,
-            style: {
-                paymentRequestButton: {
-                    type: 'buy',
-                    theme: 'dark',
-                    height: '56px'
-                }
+        const shippingPence = amount * quantity >= 50 ? 0 : 499;
+        const totalPence = itemPence + shippingPence;
+
+        const elements = this.stripe.elements({
+            mode: 'payment',
+            amount: totalPence,
+            currency: 'gbp',
+            paymentMethodTypes: ['card'],
+            appearance: { theme: 'stripe' }
+        });
+
+        const expressCheckoutElement = elements.create('expressCheckout', {
+            buttonType: { applePay: 'buy', googlePay: 'buy' },
+            buttonHeight: 48,
+            paymentMethods: {
+                applePay: 'always',
+                googlePay: 'always',
+                link: 'never',
+                paypal: 'never'
             }
         });
 
-        prButton.mount(`#${containerId}`);
+        return new Promise((resolve) => {
+            let settled = false;
+            const settle = (value) => {
+                if (settled) return;
+                settled = true;
+                resolve(value);
+            };
 
-        // Handle the payment
-        paymentRequest.on('paymentmethod', async (ev) => {
-            try {
-                // Create payment intent on server
-                const intentData = await this.createPaymentIntent(Math.round(amount * 100), {
-                    productId,
-                    size,
-                    color,
-                    quantity: String(quantity)
-                });
-
-                const clientSecret = intentData.clientSecret;
-
-                const { paymentIntent, error: confirmError } = await this.stripe.confirmCardPayment(
-                    clientSecret,
-                    { payment_method: ev.paymentMethod.id },
-                    { handleActions: false }
-                );
-
-                if (confirmError) {
-                    ev.complete('fail');
-                    if (typeof showToast !== 'undefined') showToast(confirmError.message, 'error');
+            expressCheckoutElement.on('ready', (event) => {
+                const methods = event.availablePaymentMethods || {};
+                if (!methods.applePay && !methods.googlePay) {
+                    container.style.display = 'none';
+                    settle(null);
                     return;
                 }
+                settle(expressCheckoutElement);
+            });
 
-                if (paymentIntent.status === 'requires_action') {
-                    const { error } = await this.stripe.confirmCardPayment(clientSecret);
-                    if (error) {
-                        ev.complete('fail');
-                        if (typeof showToast !== 'undefined') showToast(error.message, 'error');
+            expressCheckoutElement.on('loaderror', (event) => {
+                console.error('[Express Checkout] load error:', event);
+                container.style.display = 'none';
+                settle(null);
+            });
+
+            expressCheckoutElement.on('click', (event) => {
+                event.resolve({
+                    emailRequired: true,
+                    phoneNumberRequired: false,
+                    shippingAddressRequired: true,
+                    shippingRates: [
+                        {
+                            id: 'standard',
+                            displayName: shippingPence === 0 ? 'Free Standard Shipping' : 'Standard Shipping',
+                            amount: shippingPence,
+                            deliveryEstimate: {
+                                maximum: { unit: 'business_day', value: 5 },
+                                minimum: { unit: 'business_day', value: 3 }
+                            }
+                        }
+                    ],
+                    allowedShippingCountries: ['GB']
+                });
+            });
+
+            expressCheckoutElement.on('confirm', async (event) => {
+                try {
+                    const totalPounds = totalPence / 100;
+                    const email = event.billingDetails?.email || '';
+                    const fullName = event.billingDetails?.name || '';
+                    const orderNumber = `1H-${Date.now().toString(36).toUpperCase()}`;
+
+                    const intentData = await this.createPaymentIntent(
+                        totalPounds,
+                        {
+                            orderNumber,
+                            productId: String(productId),
+                            size: String(size || ''),
+                            color: String(color || ''),
+                            quantity: String(quantity),
+                            customerEmail: email,
+                            customerName: fullName
+                        },
+                        [{ id: productId, price: amount, quantity }]
+                    );
+
+                    const clientSecret = intentData.clientSecret;
+
+                    const { error: submitError } = await elements.submit();
+                    if (submitError) {
+                        console.error('[Express Checkout] submit error:', submitError);
+                        if (typeof showToast !== 'undefined') showToast(submitError.message, 'error');
                         return;
                     }
+
+                    const { error } = await this.stripe.confirmPayment({
+                        elements,
+                        clientSecret,
+                        confirmParams: {
+                            return_url: window.location.origin + '/checkout?success=true'
+                        },
+                        redirect: 'if_required'
+                    });
+
+                    if (error) {
+                        console.error('[Express Checkout] confirm error:', error);
+                        if (typeof showToast !== 'undefined') showToast(error.message || 'Payment failed. Please try again.', 'error');
+                        return;
+                    }
+
+                    if (typeof addToCart === 'function') {
+                        addToCart(productId, size, color, quantity);
+                    }
+                    if (typeof showToast !== 'undefined') {
+                        showToast('Payment successful! Order confirmed.', 'success');
+                    }
+
+                    const orders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
+                    orders.unshift({
+                        id: orderNumber,
+                        date: new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }),
+                        status: 'processing',
+                        items: [{ title: label, price: amount, quantity, size, color }],
+                        total: totalPounds,
+                        email,
+                        customer: fullName || 'Customer'
+                    });
+                    localStorage.setItem('1hundred_orders', JSON.stringify(orders));
+                } catch (err) {
+                    console.error('[Express Checkout] payment error:', err);
+                    if (typeof showToast !== 'undefined') showToast('Payment failed. Please try again.', 'error');
                 }
+            });
 
-                ev.complete('success');
-
-                // Add to cart and show success
-                if (typeof addToCart === 'function') {
-                    addToCart(productId, size, color, quantity);
-                }
-
-                if (typeof showToast !== 'undefined') {
-                    showToast('Payment successful! Order confirmed.', 'success');
-                }
-
-                // Save order
-                const orderNumber = `1H-${Date.now().toString(36).toUpperCase()}`;
-                const orders = JSON.parse(localStorage.getItem('1hundred_orders') || '[]');
-                orders.unshift({
-                    id: orderNumber,
-                    date: new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }),
-                    status: 'processing',
-                    items: [{ title: label, price: amount, quantity: quantity, size: size, color: color }],
-                    total: amount,
-                    email: ev.payerEmail,
-                    customer: ev.payerName || 'Customer'
-                });
-                localStorage.setItem('1hundred_orders', JSON.stringify(orders));
-            } catch (err) {
-                ev.complete('fail');
-                if (typeof showToast !== 'undefined') showToast('Payment failed. Please try again.', 'error');
-                console.error('Payment request error:', err);
-            }
+            expressCheckoutElement.mount(`#${containerId}`);
         });
-
-        return prButton;
     },
 
     // Unmount card element
