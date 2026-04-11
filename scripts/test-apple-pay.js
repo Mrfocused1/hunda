@@ -83,38 +83,21 @@ const puppeteer = require('puppeteer');
     }));
     console.log('STATE:', state);
 
-    // Jump to step 2 (payment) and select the Apple Pay radio
-    const result = await page.evaluate(async () => {
-        if (typeof goToStep === 'function') goToStep(2);
-        const radio = document.querySelector('input[name="payment"][value="apple"]');
-        if (!radio) return { error: 'apple radio not found' };
-        radio.checked = true;
-        radio.dispatchEvent(new Event('change', { bubbles: true }));
-
-        // Wait up to 10s for the express checkout element to fire `ready` or `loaderror`.
-        // We capture the event payload by re-attaching listeners.
-        return await new Promise((resolve) => {
-            let resolved = false;
-            const finish = (payload) => {
-                if (resolved) return;
-                resolved = true;
-                resolve(payload);
-            };
-            const tryAttach = () => {
-                if (window.expressCheckoutElement) {
-                    window.expressCheckoutElement.on('ready', (e) =>
-                        finish({ event: 'ready', availablePaymentMethods: e.availablePaymentMethods || null })
-                    );
-                    window.expressCheckoutElement.on('loaderror', (e) =>
-                        finish({ event: 'loaderror', error: e?.error?.message || JSON.stringify(e) })
-                    );
-                } else {
-                    setTimeout(tryAttach, 100);
-                }
-            };
-            tryAttach();
-            setTimeout(() => finish({ event: 'timeout' }), 10000);
-        });
+    // The step-2 Apple Pay radio has been removed — the Express Checkout element is now
+    // mounted at the top of step 1 on page load. Wait for it to log "ready" or "loaderror"
+    // via the console messages we capture above.
+    const result = await new Promise((resolve) => {
+        const start = Date.now();
+        const tick = () => {
+            const ready = consoleMessages.find((m) => /\[Wallets:express-checkout-top\] ready/i.test(m));
+            const available = consoleMessages.find((m) => /\[Wallets:express-checkout-top\] Available methods/i.test(m));
+            const loaderror = consoleMessages.find((m) => /\[Wallets:express-checkout-top\] load error/i.test(m));
+            if (available) return resolve({ event: 'ready', methods: available });
+            if (loaderror) return resolve({ event: 'loaderror', error: loaderror });
+            if (Date.now() - start > 15000) return resolve({ event: 'timeout' });
+            setTimeout(tick, 250);
+        };
+        tick();
     });
 
     // Give the page another moment so any late Stripe warnings land
