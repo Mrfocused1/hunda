@@ -167,14 +167,17 @@ function getEmailTemplate(type, rawData) {
         }))
     };
 
+    const emailHeader = `
+                    <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
+                        <img src="https://www.1hundredornothing.co.uk/logo.svg" alt="1 HUNDRED OR NOTHING" style="height: 40px; width: auto; filter: brightness(0) invert(1);" />
+                    </div>`;
+
     const templates = {
         'order-confirmation': {
             subject: `Order Confirmation #${data.orderNumber} - 1 HUNDRED OR NOTHING`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
-                    <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED OR NOTHING</h1>
-                    </div>
+                    ${emailHeader}
                     <div style="padding: 30px 20px;">
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Thank you for your order!</h2>
                         <p>Hi ${data.firstName},</p>
@@ -205,9 +208,7 @@ function getEmailTemplate(type, rawData) {
             subject: `Your Order #${data.orderNumber} Has Shipped! - 1 HUNDRED OR NOTHING`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
-                    <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED OR NOTHING</h1>
-                    </div>
+                    ${emailHeader}
                     <div style="padding: 30px 20px;">
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Your order is on the way!</h2>
                         <p>Hi ${data.firstName},</p>
@@ -234,9 +235,7 @@ function getEmailTemplate(type, rawData) {
             subject: 'Welcome to 1 HUNDRED OR NOTHING!',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
-                    <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED OR NOTHING</h1>
-                    </div>
+                    ${emailHeader}
                     <div style="padding: 30px 20px;">
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Welcome to the family!</h2>
                         <p>Hi ${data.firstName},</p>
@@ -269,9 +268,7 @@ function getEmailTemplate(type, rawData) {
             subject: 'You left something behind... - 1 HUNDRED OR NOTHING',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
-                    <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED OR NOTHING</h1>
-                    </div>
+                    ${emailHeader}
                     <div style="padding: 30px 20px;">
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Your cart is waiting...</h2>
                         <p>Hi ${data.firstName},</p>

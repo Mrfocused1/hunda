@@ -177,13 +177,13 @@ body {
 
 /* Logo */
 .logo-img {
-    height: 2rem;
+    height: 1.75rem;
     width: auto;
 }
 
 @media (width >= 768px) {
     .logo-img {
-        height: 2.5rem;
+        height: 2.25rem;
     }
 }
 
