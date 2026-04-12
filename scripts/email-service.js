@@ -78,9 +78,11 @@ const EmailService = {
             debugLog('Welcome emails disabled');
             return { success: false, error: 'Email type disabled' };
         }
-        return this.sendEmail('welcome', email, {
+        const payload = {
             firstName: userData.firstName || userData.name?.split(' ')[0] || 'Customer'
-        });
+        };
+        if (userData.discountCode) payload.discountCode = userData.discountCode;
+        return this.sendEmail('welcome', email, payload);
     },
 
     /**

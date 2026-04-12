@@ -351,6 +351,7 @@
         <script src="supabase.js"></script>
         <script src="scripts/security.js"></script>
         <script src="scripts/pricing.js"></script>
+        <script src="scripts/email-service.js"></script>
         <script src="main.js?v=3"></script>
         <script src="auth.js"></script>
         <script>
@@ -610,9 +611,16 @@
                 });
 
                 // Newsletter form
-                document.getElementById('newsletter-form')?.addEventListener('submit', function (e) {
+                document.getElementById('newsletter-form')?.addEventListener('submit', async function (e) {
                     e.preventDefault();
-                    showToast('Thanks for subscribing!', 'success');
+                    const input = this.querySelector('input[type="email"]');
+                    const email = (input?.value || '').trim();
+                    if (!email) return;
+                    if (typeof EmailService !== 'undefined') {
+                        EmailService.sendWelcomeEmail(email, { firstName: 'there', discountCode: 'WELCOME10' })
+                            .catch((err) => console.error('Welcome email failed:', err));
+                    }
+                    showToast('Thanks for subscribing! Check your inbox.', 'success');
                     this.reset();
                 });
             });

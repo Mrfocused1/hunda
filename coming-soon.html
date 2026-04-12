@@ -373,27 +373,42 @@
                 if (e.key === 'Enter') document.getElementById('login-pass').focus();
             });
 
-            document.getElementById('notify-form').addEventListener('submit', function (e) {
+            document.getElementById('notify-form').addEventListener('submit', async function (e) {
                 e.preventDefault();
-                const email = document.getElementById('notify-email').value;
+                const email = document.getElementById('notify-email').value.trim();
                 const msg = document.getElementById('notify-message');
                 const btn = this.querySelector('.signup-btn');
+
+                if (!email) return;
 
                 btn.textContent = '...';
                 btn.disabled = true;
 
-                // Store locally (and could send to API)
+                // Store locally
                 const list = (window.safeParse ? window.safeParse(localStorage.getItem('1hundred_notify_list'), []) : []);
                 if (!list.includes(email)) list.push(email);
                 localStorage.setItem('1hundred_notify_list', JSON.stringify(list));
 
-                setTimeout(() => {
-                    msg.textContent = "You're on the list. We'll be in touch.";
-                    msg.classList.add('success');
-                    btn.textContent = 'Notify Me';
-                    btn.disabled = false;
-                    this.reset();
-                }, 600);
+                // Send welcome email via API
+                try {
+                    await fetch('/api/send-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'welcome',
+                            to: email,
+                            data: { firstName: 'there' }
+                        })
+                    });
+                } catch (err) {
+                    console.error('Notify email failed:', err);
+                }
+
+                msg.textContent = "You're on the list. We'll be in touch.";
+                msg.classList.add('success');
+                btn.textContent = 'Notify Me';
+                btn.disabled = false;
+                this.reset();
             });
         </script>
     </body>
