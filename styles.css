@@ -2094,3 +2094,48 @@ body {
         padding: 3rem 3rem 2.5rem;
     }
 }
+
+/* ========================================
+   Hero Section - Mobile Fixes
+   ======================================== */
+
+/* Mobile: stack content above image, fix scroll indicator */
+@media (max-width: 767px) {
+    .hero-section {
+        display: flex;
+        flex-direction: column;
+        height: 100svh;
+    }
+
+    .hero-bg-wrapper {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
+        order: 2;
+    }
+
+    .hero-bg-image {
+        object-fit: contain;
+        object-position: bottom center;
+    }
+
+    .hero-content {
+        position: relative;
+        flex: 0 0 auto;
+        height: auto;
+        order: 1;
+        padding-top: 80px;
+        padding-bottom: 0;
+        align-items: flex-start;
+    }
+
+    .hero-scroll-indicator {
+        position: relative;
+        order: 3;
+        bottom: auto;
+        left: auto;
+        transform: none;
+        padding-bottom: 16px;
+        margin: 0 auto;
+    }
+}
