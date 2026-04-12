@@ -159,6 +159,7 @@ function getEmailTemplate(type, rawData) {
         total: escapeHtml(rawData.total || ''),
         trackingNumber: escapeHtml(rawData.trackingNumber || ''),
         carrier: escapeHtml(rawData.carrier || ''),
+        discountCode: escapeHtml(rawData.discountCode || ''),
         items: (rawData.items || []).map((item) => ({
             name: escapeHtml(item.name || ''),
             price: escapeHtml(item.price || ''),
@@ -240,6 +241,13 @@ function getEmailTemplate(type, rawData) {
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Welcome to the family!</h2>
                         <p>Hi ${data.firstName},</p>
                         <p>Welcome to 1 HUNDRED! We're excited to have you on board.</p>
+                        ${data.discountCode ? `
+                        <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0 0 8px; font-size: 14px;">Your exclusive discount code:</p>
+                            <p style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 2px;">${data.discountCode}</p>
+                            <p style="margin: 8px 0 0; font-size: 14px; color: #666;">Use at checkout for 10% off your first order</p>
+                        </div>
+                        ` : ''}
                         <p>Start exploring our latest collection and find your new favorite pieces.</p>
 
                         <div style="text-align: center; margin: 30px 0;">
@@ -254,7 +262,7 @@ function getEmailTemplate(type, rawData) {
                     </div>
                 </div>
             `,
-            text: `Welcome to 1 HUNDRED!\n\nHi ${data.firstName},\n\nWelcome to the family! We're excited to have you on board.\n\nStart exploring our latest collection:\nhttps://www.1hundredornothing.co.uk/shop\n\n1 HUNDRED | No half measures.`
+            text: `Welcome to 1 HUNDRED!\n\nHi ${data.firstName},\n\nWelcome to the family! We're excited to have you on board.\n\n${data.discountCode ? `Your discount code: ${data.discountCode}\nUse at checkout for 10% off your first order.\n\n` : ''}Start exploring our latest collection:\nhttps://www.1hundredornothing.co.uk/shop\n\n1 HUNDRED | No half measures.`
         },
 
         'abandoned-cart': {
