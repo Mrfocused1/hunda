@@ -71,10 +71,10 @@ Located in Admin → Emails tab:
 
 ```
 RESEND_API_KEY=re_CQnA7NRL_24FVD4P2FGaYhCMa2XC3WVxV
-FROM_EMAIL=hundredornothing@outlook.com
+FROM_EMAIL=contact@1hundredornothing.co.uk
 ```
 
-**Note:** Using `hundredornothing@outlook.com` as the verified sender. This email must be verified in your Resend dashboard.
+**Note:** Using `contact@1hundredornothing.co.uk` as the verified sender. This email must be verified in your Resend dashboard.
 
 ## How It Works
 
@@ -136,8 +136,8 @@ Use the admin panel to send test emails:
 
 ### Sender Email Verification
 
-The FROM email (`hundredornothing@outlook.com`) must be verified in Resend:
+The FROM email (`contact@1hundredornothing.co.uk`) must be verified in Resend:
 1. Go to Resend Dashboard → Domains
-2. Add `hundredornothing@outlook.com` as a sender
+2. Add `contact@1hundredornothing.co.uk` as a sender
 3. Verify via the confirmation email
 4. Emails will fail to send until verification is complete

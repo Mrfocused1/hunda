@@ -120,8 +120,8 @@ Sent from 1hundredornothing.co.uk/contact
                 Authorization: `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                from: process.env.FROM_EMAIL || 'hundredornothing@outlook.com',
-                to: ['hundredornothing@outlook.com'],
+                from: process.env.FROM_EMAIL || 'contact@1hundredornothing.co.uk',
+                to: ['contact@1hundredornothing.co.uk'],
                 reply_to: email,
                 subject: emailSubject,
                 html: emailHtml,
