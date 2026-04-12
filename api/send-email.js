@@ -169,11 +169,11 @@ function getEmailTemplate(type, rawData) {
 
     const templates = {
         'order-confirmation': {
-            subject: `Order Confirmation #${data.orderNumber} - 1 HUNDRED`,
+            subject: `Order Confirmation #${data.orderNumber} - 1 HUNDRED OR NOTHING`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
                     <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED</h1>
+                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED OR NOTHING</h1>
                     </div>
                     <div style="padding: 30px 20px;">
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Thank you for your order!</h2>
@@ -193,20 +193,20 @@ function getEmailTemplate(type, rawData) {
                         <p>Thanks for shopping with us!</p>
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
-                        <p>1 HUNDRED | No half measures.</p>
+                        <p>1 HUNDRED OR NOTHING | No half measures.</p>
                         <p>Questions? Contact us at contact@1hundredornothing.co.uk</p>
                     </div>
                 </div>
             `,
-            text: `Thank you for your order!\n\nHi ${data.firstName},\n\nWe've received your order and are preparing it for shipment.\n\nOrder #${data.orderNumber}\nTotal: £${data.total}\n\nWe'll send you another email when your order ships.\n\nThanks for shopping with us!\n\n1 HUNDRED | No half measures.`
+            text: `Thank you for your order!\n\nHi ${data.firstName},\n\nWe've received your order and are preparing it for shipment.\n\nOrder #${data.orderNumber}\nTotal: £${data.total}\n\nWe'll send you another email when your order ships.\n\nThanks for shopping with us!\n\n1 HUNDRED OR NOTHING | No half measures.`
         },
 
         shipping: {
-            subject: `Your Order #${data.orderNumber} Has Shipped! - 1 HUNDRED`,
+            subject: `Your Order #${data.orderNumber} Has Shipped! - 1 HUNDRED OR NOTHING`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
                     <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED</h1>
+                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED OR NOTHING</h1>
                     </div>
                     <div style="padding: 30px 20px;">
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Your order is on the way!</h2>
@@ -222,25 +222,25 @@ function getEmailTemplate(type, rawData) {
                         <p>Thanks for your patience!</p>
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
-                        <p>1 HUNDRED | No half measures.</p>
+                        <p>1 HUNDRED OR NOTHING | No half measures.</p>
                         <p>Questions? Contact us at contact@1hundredornothing.co.uk</p>
                     </div>
                 </div>
             `,
-            text: `Your order is on the way!\n\nHi ${data.firstName},\n\nGreat news! Your order has been shipped and is on its way to you.\n\nOrder #${data.orderNumber}\n${data.trackingNumber ? `Tracking: ${data.trackingNumber}\n` : ''}${data.carrier ? `Carrier: ${data.carrier}\n` : ''}\n\nThanks for your patience!\n\n1 HUNDRED | No half measures.`
+            text: `Your order is on the way!\n\nHi ${data.firstName},\n\nGreat news! Your order has been shipped and is on its way to you.\n\nOrder #${data.orderNumber}\n${data.trackingNumber ? `Tracking: ${data.trackingNumber}\n` : ''}${data.carrier ? `Carrier: ${data.carrier}\n` : ''}\n\nThanks for your patience!\n\n1 HUNDRED OR NOTHING | No half measures.`
         },
 
         welcome: {
-            subject: 'Welcome to 1 HUNDRED!',
+            subject: 'Welcome to 1 HUNDRED OR NOTHING!',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
                     <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED</h1>
+                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED OR NOTHING</h1>
                     </div>
                     <div style="padding: 30px 20px;">
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Welcome to the family!</h2>
                         <p>Hi ${data.firstName},</p>
-                        <p>Welcome to 1 HUNDRED! We're excited to have you on board.</p>
+                        <p>Welcome to 1 HUNDRED OR NOTHING! We're excited to have you on board.</p>
                         ${data.discountCode ? `
                         <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; text-align: center;">
                             <p style="margin: 0 0 8px; font-size: 14px;">Your exclusive discount code:</p>
@@ -257,20 +257,20 @@ function getEmailTemplate(type, rawData) {
                         <p>Follow us on social media for exclusive drops and behind-the-scenes content.</p>
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
-                        <p>1 HUNDRED | No half measures.</p>
+                        <p>1 HUNDRED OR NOTHING | No half measures.</p>
                         <p>Questions? Contact us at contact@1hundredornothing.co.uk</p>
                     </div>
                 </div>
             `,
-            text: `Welcome to 1 HUNDRED!\n\nHi ${data.firstName},\n\nWelcome to the family! We're excited to have you on board.\n\n${data.discountCode ? `Your discount code: ${data.discountCode}\nUse at checkout for 10% off your first order.\n\n` : ''}Start exploring our latest collection:\nhttps://www.1hundredornothing.co.uk/shop\n\n1 HUNDRED | No half measures.`
+            text: `Welcome to 1 HUNDRED OR NOTHING!\n\nHi ${data.firstName},\n\nWelcome to the family! We're excited to have you on board.\n\n${data.discountCode ? `Your discount code: ${data.discountCode}\nUse at checkout for 10% off your first order.\n\n` : ''}Start exploring our latest collection:\nhttps://www.1hundredornothing.co.uk/shop\n\n1 HUNDRED OR NOTHING | No half measures.`
         },
 
         'abandoned-cart': {
-            subject: 'You left something behind... - 1 HUNDRED',
+            subject: 'You left something behind... - 1 HUNDRED OR NOTHING',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
                     <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED</h1>
+                        <h1 style="margin: 0; font-size: 24px; text-transform: uppercase;">1 HUNDRED OR NOTHING</h1>
                     </div>
                     <div style="padding: 30px 20px;">
                         <h2 style="font-size: 20px; margin-bottom: 20px;">Your cart is waiting...</h2>
@@ -290,12 +290,12 @@ function getEmailTemplate(type, rawData) {
                         </div>
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
-                        <p>1 HUNDRED | No half measures.</p>
+                        <p>1 HUNDRED OR NOTHING | No half measures.</p>
                         <p>Questions? Contact us at contact@1hundredornothing.co.uk</p>
                     </div>
                 </div>
             `,
-            text: `You left something behind...\n\nHi ${data.firstName},\n\nLooks like you left some items in your cart. Complete your order now!\n\nTotal: £${data.total}\n\nComplete your order:\nhttps://www.1hundredornothing.co.uk/cart\n\n1 HUNDRED | No half measures.`
+            text: `You left something behind...\n\nHi ${data.firstName},\n\nLooks like you left some items in your cart. Complete your order now!\n\nTotal: £${data.total}\n\nComplete your order:\nhttps://www.1hundredornothing.co.uk/cart\n\n1 HUNDRED OR NOTHING | No half measures.`
         }
     };
 
