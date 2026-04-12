@@ -89,12 +89,22 @@ const Auth = (function () {
         }
     }
 
-    // Get current user
+    const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+    // Get current user — auto-expires sessions older than 24h
     function getCurrentUser() {
         const stored = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(STORAGE_KEY);
         if (!stored) return null;
         try {
-            return JSON.parse(stored);
+            const user = JSON.parse(stored);
+            if (user && user.loggedInAt) {
+                const age = Date.now() - new Date(user.loggedInAt).getTime();
+                if (age > SESSION_MAX_AGE_MS) {
+                    clearCurrentUser();
+                    return null;
+                }
+            }
+            return user;
         } catch (e) {
             sessionStorage.removeItem(SESSION_KEY);
             localStorage.removeItem(STORAGE_KEY);

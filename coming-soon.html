@@ -357,7 +357,7 @@
                     .map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
 
                 if (hash === '04ca8f19b67336de9868902347f24707e43d3e1f6acc24c14d94532a69bfe5e1') {
-                    sessionStorage.setItem('1hundred_gate_auth', 'granted');
+                    sessionStorage.setItem('1hundred_gate_auth', JSON.stringify({ t: Date.now() }));
                     window.location.href = '/';
                 } else {
                     err.textContent = 'Invalid credentials. Please try again.';
