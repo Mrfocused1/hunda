@@ -811,9 +811,23 @@ async function saveProduct(event) {
     // Set appropriate sizes based on category
     const sizes = category === 'hats' ? ['One Size'] : ['S', 'M', 'L', 'XL'];
 
+    const rawPrice = parseFloat(document.getElementById('product-price').value);
+    if (isNaN(rawPrice) || rawPrice < 0) {
+        showToast('Please enter a valid price (0 or more)', 'error');
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = originalText; }
+        return;
+    }
+
+    const rawTitle = (document.getElementById('product-title').value || '').trim();
+    if (!rawTitle) {
+        showToast('Product title is required', 'error');
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = originalText; }
+        return;
+    }
+
     const baseProductData = {
-        title: document.getElementById('product-title').value,
-        price: parseFloat(document.getElementById('product-price').value),
+        title: rawTitle,
+        price: rawPrice,
         category: category,
         stock: parseInt(document.getElementById('product-stock').value) || 0,
         description: document.getElementById('product-description').value,

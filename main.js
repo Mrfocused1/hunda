@@ -210,6 +210,11 @@ function initHeader() {
             mobileMenu.classList.toggle('active', state.isMenuOpen);
             if (menuOverlay) menuOverlay.classList.toggle('active', state.isMenuOpen);
             document.body.style.overflow = state.isMenuOpen ? 'hidden' : '';
+            if (state.isMenuOpen) {
+                _releaseMobileMenuTrap = trapFocus(mobileMenu);
+            } else {
+                if (_releaseMobileMenuTrap) { _releaseMobileMenuTrap(); _releaseMobileMenuTrap = null; }
+            }
         });
     }
 
@@ -263,6 +268,38 @@ function initHeader() {
     updateBadges();
 }
 
+// Lightweight focus trap — keeps Tab cycling inside `container` while it's open.
+// Call the returned function to release the trap.
+function trapFocus(container) {
+    if (!container) return () => {};
+    const focusable = 'a[href], button:not([disabled]), input:not([disabled]), textarea, select, [tabindex]:not([tabindex="-1"])';
+    const firstFocusable = () => container.querySelectorAll(focusable)[0];
+    const lastFocusable = () => {
+        const nodes = container.querySelectorAll(focusable);
+        return nodes[nodes.length - 1];
+    };
+    const handler = (e) => {
+        if (e.key !== 'Tab') return;
+        const first = firstFocusable();
+        const last = lastFocusable();
+        if (!first || !last) return;
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    };
+    container.addEventListener('keydown', handler);
+    const f = firstFocusable();
+    if (f) f.focus();
+    return () => container.removeEventListener('keydown', handler);
+}
+
+let _releaseMobileMenuTrap = null;
+let _releaseCartTrap = null;
+
 function closeMobileMenu() {
     const menuToggle = document.getElementById('menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -273,6 +310,8 @@ function closeMobileMenu() {
     if (mobileMenu) mobileMenu.classList.remove('active');
     if (menuOverlay) menuOverlay.classList.remove('active');
     document.body.style.overflow = '';
+    if (_releaseMobileMenuTrap) { _releaseMobileMenuTrap(); _releaseMobileMenuTrap = null; }
+    document.getElementById('menu-toggle')?.focus();
 }
 
 function toggleCart(open) {
@@ -288,7 +327,12 @@ function toggleCart(open) {
     }
     document.body.style.overflow = open ? 'hidden' : '';
 
-    if (open) renderMiniCart();
+    if (open) {
+        renderMiniCart();
+        _releaseCartTrap = trapFocus(cartDrawer);
+    } else {
+        if (_releaseCartTrap) { _releaseCartTrap(); _releaseCartTrap = null; }
+    }
 }
 
 // ========================================
