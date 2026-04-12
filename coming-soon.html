@@ -346,12 +346,17 @@
                 }
             });
 
-            document.getElementById('login-submit').addEventListener('click', function () {
-                var user = document.getElementById('login-user').value;
+            document.getElementById('login-submit').addEventListener('click', async function () {
+                var user = document.getElementById('login-user').value.trim();
                 var pass = document.getElementById('login-pass').value;
                 var err = document.getElementById('login-error');
 
-                if (user === 'Grimsta' && pass === 'Password') {
+                // Hash credentials so they aren't readable in source
+                var enc = new TextEncoder();
+                var hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(user + ':' + pass))))
+                    .map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+
+                if (hash === '04ca8f19b67336de9868902347f24707e43d3e1f6acc24c14d94532a69bfe5e1') {
                     sessionStorage.setItem('1hundred_gate_auth', 'granted');
                     window.location.href = '/';
                 } else {

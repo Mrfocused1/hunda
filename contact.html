@@ -520,21 +520,16 @@
                 } catch (error) {
                     console.error('Error:', error);
 
-                    // Show error toast
                     const toast = document.getElementById('toast');
                     const toastMsg = document.getElementById('toast-msg');
                     if (toast && toastMsg) {
-                        toastMsg.textContent = 'Failed to send. Please try email instead.';
+                        toastMsg.innerHTML = 'Failed to send. Please email <a href="mailto:contact@1hundredornothing.co.uk" style="color:inherit;text-decoration:underline;">contact@1hundredornothing.co.uk</a> directly.';
                         toast.classList.add('show');
-                        setTimeout(() => toast.classList.remove('show'), 5000);
+                        setTimeout(() => toast.classList.remove('show'), 7000);
                     }
-
-                    btn.textContent = originalText;
                 } finally {
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }, 3000);
+                    btn.textContent = originalText;
+                    btn.disabled = false;
                 }
             });
         </script>
