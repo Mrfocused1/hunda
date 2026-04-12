@@ -316,6 +316,7 @@ function showSection(section) {
     if (section === 'orders') loadOrders();
     if (section === 'customers') loadCustomers();
     if (section === 'emails') initEmailToggles();
+    if (section === 'content') initComingSoonToggle();
     if (section === 'media') {
         MediaAdmin.load();
         MediaAdmin.initNavToggle();
@@ -2096,6 +2097,29 @@ const MediaAdmin = {
         el.classList.toggle('active', value === true);
     }
 };
+
+async function initComingSoonToggle() {
+    const el = document.getElementById('coming-soon-toggle');
+    if (!el || typeof SettingsAPI === 'undefined') return;
+    const value = await SettingsAPI.get('coming_soon_enabled', true);
+    el.classList.toggle('active', value === true);
+}
+
+async function toggleComingSoon(el) {
+    if (typeof SettingsAPI === 'undefined') {
+        showToast('Settings API not available', 'error');
+        return;
+    }
+    const newValue = !el.classList.contains('active');
+    el.classList.toggle('active', newValue);
+    const { error } = await SettingsAPI.set('coming_soon_enabled', newValue);
+    if (error) {
+        showToast(`Failed to save: ${error.message}`, 'error');
+        el.classList.toggle('active', !newValue);
+        return;
+    }
+    showToast(newValue ? 'Coming Soon page is ON — visitors are redirected' : 'Site is now open to everyone', 'success');
+}
 
 async function toggleMediaNavVisibility(el) {
     if (typeof SettingsAPI === 'undefined') {

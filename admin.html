@@ -2128,6 +2128,17 @@
 
                     <!-- Content/Store Settings Section -->
                     <section id="content" class="admin-section">
+                        <!-- Coming Soon Gate Toggle -->
+                        <div style="background: white; border: 1px solid #e5e7eb; margin-bottom: 1.5rem; padding: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                <div>
+                                    <h3 style="font-size: 1rem; font-weight: 600; color: #111; margin-bottom: 0.25rem;">Coming Soon page</h3>
+                                    <p style="font-size: 0.8rem; color: #6b7280;">When on, visitors are redirected to the Coming Soon page. Staff can still access the site via the staff login. Turn off to open the site to everyone.</p>
+                                </div>
+                                <div id="coming-soon-toggle" class="toggle-switch active" onclick="toggleComingSoon(this)"></div>
+                            </div>
+                        </div>
+
                         <!-- Settings Navigation -->
                         <div
                             class="settings-nav"
