@@ -80,7 +80,7 @@ export default async function handler(req, res) {
     }
 
     const apiKey = process.env.RESEND_API_KEY;
-    const fromEmail = process.env.FROM_EMAIL || 'hundredornothing@outlook.com';
+    const fromEmail = process.env.FROM_EMAIL || 'contact@hundredornothing.co.uk';
 
     if (!apiKey) {
         const { response, statusCode } = createResponse(false, null, 'Server configuration error', 500);
@@ -193,7 +193,7 @@ function getEmailTemplate(type, rawData) {
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
                         <p>1 HUNDRED | No half measures.</p>
-                        <p>Questions? Contact us at hundredornothing@outlook.com</p>
+                        <p>Questions? Contact us at contact@hundredornothing.co.uk</p>
                     </div>
                 </div>
             `,
@@ -222,7 +222,7 @@ function getEmailTemplate(type, rawData) {
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
                         <p>1 HUNDRED | No half measures.</p>
-                        <p>Questions? Contact us at hundredornothing@outlook.com</p>
+                        <p>Questions? Contact us at contact@hundredornothing.co.uk</p>
                     </div>
                 </div>
             `,
@@ -250,7 +250,7 @@ function getEmailTemplate(type, rawData) {
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
                         <p>1 HUNDRED | No half measures.</p>
-                        <p>Questions? Contact us at hundredornothing@outlook.com</p>
+                        <p>Questions? Contact us at contact@hundredornothing.co.uk</p>
                     </div>
                 </div>
             `,
@@ -283,7 +283,7 @@ function getEmailTemplate(type, rawData) {
                     </div>
                     <div style="background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
                         <p>1 HUNDRED | No half measures.</p>
-                        <p>Questions? Contact us at hundredornothing@outlook.com</p>
+                        <p>Questions? Contact us at contact@hundredornothing.co.uk</p>
                     </div>
                 </div>
             `,
