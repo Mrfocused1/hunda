@@ -77,8 +77,24 @@ function fail(name, reason) {
         const titles = await page.evaluate(() =>
             Array.from(document.querySelectorAll('.product-title')).map((e) => e.textContent.trim())
         );
-        if (titles.length >= 4) ok(`Shop renders ${titles.length} products: ${titles.join(', ')}`);
-        else fail('Shop products', `Only ${titles.length} products found`);
+        // Retry up to 3 times — Supabase free tier can cold-start slowly
+        let finalTitles = titles;
+        if (titles.length < 4) {
+            for (let retry = 0; retry < 2; retry++) {
+                await new Promise((r) => setTimeout(r, 3000));
+                finalTitles = await page.evaluate(() =>
+                    Array.from(document.querySelectorAll('.product-title')).map((e) => e.textContent.trim())
+                );
+                if (finalTitles.length >= 4) break;
+                await page.reload({ waitUntil: 'networkidle2', timeout: 45000 });
+                finalTitles = await page.evaluate(() =>
+                    Array.from(document.querySelectorAll('.product-title')).map((e) => e.textContent.trim())
+                );
+                if (finalTitles.length >= 4) break;
+            }
+        }
+        if (finalTitles.length >= 4) ok(`Shop renders ${finalTitles.length} products: ${finalTitles.join(', ')}`);
+        else fail('Shop products', `Only ${finalTitles.length} products found`);
         await page.close();
     }
 
