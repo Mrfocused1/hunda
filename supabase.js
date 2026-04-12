@@ -9,9 +9,9 @@
 if (typeof window.debugLog !== 'function') window.debugLog = function () {};
 if (typeof window.debugError !== 'function') window.debugError = function () {};
 
-const SUPABASE_URL = 'https://wsgbnfoazvdkxpdqwgyo.supabase.co';
+const SUPABASE_URL = 'https://keaxchpeotydepqwjooh.supabase.co';
 const SUPABASE_ANON_KEY =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzZ2JuZm9henZka3hwZHF3Z3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NDY4MTMsImV4cCI6MjA5MDEyMjgxM30.YUl4-O9q39Wn5xqUjp8S1F8VmTQH76PTIcQGpnrHXNE';
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlYXhjaHBlb3R5ZGVwcXdqb29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5NTQwNDEsImV4cCI6MjA5MTUzMDA0MX0.Uu-s2iUhzXTE3LeSfyA0XSVbQaFHY124AGrrN79BFRg';
 
 let supabaseClient = null;
 
