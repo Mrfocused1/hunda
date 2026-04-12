@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 const ADMIN_EMAILS = new Set([
     'admin@1hundredornothing.co.uk',
     'hundredornothing@outlook.com',
-    'contact@hundredornothing.co.uk'
+    'contact@1hundredornothing.co.uk'
 ]);
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://keaxchpeotydepqwjooh.supabase.co';

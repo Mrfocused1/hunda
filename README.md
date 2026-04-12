@@ -214,7 +214,7 @@ Private - All rights reserved © 2026 1 HUNDRED
 
 ## 🤝 Support
 
-For support, email hundredornothing@outlook.com or open an issue.
+For support, email contact@1hundredornothing.co.uk or open an issue.
 
 ---
 
