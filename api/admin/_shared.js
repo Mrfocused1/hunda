@@ -10,7 +10,7 @@ const ADMIN_EMAILS = new Set([
     'contact@1hundredornothing.co.uk'
 ]);
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://wsgbnfoazvdkxpdqwgyo.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://keaxchpeotydepqwjooh.supabase.co';
 
 // Lazy clients — one for auth verification (uses anon key), one for admin writes (service role).
 let authClient = null;
