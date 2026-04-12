@@ -1095,7 +1095,7 @@ function initIntroPopup() {
             <div class="intro-popup-modal">
                 <button type="button" class="intro-popup-close" aria-label="Close">&times;</button>
                 <div class="intro-popup-content">
-                    <p class="intro-popup-eyebrow">Welcome to 1 Hundred or Nothing</p>
+                    <p class="intro-popup-eyebrow">Welcome to 1Hundred or Nothing</p>
                     <h2 id="intro-popup-title" class="intro-popup-title">GET <span>10% OFF</span><br/>YOUR FIRST ORDER</h2>
                     <p class="intro-popup-sub">Drop your email and we'll send a code plus early access to new drops.</p>
                     <form id="intro-popup-form" class="intro-popup-form" novalidate>
