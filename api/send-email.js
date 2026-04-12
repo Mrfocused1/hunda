@@ -169,7 +169,7 @@ function getEmailTemplate(type, rawData) {
 
     const emailHeader = `
                     <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
-                        <img src="https://www.1hundredornothing.co.uk/logo.svg" alt="1 HUNDRED OR NOTHING" style="height: 40px; width: auto; filter: brightness(0) invert(1);" />
+                        <img src="https://www.1hundredornothing.co.uk/logo-white.svg" alt="1 HUNDRED OR NOTHING" style="height: 40px; width: auto;" />
                     </div>`;
 
     const templates = {

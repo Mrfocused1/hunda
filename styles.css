@@ -1706,7 +1706,6 @@ body {
 
 .page-loader img {
     height: 6rem;
-    filter: brightness(0) invert(1);
 }
 
 /* ========================================
